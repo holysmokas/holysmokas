@@ -1,0 +1,56 @@
+<!-- src/frontend/pages/dashboard.html - UPDATED -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - HolySmokas</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/portal.css">
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">🔥 HolySmokas</div>
+            <button onclick="handleLogout()" class="btn btn-outline">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-header-custom">
+            <h1>Your Projects</h1>
+        </div>
+
+        <div id="projectsContainer" class="projects-grid">
+            <div class="loading-state">Loading your projects...</div>
+        </div>
+    </div>
+
+    <div id="modificationModal" class="modal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModificationModal()">&times;</button>
+            <h2>Request Modifications</h2>
+            <form id="modificationForm" onsubmit="submitModification(event)">
+                <textarea id="modificationRequest"
+                    placeholder="Describe the changes you want (e.g., 'Change the header color to blue', 'Add a testimonials section', 'Update the contact form to include phone number')"
+                    required></textarea>
+                <button type="submit" class="btn btn-primary btn-full-width">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="responseModal" class="modal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeResponseModal()">&times;</button>
+            <div id="responseContent"></div>
+        </div>
+    </div>
+
+    <script type="module" src="/src/backend/authLogic.js"></script>
+    <script type="module" src="/src/backend/dashboardLogic.js"></script>
+</body>
+
+</html>
