@@ -93,30 +93,82 @@ window.checkDomain = async function () {
 
         if (data.available === true) {
             const cleanedDomain = data.cleanedDomain || cleanDomainName(domain);
+
+            // Get pricing information (default values if not provided by backend)
+            const initialCost = data.pricing?.initialCost || data.price || 12.99;
+            const renewalCost = data.pricing?.renewalCost || data.renewalPrice || 12.99;
+
             domainResult.innerHTML = `
-                ✅ ${cleanedDomain} is available! 
-                <button type="button" class="btn btn-secondary" onclick="addDomainToForm('${cleanedDomain}')" style="margin-left: 10px; padding: 0.5rem 1rem; font-size: 0.875rem;">
-                    Add to Form
-                </button>
+                <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                        <span style="font-size: 1.5rem;">✅</span>
+                        <strong style="color: #065f46; font-size: 1.1rem;">${cleanedDomain} is available!</strong>
+                    </div>
+                    
+                    <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                            <span style="color: #6b7280;">Initial Registration:</span>
+                            <strong style="color: #059669; font-size: 1.1rem;">$${initialCost.toFixed(2)}</strong>
+                        </div>
+                        <div style="display: flex; justify-content: space-between;">
+                            <span style="color: #6b7280;">Annual Renewal:</span>
+                            <strong style="color: #059669; font-size: 1.1rem;">$${renewalCost.toFixed(2)}/year</strong>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        type="button" 
+                        class="btn btn-primary" 
+                        onclick="addDomainToForm('${cleanedDomain}', ${initialCost}, ${renewalCost})" 
+                        style="width: 100%; margin-top: 0.5rem;">
+                        Add to Form
+                    </button>
+                    
+                    <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem; margin-bottom: 0;">
+                        💡 Domain will be registered after you complete your website order
+                    </p>
+                </div>
             `;
             domainResult.style.color = "#10b981";
-            window.selectedDomain = cleanedDomain; // Save globally for form submission
+            window.selectedDomain = cleanedDomain;
+            window.domainPricing = { initialCost, renewalCost };
         } else {
             const checkedDomain = data.domain || domain;
-            domainResult.innerHTML = `❌ ${checkedDomain} is already taken.`;
+            domainResult.innerHTML = `
+                <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.5rem;">❌</span>
+                        <strong style="color: #991b1b;">${checkedDomain} is already taken</strong>
+                    </div>
+                    <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem; margin-bottom: 0;">
+                        Try a different domain name or extension (.net, .org, .co)
+                    </p>
+                </div>
+            `;
             domainResult.style.color = "#ef4444";
             window.selectedDomain = null;
+            window.domainPricing = null;
         }
 
     } catch (error) {
         console.error("Domain check error:", error);
-        domainResult.innerHTML = "❌ Error checking domain. Please try again.";
+        domainResult.innerHTML = `
+            <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">⚠️</span>
+                    <strong style="color: #991b1b;">Error checking domain</strong>
+                </div>
+                <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem; margin-bottom: 0;">
+                    Please try again or contact support
+                </p>
+            </div>
+        `;
         domainResult.style.color = "#ef4444";
     }
 };
 
 // ✅ Function to add domain to the "Current Website URL" input field
-window.addDomainToForm = function (domain) {
+window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
     // Add domain to the Current Website URL field
     const currentUrlInput = document.getElementById("currentUrl");
     if (currentUrlInput) {
@@ -129,11 +181,41 @@ window.addDomainToForm = function (domain) {
     }
 
     window.selectedDomain = domain;
+    window.domainPricing = { initialCost, renewalCost };
 
-    // Show confirmation
+    // Show confirmation with pricing
     const domainResult = document.getElementById("domainResult");
-    domainResult.innerHTML = `✅ ${domain} has been added to your form!`;
+    domainResult.innerHTML = `
+        <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <span style="font-size: 1.5rem;">✅</span>
+                <strong style="color: #065f46;">${domain} has been added to your form!</strong>
+            </div>
+            
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: #6b7280;">Initial Registration:</span>
+                    <strong style="color: #059669;">$${initialCost.toFixed(2)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280;">Annual Renewal:</span>
+                    <strong style="color: #059669;">$${renewalCost.toFixed(2)}/year</strong>
+                </div>
+            </div>
+            
+            <button 
+                type="button" 
+                class="btn btn-secondary" 
+                onclick="removeDomainFromForm()" 
+                style="width: 100%; font-size: 0.875rem;">
+                Remove Domain
+            </button>
+        </div>
+    `;
     domainResult.style.color = "#10b981";
+
+    // Update pricing breakdown
+    updatePricingBreakdown();
 
     // Scroll to form
     document.getElementById("contactForm").scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -147,6 +229,116 @@ window.addDomainToForm = function (domain) {
     }, 500);
 };
 
+// Get package price
+function getPackagePrice(packageName) {
+    const prices = {
+        'Starter - $599 (New Website)': 599,
+        'Business - $1,199 (New Website)': 1199,
+        'Small Shop - $1,699 (New Website)': 1699,
+        'E-Commerce/Enterprise - Custom Quote': 0,
+        'Website Redesign/Updates': 0,
+        'Not Sure Yet': 0
+    };
+    return prices[packageName] || 0;
+}
+
+// Update pricing breakdown display
+function updatePricingBreakdown() {
+    const packageSelect = document.getElementById("package");
+    const selectedPackage = packageSelect ? packageSelect.value : '';
+    const packagePrice = getPackagePrice(selectedPackage);
+    const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
+
+    let pricingDisplay = document.getElementById("pricingBreakdown");
+
+    // Create pricing display if it doesn't exist
+    if (!pricingDisplay) {
+        pricingDisplay = document.createElement("div");
+        pricingDisplay.id = "pricingBreakdown";
+        pricingDisplay.style.cssText = "margin-top: 2rem; padding: 1.5rem; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px;";
+
+        // Insert before submit button
+        const submitBtn = document.getElementById("submitBtn");
+        if (submitBtn) {
+            submitBtn.parentNode.insertBefore(pricingDisplay, submitBtn);
+        }
+    }
+
+    // Show pricing only if package is selected and has a price
+    if (packagePrice > 0) {
+        const total = packagePrice + domainPrice;
+
+        pricingDisplay.innerHTML = `
+            <h3 style="color: #065f46; font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">
+                💰 Your Project Estimate
+            </h3>
+            
+            <div style="background: white; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+                    <span style="color: #6b7280; font-size: 1rem;">
+                        <strong>Website Package:</strong><br>
+                        <span style="font-size: 0.875rem;">${selectedPackage}</span>
+                    </span>
+                    <strong style="color: #059669; font-size: 1.1rem;">$${packagePrice.toFixed(2)}</strong>
+                </div>
+                
+                ${domainPrice > 0 ? `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
+                        <span style="color: #6b7280; font-size: 1rem;">
+                            <strong>Domain Registration:</strong><br>
+                            <span style="font-size: 0.875rem;">${window.selectedDomain}</span>
+                        </span>
+                        <strong style="color: #059669; font-size: 1.1rem;">$${domainPrice.toFixed(2)}</strong>
+                    </div>
+                ` : ''}
+                
+                <div style="display: flex; justify-content: space-between; padding-top: 0.75rem;">
+                    <strong style="color: #065f46; font-size: 1.2rem;">Total First Year:</strong>
+                    <strong style="color: #065f46; font-size: 1.4rem;">$${total.toFixed(2)}</strong>
+                </div>
+            </div>
+            
+            ${domainPrice > 0 ? `
+                <p style="color: #6b7280; font-size: 0.875rem; text-align: center; margin-top: 1rem; margin-bottom: 0;">
+                    📅 Domain renewal of $${window.domainPricing.renewalCost.toFixed(2)} will be due annually
+                </p>
+            ` : ''}
+            
+            <p style="color: #6b7280; font-size: 0.875rem; text-align: center; margin-top: 0.75rem; margin-bottom: 0;">
+                ✨ This is an estimate. Final quote will be provided after reviewing your requirements.
+            </p>
+        `;
+        pricingDisplay.style.display = 'block';
+    } else if (selectedPackage.includes('Custom Quote')) {
+        // Show custom quote message
+        pricingDisplay.innerHTML = `
+            <h3 style="color: #6366f1; font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">
+                💼 Custom Enterprise Quote
+            </h3>
+            
+            <div style="background: white; padding: 1.5rem; border-radius: 6px; text-align: center;">
+                <p style="color: #6b7280; margin-bottom: 1rem;">
+                    We'll provide a detailed custom quote based on your specific requirements and features.
+                </p>
+                ${domainPrice > 0 ? `
+                    <div style="padding-top: 1rem; border-top: 1px solid #e5e7eb;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <span style="color: #6b7280;">
+                                <strong>Domain Registration:</strong><br>
+                                <span style="font-size: 0.875rem;">${window.selectedDomain}</span>
+                            </span>
+                            <strong style="color: #059669; font-size: 1.1rem;">$${domainPrice.toFixed(2)}</strong>
+                        </div>
+                    </div>
+                ` : ''}
+            </div>
+        `;
+        pricingDisplay.style.display = 'block';
+    } else {
+        pricingDisplay.style.display = 'none';
+    }
+}
+
 // ✅ Function to remove domain from form (optional - can be removed if not needed)
 window.removeDomainFromForm = function () {
     const currentUrlInput = document.getElementById("currentUrl");
@@ -155,6 +347,7 @@ window.removeDomainFromForm = function () {
     }
 
     window.selectedDomain = null;
+    window.domainPricing = null;
 
     // Clear the domain input
     const domainInput = document.getElementById("domainInput");
@@ -167,6 +360,9 @@ window.removeDomainFromForm = function () {
     if (domainResult) {
         domainResult.innerHTML = "";
     }
+
+    // Update pricing breakdown
+    updatePricingBreakdown();
 };
 
 window.handleContactSubmit = async function (e) {
@@ -187,31 +383,52 @@ window.handleContactSubmit = async function (e) {
     const mainGoal = form.querySelector("#mainGoal")?.value.trim() || "";
     const mustHaveFeatures = form.querySelector("#mustHaveFeatures")?.value.trim() || "";
 
-    // ✅ Build one clean data object for both backend + Google Sheets
+    // Calculate totals
+    const packagePrice = getPackagePrice(packageSelected);
+    const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
+    const totalCost = packagePrice + domainPrice;
+
+    // Validate that a paid package is selected
+    if (packagePrice === 0) {
+        showModal(
+            "Please Select a Package",
+            "Please select a website package (Starter, Business, or Small Shop) before submitting.",
+            false
+        );
+        return;
+    }
+
+    // ✅ Build one clean data object
     const contactData = {
         name,
         email,
         businessName,
         phone,
         package: packageSelected,
+        packagePrice: packagePrice,
         timeline,
         currentUrl,
         referenceWebsite,
         mainGoal,
         mustHaveFeatures,
         selectedDomain: window.selectedDomain || "N/A",
+        domainPricing: window.domainPricing ? {
+            initialCost: window.domainPricing.initialCost,
+            renewalCost: window.domainPricing.renewalCost
+        } : null,
+        totalCost: totalCost,
         timestamp: new Date().toISOString(),
-        status: "new"
+        status: "pending_payment"
     };
 
     const submitBtn = document.getElementById("submitBtn");
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Sending...";
+    submitBtn.textContent = "Creating Payment Session...";
     submitBtn.disabled = true;
 
     try {
-        // ✅ Send to backend (server.js) for email
-        const backendResponse = await fetch("http://localhost:8080/submit-contact", {
+        // ✅ Send to backend to create Stripe session
+        const backendResponse = await fetch("http://localhost:8080/create-payment-session", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(contactData),
@@ -219,42 +436,35 @@ window.handleContactSubmit = async function (e) {
 
         const backendResult = await backendResponse.json();
 
-        // ✅ Also send to Google Apps Script for sheets logging
-        sendToGoogleScript(contactData).catch(err => {
-            console.warn("⚠️ Google Script submission failed, but backend succeeded:", err);
-        });
+        if (backendResult.success && backendResult.sessionUrl) {
+            // ✅ Also send to Google Apps Script for sheets logging
+            sendToGoogleScript(contactData).catch(err => {
+                console.warn("⚠️ Google Script submission failed, but proceeding to payment:", err);
+            });
 
-        if (backendResult.success) {
-            showModal(
-                "Success!",
-                "Thank you for contacting us! We'll get back to you within 24 hours.",
-                true
-            );
-            form.reset();
-            window.selectedDomain = null; // clear selected domain
-
-            // Clear domain search results
-            const domainResult = document.getElementById("domainResult");
-            if (domainResult) {
-                domainResult.innerHTML = "";
-            }
-            const domainInput = document.getElementById("domainInput");
-            if (domainInput) {
-                domainInput.value = "";
-            }
+            // Redirect to Stripe Checkout
+            window.location.href = backendResult.sessionUrl;
         } else {
-            throw new Error(backendResult.error || "Unknown error");
+            throw new Error(backendResult.error || "Failed to create payment session");
         }
 
     } catch (error) {
-        console.error("Error submitting form:", error);
+        console.error("Error creating payment session:", error);
         showModal(
             "Error",
-            "There was an error submitting your form. Please try again later.",
+            "There was an error processing your request. Please try again or contact us at (415) 691-7085.",
             false
         );
-    } finally {
+
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
 };
+
+// Listen for package selection changes
+document.addEventListener('DOMContentLoaded', () => {
+    const packageSelect = document.getElementById("package");
+    if (packageSelect) {
+        packageSelect.addEventListener('change', updatePricingBreakdown);
+    }
+});

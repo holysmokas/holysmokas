@@ -1,14 +1,18 @@
-<!--src/frontend/pages/login.html-->
+<!-- src/frontend/pages/login.html - UPDATED -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="/assets/holysmokas-thats-cheap-2-Bh4TFw0d-Bh4TFw0d-Bh4TFw0d.png" />
     <title>Client Login - Holy Smokas</title>
-    <link rel="stylesheet" href="/src/frontend/css/style.css">
-    <script type="module" src="/src/backend/authLogic.js"></script>
+  <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX-ulV_1b7r-BGxEsOWE.js"></script>
+  <script type="module" crossorigin src="/assets/firebase-BtvxRjGj-Bmveahn2-DtNkYIDR.js"></script>
+  <script type="module" crossorigin src="/assets/authLogic-CC4CpbKG-CrBVcBcr-DJSf1S8_.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/style-BZglE8e5-BZglE8e5-BZglE8e5.css">
 </head>
+
 
 <body>
     <nav>
@@ -16,7 +20,7 @@
             <div class="logo">
                 <a href="/" style="text-decoration: none; color: inherit;">
                     Holy Smokas - That's Cheap!
-                    <img src="/src/frontend/img/holysmokas-thats-cheap-2.png" alt="Woman looking surprised"
+                    <img src="/assets/holysmokas-thats-cheap-2-Bh4TFw0d-Bh4TFw0d-Bh4TFw0d.png" alt="Woman looking surprised"
                         style="height:60px; vertical-align: middle; margin-left: 5px;">
                 </a>
             </div>
@@ -50,7 +54,7 @@
                         <input type="checkbox" name="remember">
                         <span style="font-weight: normal;">Remember me</span>
                     </label>
-                    <a href="#" onclick="alert('Please contact us at (415) 691-7085 to reset your password')"
+                    <a href="#" onclick="handlePasswordReset(); return false;"
                         style="color: var(--primary); text-decoration: none; font-size: 0.875rem;">
                         Forgot password?
                     </a>
@@ -63,14 +67,63 @@
                 <div class="form-footer">
                     New client? We'll create your account after you hire us.
                     <br>
-                    <a href="/contact.html">Get a quote →</a>
+                    <a href="/src/frontend/pages/contact.html">Get a quote →</a>
                 </div>
             </form>
+
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb; text-align: center;">
+                <p style="color: var(--gray); font-size: 0.875rem; margin-bottom: 1rem;">
+                    First time here? Create your account:
+                </p>
+                <button onclick="showRegisterForm()" class="btn btn-secondary" style="width: 100%;">
+                    Create Account
+                </button>
+            </div>
 
             <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
                 <p style="text-align: center; color: var(--gray); font-size: 0.875rem;">
                     🔒 Secure login powered by Firebase Authentication
                 </p>
+            </div>
+        </div>
+
+        <!-- Register Form (Hidden by default) -->
+        <div id="registerBox" class="auth-box" style="max-width: 500px; display: none;">
+            <h2>Create Your Account</h2>
+            <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
+                Get access to your project dashboard
+            </p>
+
+            <form id="registerForm" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" name="name" required placeholder="John Doe">
+                </div>
+
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" name="email" required placeholder="your@email.com" autocomplete="email">
+                </div>
+
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" name="password" required placeholder="At least 6 characters"
+                        autocomplete="new-password">
+                </div>
+
+                <button type="submit" class="btn btn-primary" style="width: 100%;" id="registerBtn">
+                    Create Account
+                </button>
+
+                <div class="form-footer">
+                    Already have an account?
+                    <a href="#" onclick="showLoginForm(); return false;">Sign in</a>
+                </div>
+            </form>
+
+            <div
+                style="margin-top: 1.5rem; padding: 1rem; background: #eff6ff; border-radius: 8px; font-size: 0.875rem; color: #1e40af;">
+                ℹ️ You'll need to verify your email address before you can log in.
             </div>
         </div>
     </div>
@@ -96,16 +149,30 @@
         </div>
     </footer>
 
-    <!-- Status Modal -->
+    <!-- Status Modal (UPDATED) -->
     <div id="authModal" class="modal">
         <div class="modal-overlay" onclick="closeAuthModal()"></div>
         <div class="modal-content">
             <div class="modal-icon" id="authIcon">✓</div>
             <h3 id="authTitle">Success!</h3>
             <p id="authMessage">Logging you in...</p>
-            <button class="btn btn-primary" onclick="closeAuthModal()">Close</button>
+            <div id="authModalButtons">
+                <button class="btn btn-primary" onclick="closeAuthModal()">Close</button>
+            </div>
         </div>
     </div>
+
+    <script>
+        function showRegisterForm() {
+            document.querySelector('.auth-box:first-of-type').style.display = 'none';
+            document.getElementById('registerBox').style.display = 'block';
+        }
+
+        function showLoginForm() {
+            document.querySelector('.auth-box:first-of-type').style.display = 'block';
+            document.getElementById('registerBox').style.display = 'none';
+        }
+    </script>
 </body>
 
 </html>
