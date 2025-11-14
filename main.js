@@ -8,7 +8,7 @@ document.querySelector('#app').innerHTML = `
             <div class="logo">
                 <a href="index.html" style="text-decoration: none; color: inherit;">
                     Holy Smokas - That's Cheap!
-                    <img src="/src/frontend/img/holysmokas-thats-cheap-2.png" alt="Woman looking surprised"
+                    <img src="./src/frontend/img/holysmokas-thats-cheap-2.png" alt="Woman looking surprised"
                         style="height:60px; vertical-align: middle; margin-left: 5px;">
                 </a>
             </div>
