@@ -1,405 +1,63 @@
-<!--src/frontend/pages/dashboard.html-->
+<!-- src/frontend/pages/dashboard.html - UPDATED -->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Client Portal - Holy Smokas</title>
-    <link rel="stylesheet" href="/src/frontend/css/style.css">
-    <link rel="stylesheet" href="/src/frontend/css/portal.css">
-    <script type="module" src="/src/backend/portalLogic.js"></script>
+    <title>Dashboard - HolySmokas</title>
+  <link rel="modulepreload" crossorigin href="data:text/javascript;base64,KGZ1bmN0aW9uKCl7Y29uc3QgdD1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCJsaW5rIikucmVsTGlzdDtpZih0JiZ0LnN1cHBvcnRzJiZ0LnN1cHBvcnRzKCJtb2R1bGVwcmVsb2FkIikpcmV0dXJuO2Zvcihjb25zdCBlIG9mIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ2xpbmtbcmVsPSJtb2R1bGVwcmVsb2FkIl0nKSlpKGUpO25ldyBNdXRhdGlvbk9ic2VydmVyKGU9Pntmb3IoY29uc3QgciBvZiBlKWlmKHIudHlwZT09PSJjaGlsZExpc3QiKWZvcihjb25zdCBvIG9mIHIuYWRkZWROb2RlcylvLnRhZ05hbWU9PT0iTElOSyImJm8ucmVsPT09Im1vZHVsZXByZWxvYWQiJiZpKG8pfSkub2JzZXJ2ZShkb2N1bWVudCx7Y2hpbGRMaXN0OiEwLHN1YnRyZWU6ITB9KTtmdW5jdGlvbiBzKGUpe2NvbnN0IHI9e307cmV0dXJuIGUuaW50ZWdyaXR5JiYoci5pbnRlZ3JpdHk9ZS5pbnRlZ3JpdHkpLGUucmVmZXJyZXJQb2xpY3kmJihyLnJlZmVycmVyUG9saWN5PWUucmVmZXJyZXJQb2xpY3kpLGUuY3Jvc3NPcmlnaW49PT0idXNlLWNyZWRlbnRpYWxzIj9yLmNyZWRlbnRpYWxzPSJpbmNsdWRlIjplLmNyb3NzT3JpZ2luPT09ImFub255bW91cyI/ci5jcmVkZW50aWFscz0ib21pdCI6ci5jcmVkZW50aWFscz0ic2FtZS1vcmlnaW4iLHJ9ZnVuY3Rpb24gaShlKXtpZihlLmVwKXJldHVybjtlLmVwPSEwO2NvbnN0IHI9cyhlKTtmZXRjaChlLmhyZWYscil9fSkoKTsK">
+  <link rel="modulepreload" crossorigin href="/assets/firebase-BtvxRjGj-ChxIQlm4-ChxIQlm4.js">
+  <link rel="modulepreload" crossorigin href="/assets/authLogic-CC4CpbKG-CusgSoK7-CusgSoK7.js">
+  <link rel="modulepreload" crossorigin href="data:text/javascript;base64,KGZ1bmN0aW9uKCl7Y29uc3Qgbz1kb2N1bWVudC5jcmVhdGVFbGVtZW50KCJsaW5rIikucmVsTGlzdDtpZihvJiZvLnN1cHBvcnRzJiZvLnN1cHBvcnRzKCJtb2R1bGVwcmVsb2FkIikpcmV0dXJuO2Zvcihjb25zdCBlIG9mIGRvY3VtZW50LnF1ZXJ5U2VsZWN0b3JBbGwoJ2xpbmtbcmVsPSJtb2R1bGVwcmVsb2FkIl0nKSlyKGUpO25ldyBNdXRhdGlvbk9ic2VydmVyKGU9Pntmb3IoY29uc3QgdCBvZiBlKWlmKHQudHlwZT09PSJjaGlsZExpc3QiKWZvcihjb25zdCBzIG9mIHQuYWRkZWROb2RlcylzLnRhZ05hbWU9PT0iTElOSyImJnMucmVsPT09Im1vZHVsZXByZWxvYWQiJiZyKHMpfSkub2JzZXJ2ZShkb2N1bWVudCx7Y2hpbGRMaXN0OiEwLHN1YnRyZWU6ITB9KTtmdW5jdGlvbiBuKGUpe2NvbnN0IHQ9e307cmV0dXJuIGUuaW50ZWdyaXR5JiYodC5pbnRlZ3JpdHk9ZS5pbnRlZ3JpdHkpLGUucmVmZXJyZXJQb2xpY3kmJih0LnJlZmVycmVyUG9saWN5PWUucmVmZXJyZXJQb2xpY3kpLGUuY3Jvc3NPcmlnaW49PT0idXNlLWNyZWRlbnRpYWxzIj90LmNyZWRlbnRpYWxzPSJpbmNsdWRlIjplLmNyb3NzT3JpZ2luPT09ImFub255bW91cyI/dC5jcmVkZW50aWFscz0ib21pdCI6dC5jcmVkZW50aWFscz0ic2FtZS1vcmlnaW4iLHR9ZnVuY3Rpb24gcihlKXtpZihlLmVwKXJldHVybjtlLmVwPSEwO2NvbnN0IHQ9bihlKTtmZXRjaChlLmhyZWYsdCl9fSkoKTsoZnVuY3Rpb24oKXtjb25zdCBpPWRvY3VtZW50LmNyZWF0ZUVsZW1lbnQoImxpbmsiKS5yZWxMaXN0O2lmKGkmJmkuc3VwcG9ydHMmJmkuc3VwcG9ydHMoIm1vZHVsZXByZWxvYWQiKSlyZXR1cm47Zm9yKGNvbnN0IHIgb2YgZG9jdW1lbnQucXVlcnlTZWxlY3RvckFsbCgnbGlua1tyZWw9Im1vZHVsZXByZWxvYWQiXScpKW4ocik7bmV3IE11dGF0aW9uT2JzZXJ2ZXIocj0+e2Zvcihjb25zdCBlIG9mIHIpaWYoZS50eXBlPT09ImNoaWxkTGlzdCIpZm9yKGNvbnN0IHQgb2YgZS5hZGRlZE5vZGVzKXQudGFnTmFtZT09PSJMSU5LIiYmdC5yZWw9PT0ibW9kdWxlcHJlbG9hZCImJm4odCl9KS5vYnNlcnZlKGRvY3VtZW50LHtjaGlsZExpc3Q6ITAsc3VidHJlZTohMH0pO2Z1bmN0aW9uIG8ocil7Y29uc3QgZT17fTtyZXR1cm4gci5pbnRlZ3JpdHkmJihlLmludGVncml0eT1yLmludGVncml0eSksci5yZWZlcnJlclBvbGljeSYmKGUucmVmZXJyZXJQb2xpY3k9ci5yZWZlcnJlclBvbGljeSksci5jcm9zc09yaWdpbj09PSJ1c2UtY3JlZGVudGlhbHMiP2UuY3JlZGVudGlhbHM9ImluY2x1ZGUiOnIuY3Jvc3NPcmlnaW49PT0iYW5vbnltb3VzIj9lLmNyZWRlbnRpYWxzPSJvbWl0IjplLmNyZWRlbnRpYWxzPSJzYW1lLW9yaWdpbiIsZX1mdW5jdGlvbiBuKHIpe2lmKHIuZXApcmV0dXJuO3IuZXA9ITA7Y29uc3QgZT1vKHIpO2ZldGNoKHIuaHJlZixlKX19KSgpOwo=">
+  <link rel="modulepreload" crossorigin href="/assets/firebase-BtvxRjGj-Bmveahn2-CnXNCjqT.js">
+  <link rel="modulepreload" crossorigin href="/assets/authLogic-CC4CpbKG-CrBVcBcr-Kf38cbNo.js">
+  <script type="module" crossorigin src="/assets/dashboard-D_UHdCE4.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX-ulV_1b7r-BGxEsOWE.js">
+  <link rel="modulepreload" crossorigin href="/assets/firebase-BtvxRjGj-Bmveahn2-DtNkYIDR.js">
+  <link rel="modulepreload" crossorigin href="/assets/authLogic-CC4CpbKG-CrBVcBcr-DJSf1S8_.js">
+  <link rel="stylesheet" crossorigin href="/assets/dashboard-BpDadDYg.css">
+  <link rel="stylesheet" crossorigin href="/assets/style-BZglE8e5-BZglE8e5-BZglE8e5.css">
 </head>
 
 <body>
-    <!-- Navigation -->
     <nav>
         <div class="nav-container">
-            <div class="logo">
-                <a href="/" style="text-decoration: none; color: inherit;">
-                    Holy Smokas - That's Cheap!
-                    <img src="/src/frontend/img/holysmokas-thats-cheap-2.png" alt="Woman looking surprised"
-                        style="height:60px; vertical-align: middle; margin-left: 5px;">
-                </a>
-            </div>
-            <div class="nav-cta">
-                <span id="userEmail" style="margin-right: 1rem; color: var(--gray);"></span>
-                <button onclick="handleLogout()" class="btn btn-outline">Logout</button>
-            </div>
+            <div class="logo">🔥 HolySmokas</div>
+            <button onclick="handleLogout()" class="btn btn-outline">Logout</button>
         </div>
     </nav>
 
-    <!-- Main Dashboard -->
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-menu">
-                <button class="menu-item active" onclick="showSection('overview')">
-                    <span class="menu-icon">📊</span>
-                    <span>Overview</span>
-                </button>
-                <button class="menu-item" onclick="showSection('project')">
-                    <span class="menu-icon">🚀</span>
-                    <span>My Project</span>
-                </button>
-                <button class="menu-item" onclick="showSection('files')">
-                    <span class="menu-icon">📁</span>
-                    <span>Files & Assets</span>
-                </button>
-                <button class="menu-item" onclick="showSection('messages')">
-                    <span class="menu-icon">💬</span>
-                    <span>Messages</span>
-                    <span class="badge" id="unreadBadge">0</span>
-                </button>
-                <button class="menu-item" onclick="showSection('invoices')">
-                    <span class="menu-icon">💳</span>
-                    <span>Invoices</span>
-                </button>
-            </div>
-        </aside>
+    <div class="container">
+        <div class="dashboard-header-custom">
+            <h1>Your Projects</h1>
+        </div>
 
-        <!-- Main Content -->
-        <main class="dashboard-content">
-            <!-- Overview Section -->
-            <section id="overview-section" class="content-section active">
-                <div class="section-header">
-                    <h1>Welcome back, <span id="userName">Client</span>! 👋</h1>
-                    <p>Here's what's happening with your project</p>
-                </div>
-
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: #dbeafe;">🚀</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="projectStatus">In Progress</div>
-                            <div class="stat-label">Project Status</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: #dcfce7;">📁</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="fileCount">0</div>
-                            <div class="stat-label">Files Uploaded</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: #fef3c7;">💬</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="messageCount">0</div>
-                            <div class="stat-label">Messages</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: #fce7f3;">⏱️</div>
-                        <div class="stat-info">
-                            <div class="stat-value" id="daysRemaining">--</div>
-                            <div class="stat-label">Days to Launch</div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="overview-grid">
-                    <div class="card">
-                        <h3>📋 Project Timeline</h3>
-                        <div class="timeline">
-                            <div class="timeline-item completed">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Project Kickoff</h4>
-                                    <p>Contract signed, project initiated</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item active">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Content Collection</h4>
-                                    <p>Gathering assets and content</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Design & Development</h4>
-                                    <p>Building your website</p>
-                                </div>
-                            </div>
-                            <div class="timeline-item">
-                                <div class="timeline-marker"></div>
-                                <div class="timeline-content">
-                                    <h4>Review & Launch</h4>
-                                    <p>Final review and go live!</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="card">
-                        <h3>🎯 Quick Actions</h3>
-                        <div class="quick-actions">
-                            <button class="action-btn" onclick="showSection('files')">
-                                <span>📤</span>
-                                <div>Upload Files</div>
-                            </button>
-                            <button class="action-btn" onclick="showSection('messages')">
-                                <span>💬</span>
-                                <div>Send Message</div>
-                            </button>
-                            <button class="action-btn" onclick="window.open('tel:+14156917085')">
-                                <span>📞</span>
-                                <div>Call Us</div>
-                            </button>
-                            <button class="action-btn" onclick="showSection('project')">
-                                <span>👀</span>
-                                <div>View Progress</div>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>📢 Recent Updates</h3>
-                    <div id="recentUpdates" class="updates-list">
-                        <div class="update-item">
-                            <span class="update-icon">🎉</span>
-                            <div class="update-content">
-                                <strong>Welcome to your portal!</strong>
-                                <p>Start by uploading your brand assets in the Files section</p>
-                                <small>Just now</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Project Section -->
-            <section id="project-section" class="content-section">
-                <div class="section-header">
-                    <h1>🚀 My Project</h1>
-                    <p>Track your website development progress</p>
-                </div>
-
-                <div class="card">
-                    <div class="project-header">
-                        <div>
-                            <h2 id="projectName">Your Website Project</h2>
-                            <p id="projectPackage">Business Package - $999</p>
-                        </div>
-                        <div class="status-badge status-progress">In Progress</div>
-                    </div>
-
-                    <div class="progress-section">
-                        <div class="progress-header">
-                            <span>Overall Progress</span>
-                            <span id="progressPercent">35%</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" id="progressBar" style="width: 35%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="project-details">
-                        <div class="detail-item">
-                            <strong>📅 Start Date:</strong>
-                            <span id="startDate">January 15, 2025</span>
-                        </div>
-                        <div class="detail-item">
-                            <strong>🎯 Target Launch:</strong>
-                            <span id="launchDate">March 15, 2025</span>
-                        </div>
-                        <div class="detail-item">
-                            <strong>🔗 Preview Link:</strong>
-                            <a href="#" id="previewLink" class="preview-link">Coming Soon</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>✅ Checklist</h3>
-                    <div class="checklist">
-                        <label class="checklist-item">
-                            <input type="checkbox" checked disabled>
-                            <span>Project contract signed</span>
-                        </label>
-                        <label class="checklist-item">
-                            <input type="checkbox" checked disabled>
-                            <span>Initial payment received</span>
-                        </label>
-                        <label class="checklist-item">
-                            <input type="checkbox" onchange="saveChecklist()">
-                            <span>Logo and brand assets uploaded</span>
-                        </label>
-                        <label class="checklist-item">
-                            <input type="checkbox" onchange="saveChecklist()">
-                            <span>Website content provided</span>
-                        </label>
-                        <label class="checklist-item">
-                            <input type="checkbox" onchange="saveChecklist()">
-                            <span>Product images uploaded (if applicable)</span>
-                        </label>
-                        <label class="checklist-item">
-                            <input type="checkbox" disabled>
-                            <span>Design review completed</span>
-                        </label>
-                        <label class="checklist-item">
-                            <input type="checkbox" disabled>
-                            <span>Final approval given</span>
-                        </label>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Files Section -->
-            <section id="files-section" class="content-section">
-                <div class="section-header">
-                    <h1>📁 Files & Assets</h1>
-                    <p>Upload and manage your project files</p>
-                </div>
-
-                <div class="card upload-zone">
-                    <h3>📤 Upload Files</h3>
-                    <div class="file-upload-area" id="dropZone">
-                        <input type="file" id="fileInput" multiple hidden>
-                        <div class="upload-content">
-                            <span style="font-size: 3rem;">☁️</span>
-                            <h4>Drag & drop files here</h4>
-                            <p>or</p>
-                            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
-                                Choose Files
-                            </button>
-                            <p class="upload-note">Max 10MB per file • Supported: Images, PDFs, Documents, Videos</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="file-categories">
-                    <button class="category-tab active" onclick="filterFiles('all')">All Files</button>
-                    <button class="category-tab" onclick="filterFiles('brand')">Brand Assets</button>
-                    <button class="category-tab" onclick="filterFiles('images')">Images</button>
-                    <button class="category-tab" onclick="filterFiles('content')">Content</button>
-                    <button class="category-tab" onclick="filterFiles('other')">Other</button>
-                </div>
-
-                <div class="card">
-                    <div id="filesList" class="files-grid">
-                        <div class="empty-state">
-                            <span style="font-size: 3rem;">📂</span>
-                            <h3>No files uploaded yet</h3>
-                            <p>Upload your brand assets, images, and content to get started</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Messages Section -->
-            <section id="messages-section" class="content-section">
-                <div class="section-header">
-                    <h1>💬 Messages</h1>
-                    <p>Communicate with your project manager</p>
-                </div>
-
-                <div class="messages-container">
-                    <div class="card messages-card">
-                        <div id="messagesList" class="messages-list">
-                            <div class="message received">
-                                <div class="message-avatar">HS</div>
-                                <div class="message-content">
-                                    <div class="message-header">
-                                        <strong>Holy Smokas Team</strong>
-                                        <span>2 days ago</span>
-                                    </div>
-                                    <p>Welcome to your project portal! We're excited to start working on your website.
-                                        Please upload your logo and brand assets when you get a chance.</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="message-input-area">
-                            <textarea id="messageInput" placeholder="Type your message here..." rows="3"></textarea>
-                            <button class="btn btn-primary" onclick="sendMessage()">Send Message</button>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Invoices Section -->
-            <section id="invoices-section" class="content-section">
-                <div class="section-header">
-                    <h1>💳 Invoices & Payments</h1>
-                    <p>View your payment history and invoices</p>
-                </div>
-
-                <div class="card">
-                    <div class="invoice-summary">
-                        <div class="invoice-stat">
-                            <h3>$999</h3>
-                            <p>Total Project Cost</p>
-                        </div>
-                        <div class="invoice-stat">
-                            <h3>$999</h3>
-                            <p>Amount Paid</p>
-                        </div>
-                        <div class="invoice-stat">
-                            <h3>$0</h3>
-                            <p>Balance Due</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>📄 Invoice History</h3>
-                    <div class="invoices-list">
-                        <div class="invoice-item">
-                            <div class="invoice-info">
-                                <strong>Invoice #001</strong>
-                                <p>Business Website Package</p>
-                            </div>
-                            <div class="invoice-details">
-                                <span class="invoice-amount">$999.00</span>
-                                <span class="status-badge status-paid">Paid</span>
-                                <button class="btn-icon"
-                                    onclick="alert('Download invoice feature coming soon!')">📥</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card payment-note">
-                    <h4>💰 No Monthly Fees!</h4>
-                    <p>Remember, you paid once and that's it! No recurring hosting fees, no surprise charges. Your
-                        website hosting is included for life.</p>
-                </div>
-            </section>
-        </main>
-    </div>
-
-    <!-- File Upload Modal -->
-    <div id="uploadModal" class="modal">
-        <div class="modal-overlay" onclick="closeUploadModal()"></div>
-        <div class="modal-content">
-            <h3>Choose File Category</h3>
-            <p style="margin-bottom: 1.5rem;">Select where this file should be organized:</p>
-            <div class="category-buttons">
-                <button class="category-btn" onclick="uploadFileWithCategory('brand')">
-                    <span>🎨</span>
-                    <div>Brand Assets</div>
-                </button>
-                <button class="category-btn" onclick="uploadFileWithCategory('images')">
-                    <span>🖼️</span>
-                    <div>Images</div>
-                </button>
-                <button class="category-btn" onclick="uploadFileWithCategory('content')">
-                    <span>📝</span>
-                    <div>Content</div>
-                </button>
-                <button class="category-btn" onclick="uploadFileWithCategory('other')">
-                    <span>📎</span>
-                    <div>Other</div>
-                </button>
-            </div>
-            <button class="btn btn-outline" onclick="closeUploadModal()"
-                style="width: 100%; margin-top: 1rem;">Cancel</button>
+        <div id="projectsContainer" class="projects-grid">
+            <div class="loading-state">Loading your projects...</div>
         </div>
     </div>
+
+    <div id="modificationModal" class="modal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeModificationModal()">&times;</button>
+            <h2>Request Modifications</h2>
+            <form id="modificationForm" onsubmit="submitModification(event)">
+                <textarea id="modificationRequest"
+                    placeholder="Describe the changes you want (e.g., 'Change the header color to blue', 'Add a testimonials section', 'Update the contact form to include phone number')"
+                    required></textarea>
+                <button type="submit" class="btn btn-primary btn-full-width">Submit Request</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="responseModal" class="modal">
+        <div class="modal-box">
+            <button class="modal-close" onclick="closeResponseModal()">&times;</button>
+            <div id="responseContent"></div>
+        </div>
+    </div>
+
 </body>
 
 </html>
