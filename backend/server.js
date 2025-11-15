@@ -31,10 +31,22 @@ app.post('/webhook',
             return res.status(400).send(`Webhook Error: ${err.message}`);
         }
 
+        console.log('🎯 Stripe Event Received:', event.type);
+
+        // 🆕 ADD THIS: Handle both checkout.session.completed AND payment_intent.succeeded
         if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
-            console.log('💳 Payment successful:', session.id);
+            console.log('💳 Payment successful (checkout.session.completed):', session.id);
             await handleSuccessfulPayment(session);
+        }
+
+        // 🆕 ADD THIS: Secondary event for redundancy (helpful for testing)
+        if (event.type === 'payment_intent.succeeded') {
+            const paymentIntent = event.data.object;
+            console.log('💰 Payment intent succeeded:', paymentIntent.id);
+
+            // Optional: Log this event but don't trigger duplicate generation
+            console.log('✅ Payment confirmed, checkout.session.completed will handle generation');
         }
 
         res.json({ received: true });
@@ -392,21 +404,20 @@ async function triggerAIGeneration(projectId, retryCount = 0) {
 
         console.log(`🤖 Starting AI generation for ${projectId} (Attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
 
-        // Call your existing deployment function
+        // 🆕 FIXED: Pass correct data structure to deployProject
         const deploymentResult = await deployProject({
-            businessName: projectData.businessName,
-            email: projectData.email,
-            category: extractCategoryFromPackage(projectData.package),
-            requirements: {
-                mainGoal: projectData.mainGoal,
-                mustHaveFeatures: projectData.mustHaveFeatures,
-                referenceWebsite: projectData.referenceWebsite,
-                domain: projectData.selectedDomain
-            }
+            name: projectData.businessName,  // ✅ Changed from businessName to name
+            description: projectData.mainGoal || 'Professional business website',  // ✅ Added fallback
+            category: projectData.package,  // ✅ Pass full package name
+            email: projectData.email
         });
 
         // Validate deployment result
-        if (!deploymentResult || !deploymentResult.repoUrl || !deploymentResult.liveUrl) {
+        if (!deploymentResult || !deploymentResult.success) {
+            throw new Error(deploymentResult?.error || 'Deployment failed: No result returned');
+        }
+
+        if (!deploymentResult.repoUrl || !deploymentResult.pagesUrl) {
             throw new Error('Deployment failed: Missing required URLs in result');
         }
 
@@ -416,7 +427,7 @@ async function triggerAIGeneration(projectId, retryCount = 0) {
             generationStatus: 'completed',
             generationCompletedAt: new Date(),
             githubRepoUrl: deploymentResult.repoUrl,
-            liveUrl: deploymentResult.liveUrl,
+            liveUrl: deploymentResult.pagesUrl,  // ✅ Changed from liveUrl to pagesUrl
             repoName: deploymentResult.repoName || 'unknown'
         });
 
@@ -429,7 +440,7 @@ async function triggerAIGeneration(projectId, retryCount = 0) {
             subject: `🚀 Your Website is Live! - ${projectData.businessName}`,
             html: `
                 <h2>🚀 Your Website is Live!</h2>
-                <p><strong>Live URL:</strong> <a href="${deploymentResult.liveUrl}">${deploymentResult.liveUrl}</a></p>
+                <p><strong>Live URL:</strong> <a href="${deploymentResult.pagesUrl}">${deploymentResult.pagesUrl}</a></p>
                 <p><strong>GitHub:</strong> <a href="${deploymentResult.repoUrl}">${deploymentResult.repoUrl}</a></p>
                 <p>Log in to your dashboard to request changes anytime.</p>
                 <p>Questions? Call (415) 691-7085</p>
@@ -719,7 +730,7 @@ async function processModificationInBackground(userId, projectId, modificationRe
 
         console.log('🔄 Processing modification for:', projectData.businessName);
 
-        const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+        const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
         const owner = process.env.GITHUB_USERNAME;
         const repo = projectData.repoName;
 

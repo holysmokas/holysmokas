@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 
 dotenv.config({ path: path.resolve("backend/.env") });
 
-const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN });
+const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
 const GITHUB_USERNAME = process.env.GITHUB_USERNAME;
 
 export async function createRepo(repoName, description = "Generated site") {
@@ -70,7 +70,7 @@ export async function deployToGitHub(projectDir, repoName, description = "Genera
     execSync('git commit -m "Initial commit - project files"', { cwd: projectDir, stdio: "inherit" });
     execSync("git branch -M main", { cwd: projectDir, stdio: "inherit" });
     execSync(
-      `git remote add origin https://${process.env.GITHUB_TOKEN}@github.com/${GITHUB_USERNAME}/${repoName}.git`,
+      `git remote add origin https://${process.env.GIT_TOKEN}@github.com/${GITHUB_USERNAME}/${repoName}.git`,
       { cwd: projectDir, stdio: "inherit" }
     );
     execSync("git push -u origin main --force", { cwd: projectDir, stdio: "inherit" });
