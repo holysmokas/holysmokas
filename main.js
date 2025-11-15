@@ -1,4 +1,4 @@
-import './frontend/css/style.css'
+import './frontend/styles/main.css'
 
 
 document.querySelector('#app').innerHTML = `
