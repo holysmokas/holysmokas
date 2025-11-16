@@ -1,4 +1,4 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";import{U as r,j as d}from"./style-BZglE8e5-BZglE8e5-BZglE8e5-B8qR-zYw.js";let a=null,i=null;r(d,async t=>{t?(a=t,await c(t.uid)):window.location.href="/src/frontend/pages/login.html"});async function c(t){try{const e=await(await fetch(`http://localhost:8080/user-projects/${t}`)).json(),n=document.getElementById("projectsContainer");e.success&&e.projects.length>0?n.innerHTML=e.projects.map(o=>`
+import"./modulepreload-polyfill-B5Qt9EMX.js";import{U as r,j as d}from"./style-BZglE8e5-BZglE8e5-BZglE8e5-Ds5LJTMb.js";let a=null,i=null;r(d,async t=>{t?(a=t,await c(t.uid)):window.location.href="/src/frontend/pages/login.html"});async function c(t){try{const e=await(await fetch(`http://localhost:8080/user-projects/${t}`)).json(),n=document.getElementById("projectsContainer");e.success&&e.projects.length>0?n.innerHTML=e.projects.map(o=>`
                 <div class="project-card">
                     <h3>${o.businessName}</h3>
                     <div class="project-info">
