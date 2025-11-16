@@ -1,8 +1,6 @@
 import { db } from './firebase.js';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-
-// CONFIGURATION - Add your Google Apps Script Web App URL here
-const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzJOYtbHJRuIgQTT7BVhmzGvRaJ1TMBd-VDoe_DUk_Rbnyr9EBiB5W9Xutir8r8LcgUTg/exec";
+import { GOOGLE_SHEETS_URL, ENDPOINTS } from './config.js';
 
 // Function to show modal
 function showModal(title, message, isSuccess = true) {
@@ -14,60 +12,41 @@ function showModal(title, message, isSuccess = true) {
     modalTitle.textContent = title;
     modalMessage.textContent = message;
 
-    // Set icon based on success/error
     modalIcon.textContent = isSuccess ? '✔' : '✕';
     modalIcon.style.background = isSuccess ? 'var(--secondary)' : '#ef4444';
 
     modal.classList.add('show');
 }
 
-// Function to close modal
 window.closeModal = function () {
     const modal = document.getElementById('formModal');
     modal.classList.remove('show');
 };
 
-// Function to send data to Google Apps Script (for email & sheets)
 async function sendToGoogleScript(contactData) {
     try {
-        const response = await fetch(GOOGLE_SCRIPT_URL, {
+        const response = await fetch(GOOGLE_SHEETS_URL, {
             method: 'POST',
-            mode: 'no-cors', // Google Apps Script requires this
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(contactData)
         });
-
-        // Note: With no-cors mode, we can't read the response
-        // but the request will still be processed by Google Apps Script
         console.log('Data sent to Google Apps Script');
         return true;
     } catch (error) {
         console.error('Error sending to Google Script:', error);
-        // Don't throw error - we still want Firebase to work
         return false;
     }
 }
 
-// Helper function to clean domain name
 function cleanDomainName(domain) {
-    // Remove protocol (http://, https://)
     let cleaned = domain.replace(/^https?:\/\//, '');
-
-    // Remove www. prefix
     cleaned = cleaned.replace(/^www\./, '');
-
-    // Remove trailing slash and any path
     cleaned = cleaned.split('/')[0];
-
-    // Remove any whitespace
     cleaned = cleaned.trim();
-
     return cleaned;
 }
 
-// ✅ Global checkDomain function so it can be called from HTML onclick
 window.checkDomain = async function () {
     const domainInput = document.getElementById("domainInput");
     const domainResult = document.getElementById("domainResult");
@@ -83,7 +62,7 @@ window.checkDomain = async function () {
     domainResult.style.color = "#6b7280";
 
     try {
-        const response = await fetch("https://holysmokas-backend.onrender.com/check-domain", {
+        const response = await fetch(ENDPOINTS.checkDomain, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ domain }),
@@ -93,8 +72,6 @@ window.checkDomain = async function () {
 
         if (data.available === true) {
             const cleanedDomain = data.cleanedDomain || cleanDomainName(domain);
-
-            // Get pricing information (default values if not provided by backend)
             const initialCost = data.pricing?.initialCost || data.price || 12.99;
             const renewalCost = data.pricing?.renewalCost || data.renewalPrice || 12.99;
 
@@ -167,119 +144,66 @@ window.checkDomain = async function () {
     }
 };
 
-// ✅ Function to add domain to the "Current Website URL" input field
 window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
-    // Add domain to the Current Website URL field
     const currentUrlInput = document.getElementById("currentUrl");
     if (currentUrlInput) {
         currentUrlInput.value = `https://${domain}`;
-        // Highlight the field briefly
         currentUrlInput.style.border = "2px solid #10b981";
-        setTimeout(() => {
-            currentUrlInput.style.border = "";
-        }, 2000);
+        setTimeout(() => { currentUrlInput.style.border = ""; }, 2000);
     }
 
     window.selectedDomain = domain;
     window.domainPricing = { initialCost, renewalCost };
 
-    // Show confirmation with pricing
     const domainResult = document.getElementById("domainResult");
     domainResult.innerHTML = `
         <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
-            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <span style="font-size: 1.5rem;">✅</span>
-                <strong style="color: #065f46;">${domain} has been added to your form!</strong>
+                <strong style="color: #065f46;">${domain} added to form</strong>
             </div>
-            
-            <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="color: #6b7280;">Initial Registration:</span>
-                    <strong style="color: #059669;">$${initialCost.toFixed(2)}</strong>
-                </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #6b7280;">Annual Renewal:</span>
-                    <strong style="color: #059669;">$${renewalCost.toFixed(2)}/year</strong>
-                </div>
-            </div>
-            
-            <button 
-                type="button" 
-                class="btn btn-secondary" 
-                onclick="removeDomainFromForm()" 
-                style="width: 100%; font-size: 0.875rem;">
+            <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem;">
+                This domain will be registered after payment
+            </p>
+            <button type="button" class="btn btn-secondary" onclick="removeDomainFromForm()" style="width: 100%;">
                 Remove Domain
             </button>
         </div>
     `;
     domainResult.style.color = "#10b981";
 
-    // Update pricing breakdown
     updatePricingBreakdown();
-
-    // Scroll to form
-    document.getElementById("contactForm").scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-    // Focus on the next field (email or business name)
-    setTimeout(() => {
-        const businessNameInput = document.getElementById("businessName");
-        if (businessNameInput && !businessNameInput.value) {
-            businessNameInput.focus();
-        }
-    }, 500);
 };
 
-// Get package price
-function getPackagePrice(packageName) {
-    const prices = {
-        'Starter - $599 (New Website)': 599,
-        'Business - $1,199 (New Website)': 1199,
-        'Small Shop - $1,699 (New Website)': 1699,
-        'E-Commerce/Enterprise - Custom Quote': 0,
-        'Website Redesign/Updates': 0,
-        'Not Sure Yet': 0
-    };
-    return prices[packageName] || 0;
+function getPackagePrice(packageString) {
+    if (packageString.includes('$499')) return 499;
+    if (packageString.includes('$999')) return 999;
+    if (packageString.includes('$1,999')) return 1999;
+    if (packageString.includes('Custom Quote')) return 0;
+    return 0;
 }
 
-// Update pricing breakdown display
 function updatePricingBreakdown() {
     const packageSelect = document.getElementById("package");
-    const selectedPackage = packageSelect ? packageSelect.value : '';
+    const pricingDisplay = document.getElementById("pricingBreakdown");
+
+    if (!packageSelect || !pricingDisplay) return;
+
+    const selectedPackage = packageSelect.value;
     const packagePrice = getPackagePrice(selectedPackage);
     const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
+    const total = packagePrice + domainPrice;
 
-    let pricingDisplay = document.getElementById("pricingBreakdown");
-
-    // Create pricing display if it doesn't exist
-    if (!pricingDisplay) {
-        pricingDisplay = document.createElement("div");
-        pricingDisplay.id = "pricingBreakdown";
-        pricingDisplay.style.cssText = "margin-top: 2rem; padding: 1.5rem; background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px;";
-
-        // Insert before submit button
-        const submitBtn = document.getElementById("submitBtn");
-        if (submitBtn) {
-            submitBtn.parentNode.insertBefore(pricingDisplay, submitBtn);
-        }
-    }
-
-    // Show pricing only if package is selected and has a price
     if (packagePrice > 0) {
-        const total = packagePrice + domainPrice;
-
         pricingDisplay.innerHTML = `
-            <h3 style="color: #065f46; font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">
-                💰 Your Project Estimate
+            <h3 style="color: #6366f1; font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">
+                💰 Price Breakdown
             </h3>
             
-            <div style="background: white; padding: 1rem; border-radius: 6px; margin-bottom: 1rem;">
+            <div style="background: white; padding: 1.5rem; border-radius: 6px;">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
-                    <span style="color: #6b7280; font-size: 1rem;">
-                        <strong>Website Package:</strong><br>
-                        <span style="font-size: 0.875rem;">${selectedPackage}</span>
-                    </span>
-                    <strong style="color: #059669; font-size: 1.1rem;">$${packagePrice.toFixed(2)}</strong>
+                    <span style="color: #6b7280; font-size: 1rem;"><strong>Website Package:</strong></span>
+                    <strong style="color: #6366f1; font-size: 1.1rem;">$${packagePrice.toFixed(2)}</strong>
                 </div>
                 
                 ${domainPrice > 0 ? `
@@ -310,7 +234,6 @@ function updatePricingBreakdown() {
         `;
         pricingDisplay.style.display = 'block';
     } else if (selectedPackage.includes('Custom Quote')) {
-        // Show custom quote message
         pricingDisplay.innerHTML = `
             <h3 style="color: #6366f1; font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">
                 💼 Custom Enterprise Quote
@@ -339,39 +262,26 @@ function updatePricingBreakdown() {
     }
 }
 
-// ✅ Function to remove domain from form (optional - can be removed if not needed)
 window.removeDomainFromForm = function () {
     const currentUrlInput = document.getElementById("currentUrl");
-    if (currentUrlInput) {
-        currentUrlInput.value = "";
-    }
+    if (currentUrlInput) currentUrlInput.value = "";
 
     window.selectedDomain = null;
     window.domainPricing = null;
 
-    // Clear the domain input
     const domainInput = document.getElementById("domainInput");
-    if (domainInput) {
-        domainInput.value = "";
-    }
+    if (domainInput) domainInput.value = "";
 
-    // Clear the result
     const domainResult = document.getElementById("domainResult");
-    if (domainResult) {
-        domainResult.innerHTML = "";
-    }
+    if (domainResult) domainResult.innerHTML = "";
 
-    // Update pricing breakdown
     updatePricingBreakdown();
 };
 
 window.handleContactSubmit = async function (e) {
     e.preventDefault();
-
-    // ✅ Reference the form that triggered this event
     const form = e.target;
 
-    // ✅ Grab ALL form field values with proper IDs
     const name = form.querySelector("#name")?.value.trim() || "";
     const email = form.querySelector("#email")?.value.trim() || "";
     const businessName = form.querySelector("#businessName")?.value.trim() || "";
@@ -383,22 +293,15 @@ window.handleContactSubmit = async function (e) {
     const mainGoal = form.querySelector("#mainGoal")?.value.trim() || "";
     const mustHaveFeatures = form.querySelector("#mustHaveFeatures")?.value.trim() || "";
 
-    // Calculate totals
     const packagePrice = getPackagePrice(packageSelected);
     const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
     const totalCost = packagePrice + domainPrice;
 
-    // Validate that a paid package is selected
     if (packagePrice === 0) {
-        showModal(
-            "Please Select a Package",
-            "Please select a website package (Starter, Business, or Small Shop) before submitting.",
-            false
-        );
+        showModal("Please Select a Package", "Please select a website package (Starter, Business, or Small Shop) before submitting.", false);
         return;
     }
 
-    // ✅ Build one clean data object
     const contactData = {
         name,
         email,
@@ -427,8 +330,7 @@ window.handleContactSubmit = async function (e) {
     submitBtn.disabled = true;
 
     try {
-        // ✅ Send to backend to create Stripe session
-        const backendResponse = await fetch("https://holysmokas-backend.onrender.com/create-payment-session", {
+        const backendResponse = await fetch(ENDPOINTS.createPaymentSession, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(contactData),
@@ -437,12 +339,9 @@ window.handleContactSubmit = async function (e) {
         const backendResult = await backendResponse.json();
 
         if (backendResult.success && backendResult.sessionUrl) {
-            // ✅ Also send to Google Apps Script for sheets logging
             sendToGoogleScript(contactData).catch(err => {
                 console.warn("⚠️ Google Script submission failed, but proceeding to payment:", err);
             });
-
-            // Redirect to Stripe Checkout
             window.location.href = backendResult.sessionUrl;
         } else {
             throw new Error(backendResult.error || "Failed to create payment session");
@@ -450,18 +349,12 @@ window.handleContactSubmit = async function (e) {
 
     } catch (error) {
         console.error("Error creating payment session:", error);
-        showModal(
-            "Error",
-            "There was an error processing your request. Please try again or contact us at (415) 691-7085.",
-            false
-        );
-
+        showModal("Error", "There was an error processing your request. Please try again or contact us at (415) 691-7085.", false);
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
 };
 
-// Listen for package selection changes
 document.addEventListener('DOMContentLoaded', () => {
     const packageSelect = document.getElementById("package");
     if (packageSelect) {

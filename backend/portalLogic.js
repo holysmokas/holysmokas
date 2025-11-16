@@ -1,11 +1,7 @@
-// ✅ UPDATED: Handles contact form submission + auto deployment
+// portalLogic.js
 import { auth } from "./firebase.js";
+import { ENDPOINTS } from './config.js';
 
-const FORM_URL =
-    "https://script.google.com/macros/s/AKfycbzJOYtbHJRuIgQTT7BVhmzGvRaJ1TMBd-VDoe_DUk_Rbnyr9EBiB5W9Xutir8r8LcgUTg/exec"; // ⬅️ your Google Apps Script Web App URL
-const DEPLOY_URL = "https://holysmokas-backend.onrender.com/deploy"; // ⬅️ your backend server endpoint
-
-// Handle form submission
 export async function submitContactForm(formData) {
     try {
         const { name, email, businessName, phone, package: pkg, timeline, referenceWebsite, mainGoal, mustHaveFeatures, currentUrl } = formData;
@@ -14,8 +10,7 @@ export async function submitContactForm(formData) {
             return { success: false, message: "Name, Email, and Business Name are required." };
         }
 
-        // 1️⃣ Submit to Google Sheets (Contact Submissions)
-        const response = await fetch(FORM_URL, {
+        const response = await fetch(ENDPOINTS.contactFormSubmission, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -39,9 +34,8 @@ export async function submitContactForm(formData) {
 
         console.log("✅ Form submitted to Google Sheets:", result);
 
-        // 2️⃣ Trigger automated deployment
         try {
-            const deployResponse = await fetch(DEPLOY_URL, {
+            const deployResponse = await fetch(ENDPOINTS.deploy, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
@@ -63,7 +57,6 @@ export async function submitContactForm(formData) {
             console.error("❌ Deployment trigger failed:", deployErr);
         }
 
-        // ✅ Everything done
         return { success: true, message: "Form submitted and deployment triggered successfully." };
 
     } catch (error) {

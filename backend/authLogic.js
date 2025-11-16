@@ -1,4 +1,4 @@
-// authLogic.js - Authentication Logic for Login Page (UPDATED)
+// authLogic.js
 import { auth } from './firebase.js';
 import {
     signInWithEmailAndPassword,
@@ -9,19 +9,13 @@ import {
     sendPasswordResetEmail,
     sendEmailVerification
 } from 'firebase/auth';
+import { ENDPOINTS } from './config.js';
 
-// Flag to prevent auto-redirect during registration
 let isRegistering = false;
 
-// Check if user is already logged in
 onAuthStateChanged(auth, (user) => {
     const currentPath = window.location.pathname;
-
-    // Don't redirect during registration process
-    if (isRegistering) {
-        return;
-    }
-
+    if (isRegistering) return;
     if (user && currentPath.includes('login.html')) {
         window.location.href = '/src/frontend/pages/dashboard.html';
     } else if (!user && currentPath.includes('dashboard.html')) {
@@ -29,31 +23,22 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Claim projects after login/registration
 async function claimUserProjects(user) {
     try {
-        const response = await fetch('https://holysmokas-backend.onrender.com/claim-projects', {
+        const response = await fetch(ENDPOINTS.claimProjects, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                userId: user.uid,
-                email: user.email
-            })
+            body: JSON.stringify({ userId: user.uid, email: user.email })
         });
-
         const data = await response.json();
-        if (data.success) {
-            console.log('✅ Projects claimed successfully');
-        }
+        if (data.success) console.log('✅ Projects claimed successfully');
     } catch (error) {
         console.error('Error claiming projects:', error);
     }
 }
 
-// Login Function
 window.handleLogin = async function (event) {
     event.preventDefault();
-
     const form = event.target;
     const email = form.email.value;
     const password = form.password.value;
@@ -66,27 +51,11 @@ window.handleLogin = async function (event) {
         const userCredential = await signInWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Check if email is verified
         if (!user.emailVerified) {
-            showAuthModal(
-                'warning',
-                'Email Not Verified',
-                'Please verify your email before logging in. Check your inbox for the verification link.',
-                [
-                    {
-                        text: 'Resend Verification Email',
-                        action: () => {
-                            resendVerificationEmail(user);
-                        }
-                    },
-                    {
-                        text: 'Close',
-                        action: closeAuthModal,
-                        primary: true
-                    }
-                ]
-            );
-
+            showAuthModal('warning', 'Email Not Verified', 'Please verify your email before logging in. Check your inbox for the verification link.', [
+                { text: 'Resend Verification Email', action: () => { resendVerificationEmail(user); } },
+                { text: 'Close', action: closeAuthModal, primary: true }
+            ]);
             await signOut(auth);
             loginBtn.disabled = false;
             loginBtn.textContent = 'Sign In';
@@ -94,20 +63,13 @@ window.handleLogin = async function (event) {
         }
 
         console.log('Login successful:', user.email);
-
         await claimUserProjects(user);
-
         showAuthModal('success', 'Login Successful!', 'Redirecting to your dashboard...');
-
-        setTimeout(() => {
-            window.location.href = '/src/frontend/pages/dashboard.html';
-        }, 1000);
+        setTimeout(() => { window.location.href = '/src/frontend/pages/dashboard.html'; }, 1000);
 
     } catch (error) {
         console.error('Login error:', error);
-
         let errorMessage = 'Login failed. Please try again.';
-
         if (error.code === 'auth/invalid-credential' || error.code === 'auth/wrong-password') {
             errorMessage = 'Invalid email or password. Please check your credentials.';
         } else if (error.code === 'auth/user-not-found') {
@@ -119,15 +81,12 @@ window.handleLogin = async function (event) {
         } else if (error.code === 'auth/invalid-email') {
             errorMessage = 'Please enter a valid email address.';
         }
-
         showAuthModal('error', 'Login Failed', errorMessage);
-
         loginBtn.disabled = false;
         loginBtn.textContent = 'Sign In';
     }
 };
 
-// Logout Function
 window.handleLogout = async function () {
     try {
         await signOut(auth);
@@ -139,7 +98,6 @@ window.handleLogout = async function () {
     }
 };
 
-// Modal Functions (Updated to support custom buttons)
 function showAuthModal(type, title, message, customButtons = null) {
     const modal = document.getElementById('authModal');
     const icon = document.getElementById('authIcon');
@@ -149,7 +107,6 @@ function showAuthModal(type, title, message, customButtons = null) {
 
     if (!modal) return;
 
-    // Set icon based on type
     if (type === 'success') {
         icon.textContent = '✓';
         icon.style.background = 'var(--secondary)';
@@ -164,7 +121,6 @@ function showAuthModal(type, title, message, customButtons = null) {
     titleEl.textContent = title;
     messageEl.textContent = message;
 
-    // Handle custom buttons
     if (customButtons && buttonContainer) {
         buttonContainer.innerHTML = '';
         customButtons.forEach(btn => {
@@ -184,15 +140,11 @@ function showAuthModal(type, title, message, customButtons = null) {
 
 window.closeAuthModal = function () {
     const modal = document.getElementById('authModal');
-    if (modal) {
-        modal.classList.remove('show');
-    }
+    if (modal) modal.classList.remove('show');
 };
 
-// Registration Function (Updated with email verification)
 window.handleRegister = async function (event) {
     event.preventDefault();
-
     const form = event.target;
     const name = form.name.value;
     const email = form.email.value;
@@ -206,65 +158,32 @@ window.handleRegister = async function (event) {
 
     registerBtn.disabled = true;
     registerBtn.textContent = 'Creating Account...';
-
-    // Set flag to prevent auto-redirect
     isRegistering = true;
 
     try {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
-
         console.log('Account created:', user.email);
-
-        // Update profile with display name
         await updateProfile(user, { displayName: name });
-
-        // Send verification email with action code settings
         const actionCodeSettings = {
             url: window.location.origin + '/src/frontend/pages/login.html',
             handleCodeInApp: false
         };
-
         await sendEmailVerification(user, actionCodeSettings);
-
         console.log('Verification email sent to:', email);
-
-        // Important: Sign out the user BEFORE showing modal
         await signOut(auth);
-
-        // Small delay to ensure sign out completes
         await new Promise(resolve => setTimeout(resolve, 500));
-
-        // Reset flag after sign out completes
         isRegistering = false;
 
-        showAuthModal(
-            'success',
-            'Account Created Successfully!',
-            `A verification email has been sent to ${email}. Please check your inbox (and spam folder) and click the verification link before logging in.`,
-            [
-                {
-                    text: 'Go to Login',
-                    action: () => {
-                        closeAuthModal();
-                        showLoginForm();
-                    },
-                    primary: true
-                }
-            ]
-        );
-
-        // Reset form
+        showAuthModal('success', 'Account Created Successfully!', `A verification email has been sent to ${email}. Please check your inbox (and spam folder) and click the verification link before logging in.`, [
+            { text: 'Go to Login', action: () => { closeAuthModal(); showLoginForm(); }, primary: true }
+        ]);
         form.reset();
 
     } catch (error) {
         console.error('Registration error:', error);
-
-        // Reset flag on error
         isRegistering = false;
-
         let errorMessage = 'Failed to create account. ';
-
         if (error.code === 'auth/email-already-in-use') {
             errorMessage += 'An account with this email already exists.';
         } else if (error.code === 'auth/weak-password') {
@@ -276,9 +195,7 @@ window.handleRegister = async function (event) {
         } else {
             errorMessage += error.message;
         }
-
         showAuthModal('error', 'Registration Failed', errorMessage);
-
         registerBtn.disabled = false;
         registerBtn.textContent = 'Create Account';
     } finally {
@@ -287,54 +204,33 @@ window.handleRegister = async function (event) {
     }
 };
 
-// Resend Verification Email Function
 async function resendVerificationEmail(user) {
     try {
         await sendEmailVerification(user);
-        showAuthModal(
-            'success',
-            'Verification Email Sent',
-            'Please check your inbox for the verification link.'
-        );
+        showAuthModal('success', 'Verification Email Sent', 'Please check your inbox for the verification link.');
     } catch (error) {
         console.error('Error resending verification email:', error);
-        showAuthModal(
-            'error',
-            'Error',
-            'Failed to resend verification email. Please try again later.'
-        );
+        showAuthModal('error', 'Error', 'Failed to resend verification email. Please try again later.');
     }
 }
 
-// Password Reset Function (With styled modal input)
 window.handlePasswordReset = async function (emailParam = null) {
     let email = emailParam;
-
-    // If no email provided, show styled modal with input
     if (!email) {
         showPasswordResetModal();
         return;
     }
-
-    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
         showAuthModal('error', 'Invalid Email', 'Please enter a valid email address.');
         return;
     }
-
     try {
         await sendPasswordResetEmail(auth, email);
-        showAuthModal(
-            'success',
-            'Password Reset Email Sent',
-            `A password reset link has been sent to ${email}. Please check your inbox and follow the instructions.`
-        );
+        showAuthModal('success', 'Password Reset Email Sent', `A password reset link has been sent to ${email}. Please check your inbox and follow the instructions.`);
     } catch (error) {
         console.error('Password reset error:', error);
-
         let errorMessage = 'Failed to send password reset email.';
-
         if (error.code === 'auth/user-not-found') {
             errorMessage = 'No account found with this email address.';
         } else if (error.code === 'auth/invalid-email') {
@@ -344,12 +240,10 @@ window.handlePasswordReset = async function (emailParam = null) {
         } else {
             errorMessage = 'An error occurred. Please contact support at (415) 691-7085.';
         }
-
         showAuthModal('error', 'Password Reset Failed', errorMessage);
     }
 };
 
-// Show Password Reset Modal with Input
 function showPasswordResetModal() {
     const modal = document.getElementById('authModal');
     const icon = document.getElementById('authIcon');
@@ -359,24 +253,17 @@ function showPasswordResetModal() {
 
     if (!modal) return;
 
-    // Set icon
-    icon.textContent = '🔑';
+    icon.textContent = '🔒';
     icon.style.background = 'var(--primary)';
-
     titleEl.textContent = 'Reset Your Password';
     messageEl.innerHTML = `
         <div style="margin: 1.5rem 0;">
-            <input 
-                type="email" 
-                id="resetEmailInput" 
-                placeholder="Enter your email address"
-                style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; font-family: inherit;"
-            />
+            <input type="email" id="resetEmailInput" placeholder="Enter your email address"
+                style="width: 100%; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem; font-family: inherit;"/>
         </div>
     `;
 
     buttonContainer.innerHTML = '';
-
     const sendButton = document.createElement('button');
     sendButton.textContent = 'Send Reset Link';
     sendButton.className = 'btn btn-primary';
@@ -384,12 +271,10 @@ function showPasswordResetModal() {
     sendButton.onclick = async () => {
         const emailInput = document.getElementById('resetEmailInput');
         const email = emailInput.value.trim();
-
         if (!email) {
             emailInput.style.borderColor = '#ef4444';
             return;
         }
-
         closeAuthModal();
         await handlePasswordReset(email);
     };
@@ -402,32 +287,22 @@ function showPasswordResetModal() {
 
     buttonContainer.appendChild(sendButton);
     buttonContainer.appendChild(cancelButton);
-
     modal.classList.add('show');
 
-    // Focus on input after modal opens
     setTimeout(() => {
         const input = document.getElementById('resetEmailInput');
         if (input) {
             input.focus();
-            // Allow Enter key to submit
-            input.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendButton.click();
-                }
-            });
+            input.addEventListener('keypress', (e) => { if (e.key === 'Enter') sendButton.click(); });
         }
     }, 100);
 }
 
-// Auto-close modal on outside click
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('authModal');
     if (modal) {
         modal.addEventListener('click', (e) => {
-            if (e.target === modal || e.target.classList.contains('modal-overlay')) {
-                closeAuthModal();
-            }
+            if (e.target === modal || e.target.classList.contains('modal-overlay')) closeAuthModal();
         });
     }
 });

@@ -1,11 +1,11 @@
-// src/frontend/scripts/dashboardLogic.js - UPDATED
+// dashboardLogic.js
 import { auth } from './firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
+import { ENDPOINTS } from './config.js';
 
 let currentUser = null;
 let currentProjectId = null;
 
-// Check authentication
 onAuthStateChanged(auth, async (user) => {
     if (user) {
         currentUser = user;
@@ -15,12 +15,10 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
-// Load user projects
 async function loadProjects(userId) {
     try {
-        const response = await fetch(`https://holysmokas-backend.onrender.com/user-projects/${userId}`);
+        const response = await fetch(ENDPOINTS.userProjects(userId));
         const data = await response.json();
-
         const container = document.getElementById('projectsContainer');
 
         if (data.success && data.projects.length > 0) {
@@ -58,26 +56,22 @@ async function loadProjects(userId) {
     }
 }
 
-// Open modification modal
 window.openModificationModal = function (projectId) {
     currentProjectId = projectId;
     document.getElementById('modificationModal').classList.add('show');
 };
 
-// Close modification modal
 window.closeModificationModal = function () {
     document.getElementById('modificationModal').classList.remove('show');
     document.getElementById('modificationRequest').value = '';
 };
 
-// Submit modification request
 window.submitModification = async function (event) {
     event.preventDefault();
-
     const request = document.getElementById('modificationRequest').value;
 
     try {
-        const response = await fetch('https://holysmokas-backend.onrender.com/request-modification', {
+        const response = await fetch(ENDPOINTS.requestModification, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -88,7 +82,6 @@ window.submitModification = async function (event) {
         });
 
         const data = await response.json();
-
         closeModificationModal();
 
         if (data.success) {
@@ -103,7 +96,6 @@ window.submitModification = async function (event) {
     }
 };
 
-// Response modal functions
 function showResponseModal(title, message) {
     const modal = document.getElementById('responseModal');
     const content = document.getElementById('responseContent');
