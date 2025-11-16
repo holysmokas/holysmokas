@@ -3,7 +3,7 @@ import { auth } from "./firebase.js";
 
 const FORM_URL =
     "https://script.google.com/macros/s/AKfycbzJOYtbHJRuIgQTT7BVhmzGvRaJ1TMBd-VDoe_DUk_Rbnyr9EBiB5W9Xutir8r8LcgUTg/exec"; // ⬅️ your Google Apps Script Web App URL
-const DEPLOY_URL = "http://localhost:8080/deploy"; // ⬅️ your backend server endpoint
+const DEPLOY_URL = "https://holysmokas-backend.onrender.com/deploy"; // ⬅️ your backend server endpoint
 
 // Handle form submission
 export async function submitContactForm(formData) {

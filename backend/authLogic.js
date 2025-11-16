@@ -32,7 +32,7 @@ onAuthStateChanged(auth, (user) => {
 // Claim projects after login/registration
 async function claimUserProjects(user) {
     try {
-        const response = await fetch('http://localhost:8080/claim-projects', {
+        const response = await fetch('https://holysmokas-backend.onrender.com/claim-projects', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

@@ -83,7 +83,7 @@ window.checkDomain = async function () {
     domainResult.style.color = "#6b7280";
 
     try {
-        const response = await fetch("http://localhost:8080/check-domain", {
+        const response = await fetch("https://holysmokas-backend.onrender.com/check-domain", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ domain }),
@@ -428,7 +428,7 @@ window.handleContactSubmit = async function (e) {
 
     try {
         // ✅ Send to backend to create Stripe session
-        const backendResponse = await fetch("http://localhost:8080/create-payment-session", {
+        const backendResponse = await fetch("https://holysmokas-backend.onrender.com/create-payment-session", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(contactData),

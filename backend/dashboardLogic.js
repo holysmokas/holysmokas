@@ -18,7 +18,7 @@ onAuthStateChanged(auth, async (user) => {
 // Load user projects
 async function loadProjects(userId) {
     try {
-        const response = await fetch(`http://localhost:8080/user-projects/${userId}`);
+        const response = await fetch(`https://holysmokas-backend.onrender.com/user-projects/${userId}`);
         const data = await response.json();
 
         const container = document.getElementById('projectsContainer');
@@ -77,7 +77,7 @@ window.submitModification = async function (event) {
     const request = document.getElementById('modificationRequest').value;
 
     try {
-        const response = await fetch('http://localhost:8080/request-modification', {
+        const response = await fetch('https://holysmokas-backend.onrender.com/request-modification', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({

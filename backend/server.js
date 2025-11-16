@@ -57,7 +57,15 @@ app.post('/webhook',
     }
 );
 
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://holysmokas.com',
+        'https://www.holysmokas.com'
+    ],
+    credentials: true
+}));
+
 app.use(express.json());
 
 const transporter = nodemailer.createTransport({
@@ -300,7 +308,7 @@ app.post("/create-payment-session", async (req, res) => {
             }
 
             // Send fake success URL
-            const successUrl = `http://localhost:5173/payment-success.html?session_id=bypass_${projectId}`;
+            const successUrl = `https://holysmokas.com/payment-success.html?session_id=bypass_${projectId}`;
             console.log('🔗 Success URL:', successUrl);
 
             // Trigger AI generation in background
@@ -358,8 +366,8 @@ app.post("/create-payment-session", async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url: `http://localhost:5173/payment-success.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `http://localhost:5173/contact.html?canceled=true`,
+            success_url:`https://holysmokas.com/payment-success.html?session_id={CHECKOUT_SESSION_ID}`,
+            cancel_url: `https://holysmokas.com/contact.html?canceled=true`,
             customer_email: contactData.email,
             metadata: {
                 projectId: projectId,
@@ -674,7 +682,7 @@ async function processDeploymentInBackground(formData) {
                             <p>Great news! Your website for <strong>${formData.businessName}</strong> has been generated and is ready for review.</p>
                             
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="http://localhost:5173/src/frontend/pages/dashboard.html" 
+                                <a href="https://holysmokas.com/login.html" 
                                    style="background: #6366f1; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                                     View in Dashboard
                                 </a>
@@ -705,7 +713,7 @@ async function processDeploymentInBackground(formData) {
                             <p>Great news! Your website for <strong>${formData.businessName}</strong> has been generated and deployed.</p>
                             
                             <div style="text-align: center; margin: 30px 0;">
-                                <a href="http://localhost:5173/src/frontend/pages/login.html" 
+                                <a href="https://holysmokas.com/dashboard.html" 
                                    style="background: #6366f1; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                                     Create Account & View Project
                                 </a>
@@ -889,7 +897,7 @@ async function processModificationInBackground(userId, projectId, modificationRe
                     <p>Great news! The modifications you requested for <strong>${projectData.businessName}</strong> are now live.</p>
                     
                     <div style="text-align: center; margin: 30px 0;">
-                        <a href="http://localhost:5173/src/frontend/pages/dashboard.html" 
+                        <a href="https://holysmokas.com/dashboard.html" 
                            style="background: #6366f1; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">
                             View in Dashboard
                         </a>
