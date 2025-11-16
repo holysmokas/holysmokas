@@ -8,11 +8,15 @@ import nodemailer from "nodemailer";
 import Stripe from 'stripe';
 import { deployProject } from "./deployProject.js";
 import { logDeployment } from "./utils/sheetsLogger.js";
-import { db } from './firebaseAdmin.js';
+import { db, admin } from './firebaseAdmin.js';
 import { Octokit } from "@octokit/rest";
 import { generateModification } from './utils/modificationGenerator.js';
 
 dotenv.config({ path: "backend/.env" });
+
+console.log('🔥 Server starting...');
+console.log('📦 Checking Firestore:', typeof db, db ? '✅ Loaded' : '❌ Missing');
+console.log('📦 Checking admin:', typeof admin, admin ? '✅ Loaded' : '❌ Missing');
 
 const app = express();
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
@@ -230,51 +234,79 @@ app.post("/claim-projects", async (req, res) => {
     }
 });
 
-// Stripe Payment Session Creation
+// backend/server.js - FINAL /create-payment-session endpoint
+
 app.post("/create-payment-session", async (req, res) => {
+    console.log('🎯 /create-payment-session called');
+
     try {
         const contactData = req.body;
+        console.log('📝 Request data:', {
+            email: contactData.email,
+            businessName: contactData.businessName,
+            packagePrice: contactData.packagePrice
+        });
 
         if (!contactData.email || !contactData.businessName || !contactData.packagePrice) {
+            console.error('❌ Missing required fields');
             return res.status(400).json({
                 success: false,
                 error: 'Missing required fields'
             });
         }
 
-        // Save project to Firestore
-        const projectRef = db.collection('projects').doc();
-        const projectId = projectRef.id;
+        let projectId;
 
-        await projectRef.set({
-            ...contactData,
-            projectId: projectId,
-            status: 'pending_payment',
-            createdAt: new Date(),
-            paidAt: null,
-            generationAttempts: 0,
-            generationStatus: null,
-            githubRepoUrl: null,
-            liveUrl: null
-        });
+        // Try to save to Firestore, but continue if it fails
+        try {
+            console.log('💾 Attempting to save to Firestore...');
+            const projectRef = db.collection('projects').doc();
+            projectId = projectRef.id;
 
-        // BYPASS MODE FOR TESTING (Remove when Stripe is ready)
+            await projectRef.set({
+                ...contactData,
+                projectId: projectId,
+                status: 'pending_payment',
+                createdAt: new Date(),
+                paidAt: null,
+                generationAttempts: 0,
+                generationStatus: null,
+                githubRepoUrl: null,
+                liveUrl: null
+            });
+            console.log('✅ Firestore save successful, projectId:', projectId);
+        } catch (firestoreError) {
+            console.warn('⚠️ Firestore save failed:', firestoreError.message);
+            console.warn('⚠️ Continuing with generated projectId...');
+            projectId = 'local-' + Date.now();
+            console.log('🆔 Generated local projectId:', projectId);
+        }
+
+        // BYPASS MODE FOR TESTING
         if (process.env.BYPASS_PAYMENT === 'true') {
             console.log('⚠️ BYPASS MODE: Skipping Stripe, triggering AI generation directly');
 
-            // Mark as paid immediately
-            await projectRef.update({
-                status: 'paid',
-                paidAt: new Date(),
-                bypassedPayment: true
-            });
+            // Try to mark as paid in Firestore (skip if fails)
+            try {
+                const projectRef = db.collection('projects').doc(projectId);
+                await projectRef.update({
+                    status: 'paid',
+                    paidAt: new Date(),
+                    bypassedPayment: true
+                });
+                console.log('✅ Project marked as paid in Firestore');
+            } catch (err) {
+                console.warn('⚠️ Could not update Firestore (bypassing):', err.message);
+            }
 
             // Send fake success URL
             const successUrl = `http://localhost:5173/payment-success.html?session_id=bypass_${projectId}`;
+            console.log('🔗 Success URL:', successUrl);
 
             // Trigger AI generation in background
             setTimeout(() => {
-                triggerAIGeneration(projectId).catch(err => {
+                console.log('🤖 Triggering AI generation for:', projectId);
+                triggerAIGeneration(projectId, contactData).catch(err => {
                     console.error('Background generation error:', err);
                 });
             }, 1000);
@@ -288,7 +320,9 @@ app.post("/create-payment-session", async (req, res) => {
             });
         }
 
-        // REAL STRIPE FLOW (Only runs when BYPASS_PAYMENT is not true)
+        // REAL STRIPE FLOW
+        console.log('💳 Creating Stripe checkout session...');
+
         const lineItems = [
             {
                 price_data: {
@@ -305,6 +339,7 @@ app.post("/create-payment-session", async (req, res) => {
 
         // Add domain if selected
         if (contactData.domainPricing && contactData.domainPricing.initialCost > 0) {
+            console.log('🌐 Adding domain to checkout:', contactData.selectedDomain);
             lineItems.push({
                 price_data: {
                     currency: 'usd',
@@ -324,7 +359,7 @@ app.post("/create-payment-session", async (req, res) => {
             line_items: lineItems,
             mode: 'payment',
             success_url: `http://localhost:5173/payment-success.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `http://localhost:5173/src/frontend/pages/contact.html?canceled=true`,
+            cancel_url: `http://localhost:5173/contact.html?canceled=true`,
             customer_email: contactData.email,
             metadata: {
                 projectId: projectId,
@@ -337,16 +372,164 @@ app.post("/create-payment-session", async (req, res) => {
             }
         });
 
-        await projectRef.update({ stripeSessionId: session.id });
+        console.log('✅ Stripe session created:', session.id);
 
-        console.log('✅ Payment session created:', session.id);
-        res.json({ success: true, sessionUrl: session.url, sessionId: session.id, projectId: projectId });
+        // Try to save Stripe session ID to Firestore
+        try {
+            const projectRef = db.collection('projects').doc(projectId);
+            await projectRef.update({ stripeSessionId: session.id });
+            console.log('✅ Stripe session ID saved to Firestore');
+        } catch (err) {
+            console.warn('⚠️ Could not save Stripe session ID to Firestore:', err.message);
+        }
+
+        res.json({
+            success: true,
+            sessionUrl: session.url,
+            sessionId: session.id,
+            projectId: projectId
+        });
 
     } catch (error) {
         console.error('❌ Error creating payment session:', error);
-        res.status(500).json({ success: false, error: 'Failed to create payment session' });
+        console.error('Error stack:', error.stack);
+        res.status(500).json({
+            success: false,
+            error: 'Failed to create payment session',
+            details: error.message
+        });
     }
 });
+
+// UPDATED: triggerAIGeneration with fallback data parameter
+async function triggerAIGeneration(projectId, fallbackData = null, retryCount = 0) {
+    const MAX_RETRIES = 3;
+    console.log(`🤖 triggerAIGeneration called for projectId: ${projectId}`);
+
+    try {
+        let projectData;
+
+        // Try to get data from Firestore first
+        try {
+            const projectRef = db.collection('projects').doc(projectId);
+            const projectDoc = await projectRef.get();
+
+            if (!projectDoc.exists) {
+                console.warn('⚠️ Project not found in Firestore, using fallback data');
+                if (!fallbackData) throw new Error('No fallback data provided');
+                projectData = fallbackData;
+            } else {
+                projectData = projectDoc.data();
+                console.log('✅ Project data loaded from Firestore');
+            }
+        } catch (firestoreErr) {
+            console.warn('⚠️ Firestore read failed:', firestoreErr.message);
+            if (!fallbackData) throw new Error('Cannot proceed without project data');
+            projectData = fallbackData;
+            console.log('✅ Using fallback data for generation');
+        }
+
+        // Try to update status in Firestore (skip if fails)
+        try {
+            const projectRef = db.collection('projects').doc(projectId);
+            await projectRef.update({
+                status: 'generating',
+                generationStatus: 'in_progress',
+                generationStartedAt: new Date(),
+                generationAttempts: (projectData.generationAttempts || 0) + 1
+            });
+            console.log('✅ Status updated in Firestore');
+        } catch (err) {
+            console.warn('⚠️ Could not update Firestore status:', err.message);
+        }
+
+        console.log(`🤖 Starting AI generation (Attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
+        console.log('📦 Business Name:', projectData.businessName);
+        console.log('📦 Package:', projectData.package);
+
+        // Call deployment
+        const deploymentResult = await deployProject({
+            name: projectData.businessName,
+            description: projectData.mainGoal || 'Professional business website',
+            category: projectData.package,
+            email: projectData.email
+        });
+
+        console.log('🎨 Deployment result:', deploymentResult);
+
+        // Validate deployment result
+        if (!deploymentResult || !deploymentResult.success) {
+            throw new Error(deploymentResult?.error || 'Deployment failed: No result returned');
+        }
+
+        if (!deploymentResult.repoUrl || !deploymentResult.pagesUrl) {
+            throw new Error('Deployment failed: Missing required URLs in result');
+        }
+
+        console.log('✅ AI generation completed successfully');
+        console.log('🔗 Repo URL:', deploymentResult.repoUrl);
+        console.log('🔗 Live URL:', deploymentResult.pagesUrl);
+
+        // Try to update Firestore with success (skip if fails)
+        try {
+            const projectRef = db.collection('projects').doc(projectId);
+            await projectRef.update({
+                status: 'live',
+                generationStatus: 'completed',
+                generationCompletedAt: new Date(),
+                githubRepoUrl: deploymentResult.repoUrl,
+                liveUrl: deploymentResult.pagesUrl,
+                repoName: deploymentResult.repoName || 'unknown'
+            });
+            console.log('✅ Success status saved to Firestore');
+        } catch (err) {
+            console.warn('⚠️ Could not save success to Firestore:', err.message);
+        }
+
+        // Send completion email
+        try {
+            await transporter.sendMail({
+                from: `"HolySmokas" <${process.env.SMTP_USER}>`,
+                to: projectData.email,
+                subject: `🚀 Your Website is Live! - ${projectData.businessName}`,
+                html: `
+                    <h2>🚀 Your Website is Live!</h2>
+                    <p><strong>Live URL:</strong> <a href="${deploymentResult.pagesUrl}">${deploymentResult.pagesUrl}</a></p>
+                    <p><strong>GitHub:</strong> <a href="${deploymentResult.repoUrl}">${deploymentResult.repoUrl}</a></p>
+                    <p>Questions? Call (415) 691-7085</p>
+                `
+            });
+            console.log('📧 Completion email sent');
+        } catch (emailErr) {
+            console.warn('⚠️ Could not send completion email:', emailErr.message);
+        }
+
+    } catch (error) {
+        console.error(`❌ AI generation failed:`, error.message);
+        console.error('Error stack:', error.stack);
+
+        if (retryCount < MAX_RETRIES) {
+            console.log(`🔄 Retrying (${retryCount + 1}/${MAX_RETRIES})...`);
+            await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 5000));
+            await triggerAIGeneration(projectId, fallbackData, retryCount + 1);
+        } else {
+            console.error(`🚨 Max retries reached for ${projectId}`);
+
+            // Try to save failure status (skip if fails)
+            try {
+                const projectRef = db.collection('projects').doc(projectId);
+                await projectRef.update({
+                    status: 'failed',
+                    generationStatus: 'failed',
+                    generationError: error.message,
+                    generationFailedAt: new Date()
+                });
+            } catch (err) {
+                console.warn('⚠️ Could not save failure status:', err.message);
+            }
+        }
+    }
+}
 
 // Handle successful payment
 async function handleSuccessfulPayment(session) {
@@ -381,119 +564,6 @@ async function handleSuccessfulPayment(session) {
 
     } catch (error) {
         console.error(`❌ Error handling payment for ${projectId}:`, error);
-    }
-}
-
-// AI Generation with retry logic
-async function triggerAIGeneration(projectId, retryCount = 0) {
-    const MAX_RETRIES = 3;
-    const projectRef = db.collection('projects').doc(projectId);
-
-    try {
-        const projectDoc = await projectRef.get();
-        if (!projectDoc.exists) throw new Error('Project not found');
-
-        const projectData = projectDoc.data();
-
-        await projectRef.update({
-            status: 'generating',
-            generationStatus: 'in_progress',
-            generationStartedAt: new Date(),
-            generationAttempts: (projectData.generationAttempts || 0) + 1
-        });
-
-        console.log(`🤖 Starting AI generation for ${projectId} (Attempt ${retryCount + 1}/${MAX_RETRIES + 1})`);
-
-        // 🆕 FIXED: Pass correct data structure to deployProject
-        const deploymentResult = await deployProject({
-            name: projectData.businessName,  // ✅ Changed from businessName to name
-            description: projectData.mainGoal || 'Professional business website',  // ✅ Added fallback
-            category: projectData.package,  // ✅ Pass full package name
-            email: projectData.email
-        });
-
-        // Validate deployment result
-        if (!deploymentResult || !deploymentResult.success) {
-            throw new Error(deploymentResult?.error || 'Deployment failed: No result returned');
-        }
-
-        if (!deploymentResult.repoUrl || !deploymentResult.pagesUrl) {
-            throw new Error('Deployment failed: Missing required URLs in result');
-        }
-
-        // Update with success
-        await projectRef.update({
-            status: 'live',
-            generationStatus: 'completed',
-            generationCompletedAt: new Date(),
-            githubRepoUrl: deploymentResult.repoUrl,
-            liveUrl: deploymentResult.pagesUrl,  // ✅ Changed from liveUrl to pagesUrl
-            repoName: deploymentResult.repoName || 'unknown'
-        });
-
-        console.log(`✅ AI generation completed for ${projectId}`);
-
-        // Send completion email
-        await transporter.sendMail({
-            from: `"HolySmokas" <${process.env.SMTP_USER}>`,
-            to: projectData.email,
-            subject: `🚀 Your Website is Live! - ${projectData.businessName}`,
-            html: `
-                <h2>🚀 Your Website is Live!</h2>
-                <p><strong>Live URL:</strong> <a href="${deploymentResult.pagesUrl}">${deploymentResult.pagesUrl}</a></p>
-                <p><strong>GitHub:</strong> <a href="${deploymentResult.repoUrl}">${deploymentResult.repoUrl}</a></p>
-                <p>Log in to your dashboard to request changes anytime.</p>
-                <p>Questions? Call (415) 691-7085</p>
-            `
-        });
-
-    } catch (error) {
-        console.error(`❌ AI generation failed for ${projectId}:`, error);
-
-        if (retryCount < MAX_RETRIES) {
-            console.log(`🔄 Retrying (${retryCount + 1}/${MAX_RETRIES})...`);
-            await new Promise(resolve => setTimeout(resolve, (retryCount + 1) * 5000));
-            await triggerAIGeneration(projectId, retryCount + 1);
-        } else {
-            console.error(`🚨 Max retries reached for ${projectId}`);
-
-            const projectDoc = await projectRef.get();
-            const projectData = projectDoc.data();
-
-            await projectRef.update({
-                status: 'failed',
-                generationStatus: 'failed',
-                generationError: error.message,
-                generationFailedAt: new Date(),
-                requiresManualIntervention: true
-            });
-
-            // Notify admin
-            await transporter.sendMail({
-                from: `"HolySmokas" <${process.env.SMTP_USER}>`,
-                to: "holysmokasthatscheap@gmail.com",
-                subject: `🚨 MANUAL INTERVENTION - Project ${projectId}`,
-                html: `
-                    <h2>🚨 AI Generation Failed</h2>
-                    <p><strong>Project:</strong> ${projectData.businessName}</p>
-                    <p><strong>Email:</strong> ${projectData.email}</p>
-                    <p><strong>Error:</strong> ${error.message}</p>
-                `
-            });
-
-            // Notify customer
-            await transporter.sendMail({
-                from: `"HolySmokas" <${process.env.SMTP_USER}>`,
-                to: projectData.email,
-                subject: `Update - ${projectData.businessName}`,
-                html: `
-                    <h2>Update on Your Website</h2>
-                    <p>We encountered an issue generating your website automatically.</p>
-                    <p>Our team has been notified and will create it manually within 24 hours.</p>
-                    <p>We apologize for the delay. Questions? Call (415) 691-7085</p>
-                `
-            });
-        }
     }
 }
 
@@ -842,93 +912,6 @@ async function processModificationInBackground(userId, projectId, modificationRe
         });
     }
 }
-
-app.post("/create-payment-session", async (req, res) => {
-    try {
-        const contactData = req.body;
-
-        if (!contactData.email || !contactData.businessName || !contactData.packagePrice) {
-            return res.status(400).json({
-                success: false,
-                error: 'Missing required fields'
-            });
-        }
-
-        // Save project to Firestore
-        const projectRef = db.collection('projects').doc();
-        const projectId = projectRef.id;
-
-        await projectRef.set({
-            ...contactData,
-            projectId: projectId,
-            status: 'pending_payment',
-            createdAt: new Date(),
-            paidAt: null,
-            generationAttempts: 0,
-            generationStatus: null,
-            githubRepoUrl: null,
-            liveUrl: null
-        });
-
-        // Create line items
-        const lineItems = [
-            {
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: contactData.package,
-                        description: `Website package for ${contactData.businessName}`
-                    },
-                    unit_amount: Math.round(contactData.packagePrice * 100)
-                },
-                quantity: 1
-            }
-        ];
-
-        // Add domain if selected
-        if (contactData.domainPricing && contactData.domainPricing.initialCost > 0) {
-            lineItems.push({
-                price_data: {
-                    currency: 'usd',
-                    product_data: {
-                        name: `Domain: ${contactData.selectedDomain}`,
-                        description: `First year (Renewal: $${contactData.domainPricing.renewalCost}/year)`
-                    },
-                    unit_amount: Math.round(contactData.domainPricing.initialCost * 100)
-                },
-                quantity: 1
-            });
-        }
-
-        // Create Stripe session
-        const session = await stripe.checkout.sessions.create({
-            payment_method_types: ['card'],
-            line_items: lineItems,
-            mode: 'payment',
-            success_url: `http://localhost:5173/payment-success.html?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `http://localhost:5173/src/frontend/pages/contact.html?canceled=true`,
-            customer_email: contactData.email,
-            metadata: {
-                projectId: projectId,
-                businessName: contactData.businessName,
-                email: contactData.email,
-                packageType: contactData.package,
-                selectedDomain: contactData.selectedDomain || 'N/A',
-                mainGoal: contactData.mainGoal,
-                mustHaveFeatures: contactData.mustHaveFeatures
-            }
-        });
-
-        await projectRef.update({ stripeSessionId: session.id });
-
-        console.log('✅ Payment session created:', session.id);
-        res.json({ success: true, sessionUrl: session.url, sessionId: session.id, projectId: projectId });
-
-    } catch (error) {
-        console.error('❌ Error creating payment session:', error);
-        res.status(500).json({ success: false, error: 'Failed to create payment session' });
-    }
-});
 
 
 app.get("/test-email", async (req, res) => {

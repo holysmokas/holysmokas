@@ -8,6 +8,7 @@ on:
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -17,14 +18,28 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          
+
+      # -------------------------------
+      # 1️⃣ Create Firebase service key BEFORE build
+      # -------------------------------
+      - name: Create Firebase service account file
+        run: |
+          mkdir -p backend
+          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > backend/serviceAccountKey.json
+
+      # -------------------------------
+      # 2️⃣ Install dependencies
+      # -------------------------------
       - name: Install dependencies
         run: npm ci
-        
+
+      # -------------------------------
+      # 3️⃣ Build project
+      # -------------------------------
       - name: Build
         run: npm run build
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
           GITHUB_USERNAME: ${{ secrets.GITHUB_USERNAME }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NAMECHEAP_API_KEY: ${{ secrets.NAMECHEAP_API_KEY }}
@@ -32,10 +47,16 @@ jobs:
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
           STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
-        
+
+      # -------------------------------
+      # 4️⃣ Add CNAME for GitHub Pages
+      # -------------------------------
       - name: Add CNAME to docs
         run: echo "holysmokas.com" > docs/CNAME
-        
+
+      # -------------------------------
+      # 5️⃣ Deploy to GitHub Pages
+      # -------------------------------
       - name: Deploy
         run: |
           git config --global user.name 'github-actions[bot]'
