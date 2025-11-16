@@ -1,5 +1,5 @@
 // portalLogic.js
-import { auth } from "./firebase.js";
+import { auth } from "../../backend/firebase.js";
 import { ENDPOINTS } from './config.js';
 
 export async function submitContactForm(formData) {

@@ -1,4 +1,4 @@
-import { db } from './firebase.js';
+import { db } from '../../backend/firebase.js';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { GOOGLE_SHEETS_URL, ENDPOINTS } from './config.js';
 

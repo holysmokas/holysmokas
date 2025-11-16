@@ -1,5 +1,5 @@
 // dashboardLogic.js
-import { auth } from './firebase.js';
+import { auth } from '../../backend/firebase.js';
 import { onAuthStateChanged } from 'firebase/auth';
 import { ENDPOINTS } from './config.js';
 
