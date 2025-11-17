@@ -77,7 +77,7 @@ jobs:
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          key: ${{ secrets.VM_SSH_KEY }}
           script: |
             # Navigate to the project directory on your VM
             cd ${{ secrets.VM_PROJECT_PATH }}
