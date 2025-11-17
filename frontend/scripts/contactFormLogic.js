@@ -12,7 +12,7 @@ function showModal(title, message, isSuccess = true) {
     modalTitle.textContent = title;
     modalMessage.textContent = message;
 
-    modalIcon.textContent = isSuccess ? '✔' : '✕';
+    modalIcon.textContent = isSuccess ? '✓' : '✕';
     modalIcon.style.background = isSuccess ? 'var(--secondary)' : '#ef4444';
 
     modal.classList.add('show');
@@ -162,6 +162,18 @@ window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
                 <span style="font-size: 1.5rem;">✅</span>
                 <strong style="color: #065f46;">${domain} added to form</strong>
             </div>
+            
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: #6b7280;">Initial Registration:</span>
+                    <strong style="color: #059669; font-size: 1.1rem;">$${initialCost.toFixed(2)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280;">Annual Renewal:</span>
+                    <strong style="color: #059669; font-size: 1.1rem;">$${renewalCost.toFixed(2)}/year</strong>
+                </div>
+            </div>
+            
             <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem;">
                 This domain will be registered after payment
             </p>
@@ -177,7 +189,11 @@ window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
 
 function getPackagePrice(packageString) {
     if (packageString.includes('$499')) return 499;
+    if (packageString.includes('$599')) return 599;
     if (packageString.includes('$999')) return 999;
+    if (packageString.includes('$1,199')) return 1199;
+    if (packageString.includes('$1,499')) return 1499;
+    if (packageString.includes('$1,699')) return 1699;
     if (packageString.includes('$1,999')) return 1999;
     if (packageString.includes('Custom Quote')) return 0;
     return 0;
@@ -185,7 +201,20 @@ function getPackagePrice(packageString) {
 
 function updatePricingBreakdown() {
     const packageSelect = document.getElementById("package");
-    const pricingDisplay = document.getElementById("pricingBreakdown");
+    let pricingDisplay = document.getElementById("pricingBreakdown");
+
+    // Create the pricing breakdown element if it doesn't exist
+    if (!pricingDisplay && packageSelect) {
+        pricingDisplay = document.createElement('div');
+        pricingDisplay.id = 'pricingBreakdown';
+        pricingDisplay.style.cssText = 'display: none; background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;';
+
+        // Insert before the submit button
+        const submitBtn = document.getElementById("submitBtn");
+        if (submitBtn && submitBtn.parentNode) {
+            submitBtn.parentNode.insertBefore(pricingDisplay, submitBtn);
+        }
+    }
 
     if (!packageSelect || !pricingDisplay) return;
 
@@ -297,8 +326,8 @@ window.handleContactSubmit = async function (e) {
     const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
     const totalCost = packagePrice + domainPrice;
 
-    if (packagePrice === 0) {
-        showModal("Please Select a Package", "Please select a website package (Starter, Business, or Small Shop) before submitting.", false);
+    if (packagePrice === 0 && !packageSelected.includes('Custom Quote') && !packageSelected.includes('Not Sure Yet')) {
+        showModal("Please Select a Package", "Please select a website package before submitting.", false);
         return;
     }
 
@@ -365,4 +394,6 @@ document.addEventListener('DOMContentLoaded', () => {
     if (packageSelect) {
         packageSelect.addEventListener('change', updatePricingBreakdown);
     }
+    // Initialize pricing breakdown on page load
+    updatePricingBreakdown();
 });
