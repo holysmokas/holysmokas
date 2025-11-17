@@ -8,7 +8,7 @@ const CONFIG = {
         SITE_URL: 'http://localhost:5173'
     },
     production: {
-        API_BASE_URL: 'http://34.136.122.71:3001',
+        API_BASE_URL: 'https://34.136.122.71:3001',
         GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/AKfycbzJOYtbHJRuIgQTT7BVhmzGvRaJ1TMBd-VDoe_DUk_Rbnyr9EBiB5W9Xutir8r8LcgUTg/exec',
         SITE_URL: 'https://holysmokas.com'
     }
