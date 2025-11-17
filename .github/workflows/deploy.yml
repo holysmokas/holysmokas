@@ -43,8 +43,8 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-          GITHUB_USERNAME: ${{ secrets.GIT_USERNAME }}
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
+          GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           NAMECHEAP_API_KEY: ${{ secrets.NAMECHEAP_API_KEY }}
           NAMECHEAP_API_USER: ${{ secrets.NAMECHEAP_API_USER }}
