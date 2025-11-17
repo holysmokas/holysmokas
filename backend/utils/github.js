@@ -3,9 +3,14 @@ import { Octokit } from "@octokit/rest";
 import fs from "fs";
 import path from "path";
 import { execSync } from "child_process";
-import dotenv from "dotenv";
+// REMOVED: import dotenv from "dotenv";
+// REMOVED: dotenv.config({ path: path.resolve("backend/.env") });
 
-dotenv.config({ path: path.resolve("backend/.env") });
+// Add debug logging
+console.log('🔍 github.js - Environment Check:');
+console.log('GIT_TOKEN exists:', !!process.env.GIT_TOKEN);
+console.log('GIT_TOKEN starts with:', process.env.GIT_TOKEN?.substring(0, 10));
+console.log('GIT_USERNAME:', process.env.GIT_USERNAME);
 
 const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
 const GIT_USERNAME = process.env.GIT_USERNAME;
