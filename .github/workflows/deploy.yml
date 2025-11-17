@@ -1,4 +1,4 @@
-name: Deploy to GitHub Pages
+name: Deploy to GitHub Pages and VM
 
 on:
   push:
@@ -60,7 +60,7 @@ jobs:
         run: echo "holysmokas.com" > docs/CNAME
       
       # -------------------------------
-      # 5️⃣ Deploy to GitHub Pages (FIXED)
+      # 5️⃣ Deploy to GitHub Pages
       # -------------------------------
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
@@ -68,3 +68,30 @@ jobs:
           github_token: ${{ secrets.GIT_TOKEN }}
           publish_dir: ./docs
           cname: holysmokas.com
+      
+      # -------------------------------
+      # 6️⃣ Deploy to VM
+      # -------------------------------
+      - name: Deploy to VM
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          script: |
+            # Navigate to the project directory on your VM
+            cd ${{ secrets.VM_PROJECT_PATH }}
+            
+            # Pull the latest changes from the main branch
+            echo "🚚 Pulling latest code from GitHub..."
+            git pull origin main
+            
+            # Install/update dependencies
+            echo "📦 Installing dependencies..."
+            npm install
+            
+            # Restart the application using a process manager like PM2
+            echo "🔄 Restarting the application..."
+            pm2 restart server
+            
+            echo "✅ Deployment to VM complete!"
