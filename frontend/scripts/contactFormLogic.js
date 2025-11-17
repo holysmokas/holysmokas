@@ -325,6 +325,11 @@ window.handleContactSubmit = async function (e) {
     };
 
     const submitBtn = document.getElementById("submitBtn");
+    if (!submitBtn) {
+        console.error("Submit button not found!");
+        showModal("Error", "Form submission error. Please refresh the page and try again.", false);
+        return;
+    }
     const originalText = submitBtn.textContent;
     submitBtn.textContent = "Creating Payment Session...";
     submitBtn.disabled = true;
