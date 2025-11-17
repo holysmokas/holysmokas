@@ -288,7 +288,7 @@ export async function deployProject(formData) {
         if (fs.existsSync(packageJsonPath)) {
             const pkg = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
             pkg.name = repoName;
-            pkg.homepage = `https://${process.env.GITHUB_USERNAME}.github.io/${repoName}/`;
+            pkg.homepage = `https://${process.env.GIT_USERNAME}.github.io/${repoName}/`;
             fs.writeFileSync(packageJsonPath, JSON.stringify(pkg, null, 2));
             console.log(`✅ Updated package.json`);
         }

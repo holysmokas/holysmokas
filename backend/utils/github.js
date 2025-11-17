@@ -8,7 +8,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: path.resolve("backend/.env") });
 
 const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
-const GITHUB_USERNAME = process.env.GITHUB_USERNAME;
+const GIT_USERNAME = process.env.GIT_USERNAME;
 
 export async function createRepo(repoName, description = "Generated site") {
   try {
@@ -29,7 +29,7 @@ export async function createRepo(repoName, description = "Generated site") {
 export async function enablePages(repoName) {
   try {
     await octokit.repos.createPagesSite({
-      owner: GITHUB_USERNAME,
+      owner: GIT_USERNAME,
       repo: repoName,
       build_type: "workflow",
     });
@@ -70,7 +70,7 @@ export async function deployToGitHub(projectDir, repoName, description = "Genera
     execSync('git commit -m "Initial commit - project files"', { cwd: projectDir, stdio: "inherit" });
     execSync("git branch -M main", { cwd: projectDir, stdio: "inherit" });
     execSync(
-      `git remote add origin https://${process.env.GIT_TOKEN}@github.com/${GITHUB_USERNAME}/${repoName}.git`,
+      `git remote add origin https://${process.env.GIT_TOKEN}@github.com/${GIT_USERNAME}/${repoName}.git`,
       { cwd: projectDir, stdio: "inherit" }
     );
     execSync("git push -u origin main --force", { cwd: projectDir, stdio: "inherit" });
@@ -95,7 +95,7 @@ export async function deployToGitHub(projectDir, repoName, description = "Genera
     await new Promise(resolve => setTimeout(resolve, 3000));
     await enablePages(repoName);
 
-    const pagesUrl = `https://${GITHUB_USERNAME}.github.io/${repoName}/`;
+    const pagesUrl = `https://${GIT_USERNAME}.github.io/${repoName}/`;
     console.log("✅ Deployment complete!");
     console.log("📍 Site will be available at:", pagesUrl);
 

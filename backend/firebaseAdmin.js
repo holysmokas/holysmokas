@@ -12,10 +12,10 @@ console.log('🔥 Loading Firebase service account...');
 let serviceAccount;
 
 // 1️⃣ Try environment variable first (Render/GitHub Actions)
-if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+if (process.env.GOOGLE_APPLICATION_CREDENTIALS) {
     console.log('🔐 Using FIREBASE_SERVICE_ACCOUNT from environment variable');
     try {
-        serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+        serviceAccount = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS);
         console.log('✅ Service account loaded from env var');
     } catch (err) {
         console.error('❌ Failed to parse FIREBASE_SERVICE_ACCOUNT:', err.message);

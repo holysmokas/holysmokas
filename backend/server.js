@@ -833,7 +833,7 @@ async function processModificationInBackground(userId, projectId, modificationRe
         console.log('🔄 Processing modification for:', projectData.businessName);
 
         const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
-        const owner = process.env.GITHUB_USERNAME;
+        const owner = process.env.GIT_USERNAME;
         const repo = projectData.repoName;
 
         const { data: repoData } = await octokit.repos.get({ owner, repo });
