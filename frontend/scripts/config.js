@@ -3,12 +3,12 @@ const ENV = 'production'; // Change to 'development' for local testing
 
 const CONFIG = {
     development: {
-        API_BASE_URL: 'http://localhost:3001',
+        API_BASE_URL: 'https://localhost:3001',
         GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/AKfycbzJOYtbHJRuIgQTT7BVhmzGvRaJ1TMBd-VDoe_DUk_Rbnyr9EBiB5W9Xutir8r8LcgUTg/exec',
         SITE_URL: 'http://localhost:5173'
     },
     production: {
-        API_BASE_URL: 'http://api.holysmokas.com:3001',
+        API_BASE_URL: 'https://api.holysmokas.com:3001',
         GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/AKfycbzJOYtbHJRuIgQTT7BVhmzGvRaJ1TMBd-VDoe_DUk_Rbnyr9EBiB5W9Xutir8r8LcgUTg/exec',
         SITE_URL: 'https://holysmokas.com'
     }
