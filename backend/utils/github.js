@@ -82,7 +82,7 @@ export async function deployToGitHub(projectDir, repoName, description = "Genera
     if (workflowContent) {
       console.log("📄 Adding workflow file via GitHub API...");
       await octokit.repos.createOrUpdateFileContents({
-        owner: GITHUB_USERNAME,
+        owner: GIT_USERNAME,
         repo: repoName,
         path: ".github/workflows/deploy.yml",
         message: "Add GitHub Actions deployment workflow",
