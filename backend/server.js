@@ -5,20 +5,52 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import nodemailer from "nodemailer";
-import Stripe from 'stripe';
-import { deployProject } from "./deployProject.js";
+import Stripe from "stripe";
+import { deployProject, parseCodeBlocks } from "./deployProject.js";
 import { logDeployment } from "./utils/sheetsLogger.js";
-import { db, admin } from './firebaseAdmin.js';
+import { db, admin } from "./firebaseAdmin.js";
 import { Octokit } from "@octokit/rest";
-import { generateModification } from './utils/modificationGenerator.js';
+import { generateModification } from "./utils/modificationGenerator.js";
 
-dotenv.config({ path: "backend/.env" });
+dotenv.config();
 
 console.log('🔥 Server starting...');
 console.log('📦 Checking Firestore:', typeof db, db ? '✅ Loaded' : '❌ Missing');
 console.log('📦 Checking admin:', typeof admin, admin ? '✅ Loaded' : '❌ Missing');
 
 const app = express();
+
+app.use(cors({
+    origin: [
+        'https://holysmokas.com',
+        'https://www.holysmokas.com',
+        'http://localhost:5173'
+    ],
+    credentials: true
+}));
+
+
+// Test Firestore endpoint
+app.get('/test-firestore', async (req, res) => {
+  try {
+    const testDoc = await db.collection('contacts').limit(1).get();
+    res.json({ 
+      success: true, 
+      message: 'Firestore is working!',
+      docCount: testDoc.size 
+    });
+  } catch (error) {
+    res.status(500).json({ 
+      success: false, 
+      message: 'Firestore failed', 
+      error: error.message 
+    });
+  }
+});
+
+console.log('🔍 STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'Found (length: ' + process.env.STRIPE_SECRET_KEY.length + ')' : 'NOT FOUND');
+console.log('🔍 First 10 chars:', process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 10) : 'N/A');
+console.log('🔍 Type:', typeof process.env.STRIPE_SECRET_KEY);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // IMPORTANT: Webhook route MUST come BEFORE express.json()
@@ -57,14 +89,6 @@ app.post('/webhook',
     }
 );
 
-app.use(cors({
-    origin: [
-        'http://localhost:5173',
-        'https://holysmokas.com',
-        'https://www.holysmokas.com'
-    ],
-    credentials: true
-}));
 
 app.use(express.json());
 
@@ -844,7 +868,6 @@ async function processModificationInBackground(userId, projectId, modificationRe
             category: projectData.packageType
         });
 
-        const { parseCodeBlocks } = await import('./deployProject.js');
         const parsedFiles = parseCodeBlocks(updatedCode);
 
         for (const file of parsedFiles) {
@@ -962,6 +985,6 @@ app.get("/", (req, res) => {
 });
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () =>
-    console.log(`🔥 HolySmokas backend running at http://localhost:${PORT}`)
+app.listen(PORT, '0.0.0.0', () =>
+    console.log(`🔥 HolySmokas backend running at http:0.0.0.0:${PORT}`)
 );
