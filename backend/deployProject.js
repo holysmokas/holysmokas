@@ -37,6 +37,40 @@ function copyRecursive(src, dest) {
 }
 
 /**
+ * Fix incorrect exports in AI-generated component files
+ */
+function fixExports(fileContent, filename) {
+    // Only fix .jsx component files
+    if (!filename.endsWith('.jsx')) {
+        return fileContent;
+    }
+
+    // Skip if already has export default
+    if (fileContent.includes('export default')) {
+        return fileContent;
+    }
+
+    const componentName = path.basename(filename, '.jsx');
+
+    // Fix named exports: export { ComponentName }
+    if (fileContent.includes(`export { ${componentName} }`)) {
+        fileContent = fileContent.replace(`export { ${componentName} }`, `export default ${componentName}`);
+        console.log(`  🔧 Fixed named export in ${filename}`);
+        return fileContent;
+    }
+
+    // Fix missing export when function exists
+    if (fileContent.match(new RegExp(`(function|const)\\s+${componentName}`, 'i'))) {
+        fileContent += `\n\nexport default ${componentName};\n`;
+        console.log(`  🔧 Added missing export to ${filename}`);
+        return fileContent;
+    }
+
+    console.log(`  ⚠️ Could not fix export in ${filename} - may need manual review`);
+    return fileContent;
+}
+
+/**
  * Determine which boilerplate to use based on package selection
  * Returns: { boilerplatePath, category, useBoilerplate }
  */
@@ -246,20 +280,22 @@ export async function deployProject(formData) {
                     fs.mkdirSync(dir, { recursive: true });
                 }
 
+                // Fix exports in component files
+                let content = fixExports(file.content, file.path);
+
                 if (file.path === 'vite.config.js') {
-                    let viteContent = file.content;
-                    if (!viteContent.includes('base:')) {
-                        viteContent = viteContent.replace(
+                    if (!content.includes('base:')) {
+                        content = content.replace(
                             /(plugins:\s*\[.*?\])/s,
                             `$1,\n  base: '/${repoName}/'`
                         );
                     } else {
-                        viteContent = viteContent.replace(/base:\s*['"].*?['"]/, `base: '/${repoName}/'`);
+                        content = content.replace(/base:\s*['"].*?['"]/, `base: '/${repoName}/'`);
                     }
-                    fs.writeFileSync(fullPath, viteContent, "utf8");
+                    fs.writeFileSync(fullPath, content, "utf8");
                     console.log(`  ✅ Wrote: ${file.path} (with base path)`);
                 } else {
-                    fs.writeFileSync(fullPath, file.content, "utf8");
+                    fs.writeFileSync(fullPath, content, "utf8");
                     console.log(`  ✅ Wrote: ${file.path}`);
                 }
             }
