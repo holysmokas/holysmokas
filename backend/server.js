@@ -1,4 +1,5 @@
 // backend/server.js - FIXED .env LOADING
+require('dotenv').config();
 import axios from "axios";
 import xml2js from "xml2js";
 import express from "express";
@@ -12,8 +13,7 @@ import { db, admin } from "./firebaseAdmin.js";
 import { Octokit } from "@octokit/rest";
 import { generateModification } from "./utils/modificationGenerator.js";
 
-// ✅ FIXED: Load .env from current directory (backend/.env)
-dotenv.config();
+
 
 console.log('🔥 Server starting...');
 console.log('📦 Checking Firestore:', typeof db, db ? '✅ Loaded' : '❌ Missing');

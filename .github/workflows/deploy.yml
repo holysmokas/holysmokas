@@ -69,7 +69,7 @@ jobs:
           cname: holysmokas.com
       
       # -------------------------------
-      # 6️⃣ Deploy to VM (NO .env creation - you already have it!)
+      # 6️⃣ Deploy to VM with .env file creation
       # -------------------------------
       - name: Deploy to VM
         uses: appleboy/ssh-action@v1.0.3
@@ -78,8 +78,8 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            # Navigate to the project directory on your VM
-            cd ${{ secrets.VM_PROJECT_PATH }}
+            # Navigate to the correct project directory on your VM
+            cd ${{ secrets.VM_PROJECT_PATH }}/backend
             
             # Pull the latest changes from the main branch
             echo "🚚 Pulling latest code from GitHub..."
@@ -87,28 +87,27 @@ jobs:
             
             # Create Firebase service account file on VM
             echo "🔥 Creating Firebase service account..."
-            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > backend/serviceAccountKey.json
+            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > serviceAccountKey.json
             
             # Install/update dependencies
             echo "📦 Installing dependencies..."
             npm install
             
-            # Export environment variables for the application
-            # IMPORTANT: Your server.js needs to read these environment variables.
-            # Make sure your Node.js app accesses process.env.GIT_TOKEN, etc.
-            echo "⚙️ Exporting environment variables..."
-            export GIT_TOKEN=${{ secrets.GIT_TOKEN }}
-            export GIT_USERNAME=${{ secrets.GIT_USERNAME }}
-            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            export NAMECHEAP_API_KEY=${{ secrets.NAMECHEAP_API_KEY }}
-            export NAMECHEAP_API_USER=${{ secrets.NAMECHEAP_API_USER }}
-            export STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
-            export STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
-            export SMTP_PASS=${{ secrets.SMTP_PASS }}
+            # Create .env file with secrets
+            echo "📝 Creating .env file with secrets..."
+            cat <<EOF > .env
+            GIT_TOKEN=${{ secrets.GIT_TOKEN }}
+            GIT_USERNAME=${{ secrets.GIT_USERNAME }}
+            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            NAMECHEAP_API_KEY=${{ secrets.NAMECHEAP_API_KEY }}
+            NAMECHEAP_API_USER=${{ secrets.NAMECHEAP_API_USER }}
+            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            SMTP_PASS=${{ secrets.SMTP_PASS }}
+            EOF
             
             # Restart the application using PM2
             echo "🔄 Restarting the application..."
-            pm2 restart server
+            pm2 reload holysmokas-backend
             
             echo "✅ Deployment to VM complete!"
-
