@@ -93,8 +93,22 @@ jobs:
             echo "📦 Installing dependencies..."
             npm install
             
+            # Export environment variables for the application
+            # IMPORTANT: Your server.js needs to read these environment variables.
+            # Make sure your Node.js app accesses process.env.GIT_TOKEN, etc.
+            echo "⚙️ Exporting environment variables..."
+            export GIT_TOKEN=${{ secrets.GIT_TOKEN }}
+            export GIT_USERNAME=${{ secrets.GIT_USERNAME }}
+            export OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
+            export NAMECHEAP_API_KEY=${{ secrets.NAMECHEAP_API_KEY }}
+            export NAMECHEAP_API_USER=${{ secrets.NAMECHEAP_API_USER }}
+            export STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+            export STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+            export SMTP_PASS=${{ secrets.SMTP_PASS }}
+            
             # Restart the application using PM2
             echo "🔄 Restarting the application..."
             pm2 restart server
             
             echo "✅ Deployment to VM complete!"
+
