@@ -1,26 +1,9 @@
 // backend/server.js - COMPLETE FINAL VERSION
-import dotenv from "dotenv";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Load .env file BEFORE importing any other files that need it
-dotenv.config({ path: path.join(__dirname, '.env') });
-
-// Add debug logging to verify environment is loaded
-console.log('🔍 Environment Variables Check:');
-console.log('✅ GIT_TOKEN exists:', !!process.env.GIT_TOKEN);
-console.log('✅ GIT_TOKEN length:', process.env.GIT_TOKEN?.length);
-console.log('✅ GIT_USERNAME:', process.env.GIT_USERNAME);
-console.log('✅ OPENAI_API_KEY exists:', !!process.env.OPENAI_API_KEY);
-
-// NOW import everything else
 import axios from "axios";
 import xml2js from "xml2js";
 import express from "express";
 import cors from "cors";
+import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
 import { deployProject, parseCodeBlocks } from "./deployProject.js";
@@ -28,6 +11,8 @@ import { logDeployment } from "./utils/sheetsLogger.js";
 import { db, admin } from "./firebaseAdmin.js";
 import { Octokit } from "@octokit/rest";
 import { generateModification } from "./utils/modificationGenerator.js";
+
+dotenv.config();
 
 console.log('🔥 Server starting...');
 console.log('📦 Checking Firestore:', typeof db, db ? '✅ Loaded' : '❌ Missing');
@@ -848,7 +833,7 @@ async function processModificationInBackground(userId, projectId, modificationRe
         console.log('🔄 Processing modification for:', projectData.businessName);
 
         const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
-        const owner = process.env.GIT_USERNAME;
+        const owner = process.env.GITHUB_USERNAME;
         const repo = projectData.repoName;
 
         const { data: repoData } = await octokit.repos.get({ owner, repo });
