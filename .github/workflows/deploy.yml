@@ -96,10 +96,10 @@ jobs:
             git clean -fd
             echo "Contents of current directory after Git clean/pull: $(ls -a)"
             
-            # Create Firebase service account file in the root of the VM project
-            echo "🔥 Creating Firebase service account..."
-            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > serviceAccountKey.json
-            echo "Contents of current directory after serviceAccountKey.json creation: $(ls -a)"
+            # Create Firebase service account file in backend directory
+            echo "🔥 Creating Firebase service account in backend/..."
+            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > backend/serviceAccountKey.json
+            echo "Contents of backend directory: $(ls -a backend/)"
             
             # Install/update dependencies (now using package.json in the root on VM)
             echo "📦 Installing dependencies..."

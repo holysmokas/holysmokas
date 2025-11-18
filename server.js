@@ -8,11 +8,11 @@ import express from "express";
 import cors from "cors";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
-import { deployProject, parseCodeBlocks } from "./deployProject.js";
-import { logDeployment } from "./utils/sheetsLogger.js";
-import { db, admin } from "./firebaseAdmin.js";
+import { deployProject, parseCodeBlocks } from "./backend/deployProject.js";
+import { logDeployment } from "./backend/utils/sheetsLogger.js";
+import { db, admin } from "./backend/firebaseAdmin.js";
 import { Octokit } from "@octokit/rest";
-import { generateModification } from "./utils/modificationGenerator.js";
+import { generateModification } from "./backend/utils/modificationGenerator.js";
 
 
 
