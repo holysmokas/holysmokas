@@ -5,7 +5,7 @@ import path from "path";
 import { execSync } from "child_process";
 import dotenv from "dotenv";
 
-dotenv.config({ path: path.resolve("backend/.env") });
+dotenv.config();
 
 const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
 const GIT_USERNAME = process.env.GIT_USERNAME;
