@@ -69,7 +69,7 @@ jobs:
           cname: holysmokas.com
       
       # -------------------------------
-      # 6️⃣ Deploy to VM with .env file creation
+      # 6️⃣ Deploy to VM - Manage from ROOT
       # -------------------------------
       - name: Deploy to VM
         uses: appleboy/ssh-action@v1.0.3
@@ -78,22 +78,23 @@ jobs:
           username: ${{ secrets.VM_USER }}
           key: ${{ secrets.VM_SSH_KEY }}
           script: |
-            # Navigate to the correct project directory on your VM
-            cd ${{ secrets.VM_PROJECT_PATH }}/backend
+            # Navigate to the ROOT project directory on your VM
+            cd ${{ secrets.VM_PROJECT_PATH }}
             
             # Pull the latest changes from the main branch
             echo "🚚 Pulling latest code from GitHub..."
             git pull origin main
             
-            # Create Firebase service account file on VM
+            # Create Firebase service account file in backend directory
             echo "🔥 Creating Firebase service account..."
-            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > serviceAccountKey.json
+            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > backend/serviceAccountKey.json
             
-            # Install/update dependencies
-            echo "📦 Installing dependencies..."
+            # Install/update dependencies in backend
+            echo "📦 Installing backend dependencies..."
+            cd backend
             npm install
             
-            # Create .env file with secrets
+            # Create .env file with secrets in backend directory
             echo "📝 Creating .env file with secrets..."
             cat <<EOF > .env
             GIT_TOKEN=${{ secrets.GIT_TOKEN }}
@@ -106,8 +107,11 @@ jobs:
             SMTP_PASS=${{ secrets.SMTP_PASS }}
             EOF
             
-            # Restart the application using PM2
-            echo "🔄 Restarting the application..."
-            pm2 reload holysmokas-backend
+            # Go back to root to manage PM2
+            cd ..
+            
+            # Restart the application using PM2 from root
+            echo "🔄 Restarting the application with PM2..."
+            pm2 reload holysmokas-backend || pm2 start backend/server.js --name holysmokas-backend
             
             echo "✅ Deployment to VM complete!"
