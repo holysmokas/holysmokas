@@ -133,7 +133,7 @@ code here
 - DO NOT add "bash", "on:", "File:", or any prefix before the filename
 - DO NOT use spaces in the language tag
 
-CRITICAL EXPORT/IMPORT RULES - FOLLOW EXACTLY:
+⚠️⚠️⚠️ CRITICAL EXPORT/IMPORT RULES - FOLLOW EXACTLY OR BUILD WILL FAIL ⚠️⚠️⚠️
 
 1. COMPONENTS (pages, UI components):
    - ALWAYS use default export: export default ComponentName
@@ -147,21 +147,35 @@ CRITICAL EXPORT/IMPORT RULES - FOLLOW EXACTLY:
    - Use named exports: export const helperFunction
    - Import: import { helperFunction } from './utils'
 
+⚠️ MANDATORY: EVERY .jsx COMPONENT FILE MUST END WITH "export default ComponentName" ⚠️
+
 EXAMPLES OF CORRECT EXPORTS:
 
-CORRECT - Component (src/pages/Shop.jsx):
+✅ CORRECT - Component (src/pages/Shop.jsx):
 function Shop() {
   return <div>Shop</div>
 }
 export default Shop;
 
-CORRECT - Context (src/contexts/CartContext.jsx):
+✅ CORRECT - Component (src/pages/Portfolio.jsx):
+function Portfolio() {
+  return <div>Portfolio</div>
+}
+export default Portfolio;
+
+✅ CORRECT - Component (src/pages/Home.jsx):
+function Home() {
+  return <div>Home</div>
+}
+export default Home;
+
+✅ CORRECT - Context (src/contexts/CartContext.jsx):
 export const CartProvider = ({ children }) => {
   return <CartContext.Provider>{children}</CartContext.Provider>
 }
 export const useCart = () => useContext(CartContext);
 
-CORRECT - App.jsx:
+✅ CORRECT - App.jsx:
 import { CartProvider } from './contexts/CartContext';
 import { AuthProvider } from './contexts/AuthContext';
 import Shop from './pages/Shop';
@@ -177,15 +191,26 @@ function App() {
 }
 export default App;
 
-WRONG - Never do this:
-export { ComponentName };  // Wrong for components
-export default CartProvider;  // Wrong for contexts
+❌ WRONG - Never do this:
+export { ComponentName };  // ❌ Wrong for components - BUILD WILL FAIL
+export default CartProvider;  // ❌ Wrong for contexts
+const Home = () => <div>Home</div>; // ❌ Missing export default
+
+⚠️⚠️⚠️ MANDATORY CHECKLIST - VERIFY EVERY FILE: ⚠️⚠️⚠️
+- ✅ src/App.jsx → ends with "export default App"
+- ✅ src/pages/Home.jsx → ends with "export default Home"
+- ✅ src/pages/About.jsx → ends with "export default About"
+- ✅ src/pages/Services.jsx → ends with "export default Services"
+- ✅ src/pages/Portfolio.jsx → ends with "export default Portfolio"
+- ✅ src/pages/Contact.jsx → ends with "export default Contact"
+- ✅ Every component file → ends with "export default ComponentName"
 
 REMEMBER:
-- Pages/Components = default export
+- Pages/Components = default export (MANDATORY)
 - Contexts = named exports
-- App.jsx = default export
+- App.jsx = default export (MANDATORY)
 - All imports must match the export type
+- NO EXCEPTIONS - BUILD WILL FAIL WITHOUT PROPER EXPORTS
 
 CRITICAL INDEX.HTML REQUIREMENTS:
 - The index.html MUST have ONLY <script type="module" src="/src/main.jsx"></script> in the body
