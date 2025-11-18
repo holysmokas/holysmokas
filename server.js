@@ -1,10 +1,11 @@
 // backend/server.js - FIXED .env LOADING
-require('dotenv').config();
+import dotenv from "dotenv";
+dotenv.config();
+
 import axios from "axios";
 import xml2js from "xml2js";
 import express from "express";
 import cors from "cors";
-import dotenv from "dotenv";
 import nodemailer from "nodemailer";
 import Stripe from "stripe";
 import { deployProject, parseCodeBlocks } from "./deployProject.js";
