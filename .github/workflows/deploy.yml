@@ -69,7 +69,7 @@ jobs:
           cname: holysmokas.com
       
       # -------------------------------
-      # 6️⃣ Deploy to VM and create .env file
+      # 6️⃣ Deploy to VM (NO .env creation - you already have it!)
       # -------------------------------
       - name: Deploy to VM
         uses: appleboy/ssh-action@v1.0.3
@@ -84,38 +84,6 @@ jobs:
             # Pull the latest changes from the main branch
             echo "🚚 Pulling latest code from GitHub..."
             git pull origin main
-            
-            # Create .env file in backend directory
-            echo "🔐 Creating backend/.env file..."
-            cat > backend/.env << 'ENVEOF'
-            # GitHub
-            GIT_TOKEN=${{ secrets.GIT_TOKEN }}
-            GIT_USERNAME=${{ secrets.GIT_USERNAME }}
-            
-            # OpenAI/Claude API
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            
-            # Namecheap API
-            NAMECHEAP_API_URL=https://api.namecheap.com/xml.response
-            NAMECHEAP_API_USER=${{ secrets.NAMECHEAP_API_USER }}
-            NAMECHEAP_API_KEY=${{ secrets.NAMECHEAP_API_KEY }}
-            NAMECHEAP_CLIENT_IP=${{ secrets.NAMECHEAP_CLIENT_IP }}
-            
-            # Stripe
-            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
-            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
-            
-            # SMTP Configuration
-            SMTP_HOST=${{ secrets.SMTP_HOST }}
-            SMTP_PORT=${{ secrets.SMTP_PORT }}
-            SMTP_SECURE=${{ secrets.SMTP_SECURE }}
-            SMTP_USER=${{ secrets.SMTP_USER }}
-            SMTP_PASS=${{ secrets.SMTP_PASS }}
-            
-            # Server Configuration
-            PORT=8080
-            BYPASS_PAYMENT=false
-            ENVEOF
             
             # Create Firebase service account file on VM
             echo "🔥 Creating Firebase service account..."

@@ -1,4 +1,4 @@
-// backend/server.js - COMPLETE FINAL VERSION
+// backend/server.js - FIXED .env LOADING
 import axios from "axios";
 import xml2js from "xml2js";
 import express from "express";
@@ -12,11 +12,14 @@ import { db, admin } from "./firebaseAdmin.js";
 import { Octokit } from "@octokit/rest";
 import { generateModification } from "./utils/modificationGenerator.js";
 
+// ✅ FIXED: Load .env from current directory (backend/.env)
 dotenv.config();
 
 console.log('🔥 Server starting...');
 console.log('📦 Checking Firestore:', typeof db, db ? '✅ Loaded' : '❌ Missing');
 console.log('📦 Checking admin:', typeof admin, admin ? '✅ Loaded' : '❌ Missing');
+console.log('🔑 GIT_TOKEN:', process.env.GIT_TOKEN ? `Found (${process.env.GIT_TOKEN.substring(0, 10)}...)` : '❌ NOT FOUND');
+console.log('🔑 OPENAI_API_KEY:', process.env.OPENAI_API_KEY ? 'Found' : '❌ NOT FOUND');
 
 const app = express();
 
@@ -32,25 +35,25 @@ app.use(cors({
 
 // Test Firestore endpoint
 app.get('/test-firestore', async (req, res) => {
-  try {
-    const testDoc = await db.collection('contacts').limit(1).get();
-    res.json({ 
-      success: true, 
-      message: 'Firestore is working!',
-      docCount: testDoc.size 
-    });
-  } catch (error) {
-    res.status(500).json({ 
-      success: false, 
-      message: 'Firestore failed', 
-      error: error.message 
-    });
-  }
+    try {
+        const testDoc = await db.collection('contacts').limit(1).get();
+        res.json({
+            success: true,
+            message: 'Firestore is working!',
+            docCount: testDoc.size
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Firestore failed',
+            error: error.message
+        });
+    }
 });
 
-console.log('🔍 STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'Found (length: ' + process.env.STRIPE_SECRET_KEY.length + ')' : 'NOT FOUND');
-console.log('🔍 First 10 chars:', process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 10) : 'N/A');
-console.log('🔍 Type:', typeof process.env.STRIPE_SECRET_KEY);
+console.log('🔐 STRIPE_SECRET_KEY:', process.env.STRIPE_SECRET_KEY ? 'Found (length: ' + process.env.STRIPE_SECRET_KEY.length + ')' : 'NOT FOUND');
+console.log('🔐 First 10 chars:', process.env.STRIPE_SECRET_KEY ? process.env.STRIPE_SECRET_KEY.substring(0, 10) : 'N/A');
+console.log('🔐 Type:', typeof process.env.STRIPE_SECRET_KEY);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 // IMPORTANT: Webhook route MUST come BEFORE express.json()
@@ -273,7 +276,7 @@ app.post("/create-payment-session", async (req, res) => {
 
     try {
         const contactData = req.body;
-        console.log('📝 Request data:', {
+        console.log('📋 Request data:', {
             email: contactData.email,
             businessName: contactData.businessName,
             packagePrice: contactData.packagePrice
@@ -390,7 +393,7 @@ app.post("/create-payment-session", async (req, res) => {
             payment_method_types: ['card'],
             line_items: lineItems,
             mode: 'payment',
-            success_url:`https://holysmokas.com/payment-success.html?session_id={CHECKOUT_SESSION_ID}`,
+            success_url: `https://holysmokas.com/payment-success.html?session_id={CHECKOUT_SESSION_ID}`,
             cancel_url: `https://holysmokas.com/contact.html?canceled=true`,
             customer_email: contactData.email,
             metadata: {
@@ -833,7 +836,7 @@ async function processModificationInBackground(userId, projectId, modificationRe
         console.log('🔄 Processing modification for:', projectData.businessName);
 
         const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
-        const owner = process.env.GITHUB_USERNAME;
+        const owner = process.env.GIT_USERNAME;
         const repo = projectData.repoName;
 
         const { data: repoData } = await octokit.repos.get({ owner, repo });
@@ -986,5 +989,5 @@ app.get("/", (req, res) => {
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, '0.0.0.0', () =>
-    console.log(`🔥 HolySmokas backend running at http:0.0.0.0:${PORT}`)
+    console.log(`🔥 HolySmokas backend running at http://0.0.0.0:${PORT}`)
 );
