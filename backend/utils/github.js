@@ -7,6 +7,17 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
+/** Sanitize description for GitHub */
+function sanitizeDescription(description) {
+  if (!description) return "Generated site";
+
+  return description
+    .replace(/[\r\n\t]/g, ' ')  // Replace control characters
+    .replace(/[^\x20-\x7E]/g, '') // Remove non-printable characters
+    .replace(/\s+/g, ' ')  // Collapse spaces
+    .trim()
+    .substring(0, 350);
+}
 
 const octokit = new Octokit({ auth: process.env.GIT_TOKEN });
 const GIT_USERNAME = process.env.GIT_USERNAME;
@@ -14,9 +25,11 @@ const GIT_USERNAME = process.env.GIT_USERNAME;
 
 export async function createRepo(repoName, description = "Generated site") {
   try {
+    const sanitizedDescription = sanitizeDescription(description);
+
     const response = await octokit.repos.createForAuthenticatedUser({
       name: repoName,
-      description,
+      description: sanitizedDescription,
       private: false,
       auto_init: true,
     });
@@ -122,7 +135,119 @@ export async function deployToGitHub(projectDir, repoName, description = "Genera
 /**
  * Generate AI prompts based on package type
  */
-function generatePromptByPackage({ name, description, category, packageType, useBoilerplate, boilerplateDescription }) {
+/**
+ * Parse user requirements to determine which pages/components to generate
+ * Based on the "Must-Have Features" field from contact form
+ */
+function parseUserRequirements(formData) {
+  const mustHaveFeatures = (formData.mustHaveFeatures || formData.description || '').toLowerCase();
+  const pages = new Set(['home']); // Home is always required
+  const components = new Set(['header', 'footer']); // Always needed
+
+  console.log(`📋 Parsing user requirements: "${mustHaveFeatures}"`);
+
+  // Parse for page keywords
+  const pageKeywords = {
+    'about': ['about', 'about us', 'who we are', 'our story', 'team', 'mission'],
+    'services': ['services', 'what we do', 'offerings', 'what we offer', 'service'],
+    'portfolio': ['portfolio', 'work', 'projects', 'gallery', 'showcase', 'examples', 'our work'],
+    'contact': ['contact', 'get in touch', 'reach us', 'contact form', 'contact us'],
+    'shop': ['shop', 'store', 'products', 'buy', 'purchase', 'e-commerce', 'ecommerce', 'cart'],
+    'blog': ['blog', 'articles', 'news', 'posts'],
+    'pricing': ['pricing', 'plans', 'packages', 'price']
+  };
+
+  const logoInstructions = `
+🖼️ LOGO INTEGRATION:
+- Logo file will be available at: /logo.png, /logo.jpg, or /logo.svg
+- Use logo in Header component: <img src="/logo.png" alt="Business Logo" />
+- Fallback if no logo: Use business name as text
+- Recommended logo placement: Top-left of navigation bar
+- Max logo height: 60px for header, responsive on mobile
+
+Example Header with Logo:
+\`\`\`jsx:src/components/Header.jsx
+function Header() {
+  return (
+    <header className="bg-white shadow-md">
+      <nav className="container mx-auto px-4 py-4 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <img src="/logo.png" alt="Logo" className="h-12" onError={(e) => e.target.style.display='none'} />
+          <span className="text-2xl font-bold">Business Name</span>
+        </div>
+        {/* Nav links */}
+      </nav>
+    </header>
+  );
+}
+export default Header;
+\`\`\`
+`;
+
+  // Add this to your baseInstructions
+  const baseInstructions = `
+${existingInstructions}
+${logoInstructions}
+${legalPagesInstructions}
+`;
+  // Check which pages are mentioned
+  for (const [page, keywords] of Object.entries(pageKeywords)) {
+    if (keywords.some(keyword => mustHaveFeatures.includes(keyword))) {
+      pages.add(page);
+      console.log(`  ✅ Found: ${page} page`);
+    }
+  }
+
+  // Determine components based on pages
+  if (pages.has('services')) {
+    components.add('servicecard');
+  }
+  if (pages.has('portfolio') || mustHaveFeatures.includes('gallery')) {
+    components.add('portfoliocard');
+  }
+  if (pages.has('contact')) {
+    components.add('contactform');
+  }
+  if (mustHaveFeatures.includes('testimonial') || mustHaveFeatures.includes('review')) {
+    components.add('testimonials');
+    pages.add('testimonials');
+  }
+
+  // Always add hero for visual appeal
+  components.add('hero');
+
+  console.log(`🎯 Pages to generate: ${Array.from(pages).join(', ')}`);
+  console.log(`🎯 Components to generate: ${Array.from(components).join(', ')}`);
+
+  return {
+    pages: Array.from(pages),
+    components: Array.from(components)
+  };
+}
+
+/**
+ * Get description for each page type based on user requirements
+ */
+function getPageDescription(pageName, config) {
+  const descriptions = {
+    'home': `Hero section showcasing ${config.name}, overview of services/offerings, call-to-action buttons`,
+    'about': `Company story for ${config.name}, mission statement, team information, values`,
+    'services': `Detailed service offerings for ${config.name}, what you provide, benefits`,
+    'portfolio': `Project showcase/gallery with 6-8 example projects for ${config.name}`,
+    'contact': `Contact form with name, email, message fields. Include business contact info`,
+    'shop': `Product listings with images, prices, add-to-cart functionality`,
+    'blog': `Article listings with previews and read-more links`,
+    'pricing': `Pricing plans and packages with feature comparisons`,
+    'testimonials': `Customer testimonials and reviews for ${config.name}`
+  };
+
+  return descriptions[pageName] || `${pageName} content based on: ${config.description}`;
+}
+
+function generatePromptByPackage({ name, description, category, packageType, useBoilerplate, boilerplateDescription, mustHaveFeatures }) {
+  const currentYear = new Date().getFullYear();
+  const currentDate = new Date().toLocaleDateString();
+
   const baseInstructions = `
 CRITICAL FORMATTING INSTRUCTIONS:
 - Output EXACTLY one code block per file
@@ -132,6 +257,23 @@ code here
 \`\`\`
 - DO NOT add "bash", "on:", "File:", or any prefix before the filename
 - DO NOT use spaces in the language tag
+
+⚠️⚠️⚠️ CRITICAL CSS RULES - USE ONLY VALID TAILWIND CLASSES ⚠️⚠️⚠️
+
+FORBIDDEN CSS CLASSES (DO NOT USE - THEY BREAK THE BUILD):
+❌ resize-vertical (INVALID - causes build failure)
+❌ resize-horizontal (INVALID - causes build failure)
+❌ resize-none (INVALID - causes build failure)
+❌ resize-both (INVALID - causes build failure)
+❌ resize (INVALID - causes build failure)
+
+✅ ONLY USE STANDARD TAILWIND UTILITY CLASSES:
+- Layout: flex, grid, block, inline, hidden
+- Sizing: w-full, h-screen, max-w-7xl, min-h-screen
+- Spacing: p-4, m-8, space-y-4, gap-6
+- Typography: text-lg, font-bold, text-center, leading-relaxed
+- Colors: bg-blue-500, text-white, border-gray-300
+- Effects: shadow-lg, rounded-lg, hover:bg-blue-600, transition
 
 ⚠️⚠️⚠️ CRITICAL EXPORT/IMPORT RULES - FOLLOW EXACTLY OR BUILD WILL FAIL ⚠️⚠️⚠️
 
@@ -244,12 +386,505 @@ And these dependencies:
 REMEMBER: NO <link> tags in index.html! CSS is imported in main.jsx!
 REMEMBER: Components use default exports, Contexts use named exports!`;
 
+  // ==================== ADD LEGAL PAGES INSTRUCTIONS HERE ====================
+  const legalPagesInstructions = `
+
+⚖️⚖️⚖️ MANDATORY LEGAL PAGES - MUST GENERATE FOR EVERY PROJECT ⚖️⚖️⚖️
+
+CRITICAL: Generate these 4 legal pages in the /public folder:
+1. public/terms-of-service.html
+2. public/privacy-policy.html
+3. public/cookies.html
+4. public/disclaimer.html
+
+Each page MUST:
+- Be a complete, standalone HTML page with full <html>, <head>, and <body>
+- Include responsive TailwindCSS styling via CDN
+- Have navigation back to main site
+- Use professional, industry-standard language
+- Be broad and general (not specific to any particular business)
+- Include current year: ${currentYear}
+- Include business name: {{businessName}}
+
+EXAMPLE STRUCTURE for public/terms-of-service.html:
+\`\`\`html:public/terms-of-service.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - {{businessName}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="mb-8">
+                <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Home
+                </a>
+            </div>
+            
+            <h1 class="text-4xl font-bold mb-4">Terms of Service</h1>
+            <p class="text-gray-600 mb-8">Last Updated: ${currentDate}</p>
+            
+            <div class="prose max-w-none">
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">1. Acceptance of Terms</h2>
+                    <p class="text-gray-700 mb-4">
+                        By accessing and using {{businessName}}'s website and services, you accept and agree to be bound by the terms and provision of this agreement.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">2. Use License</h2>
+                    <p class="text-gray-700 mb-4">
+                        Permission is granted to temporarily access the materials (information or software) on {{businessName}}'s website for personal, non-commercial transitory viewing only.
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>modify or copy the materials;</li>
+                        <li>use the materials for any commercial purpose;</li>
+                        <li>attempt to decompile or reverse engineer any software;</li>
+                        <li>remove any copyright or proprietary notations;</li>
+                        <li>transfer the materials to another person or "mirror" the materials on any other server.</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">3. Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The materials on {{businessName}}'s website are provided on an 'as is' basis. {{businessName}} makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">4. Limitations</h2>
+                    <p class="text-gray-700 mb-4">
+                        In no event shall {{businessName}} or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on {{businessName}}'s website.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">5. Accuracy of Materials</h2>
+                    <p class="text-gray-700 mb-4">
+                        The materials appearing on {{businessName}}'s website could include technical, typographical, or photographic errors. {{businessName}} does not warrant that any of the materials on its website are accurate, complete or current.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">6. Links</h2>
+                    <p class="text-gray-700 mb-4">
+                        {{businessName}} has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by {{businessName}} of the site.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">7. Modifications</h2>
+                    <p class="text-gray-700 mb-4">
+                        {{businessName}} may revise these terms of service for its website at any time without notice. By using this website you are agreeing to be bound by the then current version of these terms of service.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">8. Governing Law</h2>
+                    <p class="text-gray-700 mb-4">
+                        These terms and conditions are governed by and construed in accordance with the laws and you irrevocably submit to the exclusive jurisdiction of the courts in that location.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+\`\`\`
+
+EXAMPLE STRUCTURE for public/privacy-policy.html:
+\`\`\`html:public/privacy-policy.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - {{businessName}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="mb-8">
+                <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Home
+                </a>
+            </div>
+            
+            <h1 class="text-4xl font-bold mb-4">Privacy Policy</h1>
+            <p class="text-gray-600 mb-8">Last Updated: ${currentDate}</p>
+            
+            <div class="prose max-w-none">
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">1. Information We Collect</h2>
+                    <p class="text-gray-700 mb-4">
+                        We collect information that you provide directly to us, including when you create an account, make a purchase, subscribe to our newsletter, or contact us for support.
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Name and contact information</li>
+                        <li>Email address</li>
+                        <li>Phone number</li>
+                        <li>Billing and shipping address</li>
+                        <li>Payment information</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">2. How We Use Your Information</h2>
+                    <p class="text-gray-700 mb-4">
+                        We use the information we collect to:
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Provide, maintain, and improve our services</li>
+                        <li>Process transactions and send related information</li>
+                        <li>Send you technical notices and support messages</li>
+                        <li>Respond to your comments and questions</li>
+                        <li>Send you marketing communications (with your consent)</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">3. Information Sharing</h2>
+                    <p class="text-gray-700 mb-4">
+                        We do not sell, trade, or rent your personal information to third parties. We may share your information with:
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Service providers who assist in our operations</li>
+                        <li>Professional advisers including lawyers and accountants</li>
+                        <li>Law enforcement when required by law</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">4. Data Security</h2>
+                    <p class="text-gray-700 mb-4">
+                        We implement appropriate technical and organizational measures to protect your personal information against unauthorized access, alteration, disclosure, or destruction.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">5. Cookies</h2>
+                    <p class="text-gray-700 mb-4">
+                        We use cookies and similar tracking technologies to track activity on our website. You can instruct your browser to refuse all cookies or to indicate when a cookie is being sent. See our <a href="cookies.html" class="text-blue-600 hover:underline">Cookie Policy</a> for more details.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">6. Your Rights</h2>
+                    <p class="text-gray-700 mb-4">
+                        You have the right to:
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Access your personal information</li>
+                        <li>Correct inaccurate data</li>
+                        <li>Request deletion of your data</li>
+                        <li>Object to processing of your data</li>
+                        <li>Request data portability</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">7. Children's Privacy</h2>
+                    <p class="text-gray-700 mb-4">
+                        Our services are not directed to children under 13. We do not knowingly collect personal information from children under 13. If you become aware that a child has provided us with personal information, please contact us.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">8. Contact Us</h2>
+                    <p class="text-gray-700 mb-4">
+                        If you have questions about this Privacy Policy, please contact us at the information provided on our website.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+\`\`\`
+
+EXAMPLE STRUCTURE for public/cookies.html:
+\`\`\`html:public/cookies.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookie Policy - {{businessName}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="mb-8">
+                <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Home
+                </a>
+            </div>
+            
+            <h1 class="text-4xl font-bold mb-4">Cookie Policy</h1>
+            <p class="text-gray-600 mb-8">Last Updated: ${currentDate}</p>
+            
+            <div class="prose max-w-none">
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">What Are Cookies</h2>
+                    <p class="text-gray-700 mb-4">
+                        Cookies are small text files that are placed on your device when you visit our website. They help us provide you with a better experience and allow certain features to work.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">How We Use Cookies</h2>
+                    <p class="text-gray-700 mb-4">
+                        We use cookies for various purposes:
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li><strong>Essential Cookies:</strong> Required for the website to function properly</li>
+                        <li><strong>Analytics Cookies:</strong> Help us understand how visitors use our site</li>
+                        <li><strong>Functional Cookies:</strong> Remember your preferences and choices</li>
+                        <li><strong>Marketing Cookies:</strong> Used to show relevant advertisements</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Types of Cookies We Use</h2>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Session Cookies</h3>
+                        <p class="text-gray-700">Temporary cookies that expire when you close your browser.</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Persistent Cookies</h3>
+                        <p class="text-gray-700">Remain on your device for a set period or until you delete them.</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">First-Party Cookies</h3>
+                        <p class="text-gray-700">Set by {{businessName}} directly.</p>
+                    </div>
+                    
+                    <div class="mb-6">
+                        <h3 class="text-xl font-semibold mb-2">Third-Party Cookies</h3>
+                        <p class="text-gray-700">Set by external services we use (e.g., Google Analytics).</p>
+                    </div>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Managing Cookies</h2>
+                    <p class="text-gray-700 mb-4">
+                        You can control and manage cookies in various ways:
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Browser settings: Most browsers allow you to refuse cookies</li>
+                        <li>Delete existing cookies from your device</li>
+                        <li>Block third-party cookies specifically</li>
+                        <li>Receive warnings before cookies are stored</li>
+                    </ul>
+                    <p class="text-gray-700 mb-4">
+                        Please note that disabling cookies may affect your experience on our website.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Third-Party Services</h2>
+                    <p class="text-gray-700 mb-4">
+                        We may use third-party services that use cookies, including:
+                    </p>
+                    <ul class="list-disc pl-6 text-gray-700 mb-4">
+                        <li>Google Analytics for website analytics</li>
+                        <li>Social media platforms for sharing content</li>
+                        <li>Advertising networks for targeted ads</li>
+                    </ul>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Updates to This Policy</h2>
+                    <p class="text-gray-700 mb-4">
+                        We may update this Cookie Policy from time to time. Any changes will be posted on this page with an updated revision date.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Contact Us</h2>
+                    <p class="text-gray-700 mb-4">
+                        If you have questions about our use of cookies, please contact us through the information provided on our website.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+\`\`\`
+
+EXAMPLE STRUCTURE for public/disclaimer.html:
+\`\`\`html:public/disclaimer.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer - {{businessName}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="max-w-4xl mx-auto px-4 py-12">
+        <div class="bg-white rounded-lg shadow-lg p-8">
+            <div class="mb-8">
+                <a href="/" class="text-blue-600 hover:text-blue-800 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+                    </svg>
+                    Back to Home
+                </a>
+            </div>
+            
+            <h1 class="text-4xl font-bold mb-4">Disclaimer</h1>
+            <p class="text-gray-600 mb-8">Last Updated: ${currentDate}</p>
+            
+            <div class="prose max-w-none">
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Website Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The information provided by {{businessName}} on this website is for general informational purposes only. All information on the site is provided in good faith, however we make no representation or warranty of any kind, express or implied, regarding the accuracy, adequacy, validity, reliability, availability or completeness of any information on the site.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">External Links Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The site may contain (or you may be sent through the site) links to other websites or content belonging to or originating from third parties. Such external links are not investigated, monitored, or checked for accuracy, adequacy, validity, reliability, availability or completeness by us.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Professional Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The site cannot and does not contain professional advice. The information is provided for general informational and educational purposes only and is not a substitute for professional advice. Accordingly, before taking any actions based upon such information, we encourage you to consult with the appropriate professionals.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Affiliates Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The site may contain links to affiliate websites, and we may receive an affiliate commission for any purchases made by you on the affiliate website using such links.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Testimonials Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The site may contain testimonials by users of our products and/or services. These testimonials reflect the real-life experiences and opinions of such users. However, the experiences are personal to those particular users, and may not necessarily be representative of all users of our products and/or services.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Errors and Omissions Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        While we have made every attempt to ensure that the information contained in this site has been obtained from reliable sources, {{businessName}} is not responsible for any errors or omissions or for the results obtained from the use of this information.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Fair Use Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        This site may use copyrighted material which has not always been specifically authorized by the copyright owner. We believe this constitutes a 'fair use' of any such copyrighted material as provided for in section 107 of the US Copyright Law.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Views Expressed Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The site may contain views and opinions which are those of the authors and do not necessarily reflect the official policy or position of any other author, agency, organization, employer or company, including {{businessName}}.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">No Responsibility Disclaimer</h2>
+                    <p class="text-gray-700 mb-4">
+                        The information on the site is provided with the understanding that {{businessName}} is not herein engaged in rendering legal, accounting, tax, or other professional advice and services. As such, it should not be used as a substitute for consultation with professional accounting, tax, legal or other competent advisers.
+                    </p>
+                </section>
+
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold mb-4">Contact Us</h2>
+                    <p class="text-gray-700 mb-4">
+                        If you have any questions about this Disclaimer, please contact us through the information provided on our website.
+                    </p>
+                </section>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+\`\`\`
+
+CRITICAL FOOTER UPDATE:
+Every Footer component MUST include links to these legal pages:
+
+\`\`\`jsx
+<footer className="bg-gray-900 text-white py-12">
+  <div className="container mx-auto px-4">
+    {/* ... other footer content ... */}
+    
+    <div className="border-t border-gray-800 mt-8 pt-8 text-center">
+      <div className="flex flex-wrap justify-center gap-6 mb-4">
+        <a href="terms-of-service.html" className="text-gray-400 hover:text-white transition">
+          Terms of Service
+        </a>
+        <a href="privacy-policy.html" className="text-gray-400 hover:text-white transition">
+          Privacy Policy
+        </a>
+        <a href="cookies.html" className="text-gray-400 hover:text-white transition">
+          Cookie Policy
+        </a>
+        <a href="disclaimer.html" className="text-gray-400 hover:text-white transition">
+          Disclaimer
+        </a>
+      </div>
+      <p className="text-gray-400">
+        &copy; ${currentYear} {{businessName}}. All rights reserved.
+      </p>
+    </div>
+  </div>
+</footer>
+\`\`\`
+
+✅ MANDATORY CHECKLIST:
+- [ ] Generate all 4 legal pages in /public folder
+- [ ] Use TailwindCSS CDN (not imports)
+- [ ] Include back-to-home navigation
+- [ ] Replace {{businessName}} with actual business name
+- [ ] Update Footer component with legal page links
+- [ ] Use current year: ${currentYear}
+`;
+
+  // Combine base instructions with legal pages instructions
+  const fullInstructions = baseInstructions + legalPagesInstructions;
+
+  // Continue with the rest of your existing logic...
   if (category === "landing-page" || packageType?.includes("Starter")) {
     return `Generate a complete React + Vite project for "${name}" - STARTER PACKAGE ($599).
 
 Description: "${description}"
 
-${baseInstructions}
+${fullInstructions}
 
 CRITICAL: THIS IS A SIMPLE SINGLE-PAGE SITE - NO ROUTING!
 - DO NOT include react-router-dom in dependencies
@@ -323,11 +958,41 @@ Create a SIMPLE, SINGLE-PAGE website with:
   }
 
   if (category === "business" || packageType?.includes("Business")) {
+    // Parse user requirements from form
+    const requirements = parseUserRequirements({ name, description, mustHaveFeatures });
+
+    // Build file list dynamically based on what user wants
+    const pageFiles = requirements.pages.map(p =>
+      `src/pages/${p.charAt(0).toUpperCase() + p.slice(1)}.jsx`
+    );
+
+    const componentFiles = requirements.components.map(c =>
+      `src/components/${c.charAt(0).toUpperCase() + c.slice(1)}.jsx`
+    );
+
+    const allFiles = [
+      'package.json',
+      'index.html',
+      'src/main.jsx',
+      'src/index.css',
+      'tailwind.config.js',
+      'postcss.config.js',
+      'src/App.jsx',
+      ...pageFiles,
+      ...componentFiles
+    ];
+
+    const totalFiles = allFiles.length;
+    console.log(`📊 Will generate ${totalFiles} files for business website`);
+
     return `Generate a complete React + Vite project for "${name}" - BUSINESS PACKAGE ($1,199).
 
 Description: "${description}"
 
-${baseInstructions}
+USER'S MUST-HAVE FEATURES (TOP PRIORITY):
+"${mustHaveFeatures || description}"
+
+${fullInstructions}
 
 Add react-router-dom to dependencies!
 
@@ -337,8 +1002,7 @@ CRITICAL ROUTING SETUP - FOLLOW EXACTLY:
    <HashRouter><App /></HashRouter>
 
 2. src/App.jsx MUST NOT import any Router components
-   Only import: Routes, Route, Link (NO HashRouter, NO BrowserRouter)
-   App.jsx should return JSX wrapped in <> </> fragments, NOT <Router>
+   Only import: Routes, Route (NO HashRouter, NO BrowserRouter)
 
 Example src/main.jsx (REQUIRED FORMAT):
 \`\`\`jsx:src/main.jsx
@@ -357,23 +1021,13 @@ ReactDOM.createRoot(document.getElementById('root')).render(
 )
 \`\`\`
 
-CRITICAL: Use React 18 syntax!
-- Import from 'react-dom/client' NOT 'react-dom'
-- Use ReactDOM.createRoot() NOT ReactDOM.render()
-- Wrap with HashRouter for GitHub Pages routing
-
-CRITICAL EXPORT REQUIREMENTS:
-- App.jsx MUST use: export default App (NOT export { App })
-- All page components MUST use default exports
-- All other components MUST use default exports
-- NEVER use named exports like export { ComponentName }
-
 Example src/App.jsx (REQUIRED FORMAT):
 \`\`\`jsx:src/App.jsx
 import { Routes, Route } from 'react-router-dom'
 import Header from './components/Header.jsx'
 import Footer from './components/Footer.jsx'
-// import pages...
+import Home from './pages/Home.jsx'
+// ... import other pages
 
 function App() {
   return (
@@ -390,276 +1044,40 @@ function App() {
 export default App
 \`\`\`
 
-DO NOT use BrowserRouter! DO NOT wrap Routes in a Router component in App.jsx!
+⚠️⚠️⚠️ CRITICAL: YOU MUST GENERATE EXACTLY THESE ${totalFiles} FILES ⚠️⚠️⚠️
 
-Required files for BUSINESS (multi-page site):
-\`\`\`jsx:src/App.jsx (with Routes ONLY, NO Router wrapper)
-\`\`\`html:index.html
-\`\`\`jsx:src/main.jsx (with HashRouter wrapping App)
-\`\`\`css:src/index.css
-\`\`\`javascript:tailwind.config.js
-\`\`\`javascript:postcss.config.js
-\`\`\`jsx:src/pages/Home.jsx
-\`\`\`jsx:src/pages/About.jsx
-\`\`\`jsx:src/pages/Services.jsx
-\`\`\`jsx:src/pages/Portfolio.jsx
-\`\`\`jsx:src/pages/Contact.jsx
-\`\`\`jsx:src/components/Header.jsx (use Link components for navigation)
-\`\`\`jsx:src/components/Hero.jsx
-\`\`\`jsx:src/components/ServiceCard.jsx
-\`\`\`jsx:src/components/PortfolioCard.jsx
-\`\`\`jsx:src/components/Testimonials.jsx
-\`\`\`jsx:src/components/ContactForm.jsx
-\`\`\`jsx:src/components/Footer.jsx
+Required files (generate ALL, NO MORE, NO LESS):
+${allFiles.map(f => `\`\`\`jsx:${f}`).join('\n')}
 
-Create a PROFESSIONAL MULTI-PAGE business website with:
-- HashRouter in main.jsx ONLY (not in App.jsx)
-- Routes defined in App.jsx using Routes and Route components
-- Home: Hero, services overview, testimonials, recent work
-- About: Company story, team, mission
-- Services: Detailed service offerings
-- Portfolio: Project gallery with 6-8 sample projects
-- Contact: Full contact form with validation
-- Responsive navigation menu with Link components
-- Modern, corporate design with TailwindCSS`;
+DO NOT generate files not listed above.
+DO NOT skip any files listed above.
+
+PAGES TO CREATE (based on user requirements):
+${requirements.pages.map(p => `- ${p.toUpperCase()} PAGE: ${getPageDescription(p, { name, description, mustHaveFeatures })}`).join('\n')}
+
+COMPONENTS TO CREATE:
+${requirements.components.map(c => `- ${c.toUpperCase()}: Reusable component`).join('\n')}
+
+Design Guidelines:
+- Modern, professional, corporate aesthetic
+- Responsive with TailwindCSS
+- Mobile-first approach
+- All content relates to "${name}"
+- HashRouter in main.jsx ONLY
+- Routes in App.jsx WITHOUT Router wrapper
+- Every component ends with "export default ComponentName"`;
   }
 
-  // github.js - Replace the entire smallShop and custom sections
-  if (category === "e-commerce" || packageType?.includes("Small Shop")) {
-    return `Generate a complete React + Vite e-commerce project for "${name}".
+  // Continue with the rest of your existing package types...
+  // (e-commerce, custom, etc.) - they should also use fullInstructions instead of baseInstructions
 
-Description: "${description}"
-
-CRITICAL: Generate ALL files from scratch. No boilerplate exists.
-
-You MUST format code blocks as: \`\`\`language:filename
-
-CRITICAL PACKAGE.JSON - YOU MUST GENERATE THIS:
-\`\`\`json:package.json
-{
-  "name": "project-name",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "react-router-dom": "^6.20.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "vite": "^5.0.0",
-    "tailwindcss": "^3.3.0",
-    "autoprefixer": "^10.4.0",
-    "postcss": "^8.4.0"
-  }
-}
-\`\`\`
-
-CRITICAL VITE CONFIG:
-\`\`\`javascript:vite.config.js
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  base: '/{{projectName}}/'
-})
-\`\`\`
-
-CRITICAL EXPORT RULES:
-
-Regular components (Shop, Cart, Checkout, Login, AdminDashboard, Header, Footer, ProductCard, AdminProductForm, ProtectedRoute):
-function ComponentName() {
-  return <div>Content</div>;
-}
-export default ComponentName;
-
-Context files (CartContext, AuthContext, ProductContext):
-export const ProviderName = ({ children }) => { ... };
-export const useHookName = () => { ... };
-
-CRITICAL: src/index.css @import MUST be BEFORE @tailwind:
-\`\`\`css:src/index.css
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-\`\`\`
-
-CRITICAL: Use React 18 syntax in main.jsx:
-\`\`\`jsx:src/main.jsx
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import { HashRouter } from 'react-router-dom'
-import './index.css'
-import App from './App.jsx'
-
-createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <HashRouter>
-      <App />
-    </HashRouter>
-  </StrictMode>
-)
-\`\`\`
-
-CRITICAL: App.jsx structure:
-\`\`\`jsx:src/App.jsx
-import { Routes, Route } from 'react-router-dom'
-import { CartProvider } from './CartContext.jsx'
-import Shop from './Shop.jsx'
-import Cart from './Cart.jsx'
-// ... other imports
-
-function App() {
-  return (
-    <CartProvider>
-      <Header />
-      <Routes>
-        <Route path="/" element={<Shop />} />
-        <Route path="/cart" element={<Cart />} />
-        {/* ... other routes */}
-      </Routes>
-      <Footer />
-    </CartProvider>
-  );
-}
-export default App;
-\`\`\`
-
-CRITICAL: ALL imports MUST include .jsx extension:
-import Shop from './Shop.jsx' ✅
-import Shop from './Shop' ❌
-
-Generate a FULLY FUNCTIONAL E-COMMERCE SHOP:
-
-FEATURES:
-- Shop page with 8-12 sample products (use placeholder images from https://picsum.photos/400/300)
-- Product cards with image, name, price, "Add to Cart" button
-- Shopping cart with add/remove/quantity controls
-- Cart page showing items, subtotal, quantity increase/decrease
-- Checkout page with form (name, email, address, payment - UI only, no backend)
-- Admin login (username: "admin", password: "admin123")
-- Admin dashboard at /admin with product table
-- Add/Edit/Delete products (all in React state, no backend)
-- Protected admin route
-- Cart icon in header showing item count
-- Professional TailwindCSS design
-
-ROUTES:
-- / (Shop page)
-- /cart (Cart page)
-- /checkout (Checkout page)
-- /login (Admin login)
-- /admin (Admin dashboard - protected)
-
-FILES TO GENERATE:
-- package.json
-- vite.config.js
-- tailwind.config.js
-- postcss.config.js
-- index.html
-- src/main.jsx
-- src/App.jsx
-- src/index.css
-- src/Shop.jsx
-- src/Cart.jsx
-- src/Checkout.jsx
-- src/Login.jsx
-- src/AdminDashboard.jsx
-- src/Header.jsx
-- src/Footer.jsx
-- src/ProductCard.jsx
-- src/AdminProductForm.jsx
-- src/ProtectedRoute.jsx
-- src/CartContext.jsx
-
-Make it look professional and modern!`;
-  }
-
-  // Custom/Enterprise - Full custom generation
-  return `Generate a FULLY CUSTOM React + Vite project for "${name}".
-
-Client Requirements: "${description}"
-
-CRITICAL: Generate ALL files from scratch including package.json.
-
-You MUST format code blocks as: \`\`\`language:filename
-
-CRITICAL PACKAGE.JSON - YOU MUST GENERATE THIS:
-\`\`\`json:package.json
-{
-  "name": "project-name",
-  "private": true,
-  "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
-  },
-  "dependencies": {
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-react": "^4.0.0",
-    "vite": "^5.0.0",
-    "tailwindcss": "^3.3.0",
-    "autoprefixer": "^10.4.0",
-    "postcss": "^8.4.0"
-  }
-}
-\`\`\`
-
-CRITICAL VITE CONFIG:
-\`\`\`javascript:vite.config.js
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-  plugins: [react()],
-  base: '/{{projectName}}/'
-})
-\`\`\`
-
-CRITICAL EXPORT RULES:
-Components: function ComponentName() { ... } then export default ComponentName;
-Context: export const Provider, export const useHook
-
-CRITICAL: Use React 18 syntax:
-import { createRoot } from 'react-dom/client'
-createRoot(document.getElementById('root')).render(...)
-
-CRITICAL: ALL imports include .jsx extension
-
-Analyze the client requirements and create:
-- Appropriate file structure
-- All necessary pages and components
-- Context providers if needed
-- Custom features as specified
-- Professional TailwindCSS design
-
-Generate ALL required files including:
-- package.json, vite.config.js, tailwind.config.js, postcss.config.js
-- index.html
-- src/main.jsx, src/App.jsx, src/index.css
-- All components and pages needed
-
-Be creative and build exactly what the client described!`;
+  // Default return for other package types
+  return fullInstructions;
 }
 
 /**
  * Generate AI-based project code using OpenAI API
  */
-// github.js - Update the generateProjectCode function (around line 549-609)
 export async function generateProjectCode(config) {
   console.log(`🎨 Generating AI website for: ${config.name}`);
   console.log(`📦 Package type: ${config.packageType || config.category}`);
@@ -681,25 +1099,26 @@ export async function generateProjectCode(config) {
     `;
   }
 
-  try {
-    const Anthropic = (await import("@anthropic-ai/sdk")).default;
-    const anthropic = new Anthropic({ apiKey: process.env.OPENAI_API_KEY });
+  const Anthropic = (await import("@anthropic-ai/sdk")).default;
+  const anthropic = new Anthropic({ apiKey: process.env.OPENAI_API_KEY });
+  const prompt = generatePromptByPackage(config);
 
-    const prompt = generatePromptByPackage(config);
+  const MAX_RETRIES = 5;
 
-    // github.js - Update generateProjectCode function
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
-      max_tokens: 16000,  // Increase from 8000 to 16000
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      // backend/utils/github.js - UPDATE ONLY THIS SECTION (around line 31)
+  for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      console.log(`🔄 AI generation attempt ${attempt}/${MAX_RETRIES}`);
 
-      system: `You are an expert React and Vite developer. You MUST follow these rules EXACTLY:
+      const response = await anthropic.messages.create({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 20000,
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        system: `You are an expert React and Vite developer. You MUST follow these rules EXACTLY:
 
 1. Format ALL code blocks as: \`\`\`language:filename
 
@@ -739,28 +1158,47 @@ export default Navbar;
 CRITICAL: Every single component file MUST have "export default ComponentName" as the last line.
 Do NOT create any admin features, dashboards, or management panels.
 Do NOT deviate from these export patterns under any circumstances.`,
-      temperature: 0.3,
-    });
+        temperature: 0.3,
+      });
 
-    const generatedCode = response.content[0]?.text?.trim();
-    if (!generatedCode) throw new Error("Empty AI response");
+      const generatedCode = response.content[0]?.text?.trim();
+      if (!generatedCode) throw new Error("Empty AI response");
 
-    console.log("✅ AI code generated successfully");
-    return generatedCode;
-  } catch (err) {
-    console.error("❌ Error generating project code:", err.message);
-    return `
-      // App.jsx
-      import React from 'react';
-      export default function App() {
-        return (
-          <div style={{ textAlign: "center", padding: "2rem" }}>
-            <h1>${config.name}</h1>
-            <p>${config.description}</p>
-            <p><em>AI generation failed: ${err.message}</em></p>
-          </div>
-        );
+      console.log("✅ AI code generated successfully");
+      return generatedCode;
+
+    } catch (err) {
+      const errorMsg = err.message?.toLowerCase() || '';
+
+      // Check if it's a retryable error (overload/rate limit)
+      if (errorMsg.includes('overloaded') || errorMsg.includes('529') || errorMsg.includes('rate')) {
+        if (attempt < MAX_RETRIES) {
+          const delay = 1000 * Math.pow(2, attempt); // Exponential backoff: 2s, 4s, 8s, 16s
+          console.warn(`⏳ API overloaded (attempt ${attempt}/${MAX_RETRIES}). Waiting ${delay}ms before retry...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          continue; // Retry
+        }
       }
-    `;
+
+      // Non-retryable error or max retries reached
+      console.error(`❌ Error generating project code (attempt ${attempt}/${MAX_RETRIES}):`, err.message);
+
+      if (attempt === MAX_RETRIES) {
+        console.error("❌ Max retries reached. Returning fallback code.");
+        return `
+          // App.jsx
+          import React from 'react';
+          export default function App() {
+            return (
+              <div style={{ textAlign: "center", padding: "2rem" }}>
+                <h1>${config.name}</h1>
+                <p>${config.description}</p>
+                <p><em>AI generation failed after ${MAX_RETRIES} attempts: ${err.message}</em></p>
+              </div>
+            );
+          }
+        `;
+      }
+    }
   }
 }

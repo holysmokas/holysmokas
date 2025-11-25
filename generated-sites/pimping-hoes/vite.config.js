@@ -4,5 +4,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
     plugins: [react()],
-    base: '/making-people-happy-1764052461096/'
+    base: '/pimping-hoes-1763627522859/'
 })

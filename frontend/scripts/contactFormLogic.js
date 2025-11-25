@@ -1,6 +1,6 @@
 import { db } from '../../backend/firebase.js';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
-import { GOOGLE_SHEETS_URL, ENDPOINTS } from './config.js';
+import { ENDPOINTS } from './config.js';
 
 // Function to show modal
 function showModal(title, message, isSuccess = true) {
@@ -23,21 +23,10 @@ window.closeModal = function () {
     modal.classList.remove('show');
 };
 
-async function sendToGoogleScript(contactData) {
-    try {
-        const response = await fetch(GOOGLE_SHEETS_URL, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(contactData)
-        });
-        console.log('Data sent to Google Apps Script');
-        return true;
-    } catch (error) {
-        console.error('Error sending to Google Script:', error);
-        return false;
-    }
-}
+// ❌ REMOVED sendToGoogleScript function
+// Contact submissions are now handled entirely by the backend (server.js)
+// via the logContactSubmission() function in sheetsLogger.js
+// This prevents duplicate entries in Google Sheets
 
 function cleanDomainName(domain) {
     let cleaned = domain.replace(/^https?:\/\//, '');
@@ -174,47 +163,42 @@ window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
                 </div>
             </div>
             
-            <p style="color: #6b7280; font-size: 0.875rem; margin-bottom: 0.75rem;">
-                This domain will be registered after payment
-            </p>
-            <button type="button" class="btn btn-secondary" onclick="removeDomainFromForm()" style="width: 100%;">
+            <button 
+                type="button" 
+                class="btn btn-secondary" 
+                onclick="removeDomainFromForm()" 
+                style="width: 100%; margin-top: 0.5rem;">
                 Remove Domain
             </button>
+            
+            <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem; margin-bottom: 0;">
+                💡 Domain cost will be added to your total at checkout
+            </p>
         </div>
     `;
-    domainResult.style.color = "#10b981";
 
     updatePricingBreakdown();
 };
 
-function getPackagePrice(packageString) {
-    if (packageString.includes('$499')) return 499;
-    if (packageString.includes('$599')) return 599;
-    if (packageString.includes('$999')) return 999;
-    if (packageString.includes('$1,199')) return 1199;
-    if (packageString.includes('$1,499')) return 1499;
-    if (packageString.includes('$1,699')) return 1699;
-    if (packageString.includes('$1,999')) return 1999;
-    if (packageString.includes('Custom Quote')) return 0;
+function getPackagePrice(packageName) {
+    const priceMap = {
+        "Starter - $599 (New Website)": 599,
+        "Business - $1,199 (New Website)": 1199,
+        "Small Shop - $1,699 (New Website)": 1699
+    };
+
+    for (const [key, value] of Object.entries(priceMap)) {
+        if (packageName.includes(key) || packageName.includes(value)) {
+            return value;
+        }
+    }
+
     return 0;
 }
 
 function updatePricingBreakdown() {
     const packageSelect = document.getElementById("package");
-    let pricingDisplay = document.getElementById("pricingBreakdown");
-
-    // Create the pricing breakdown element if it doesn't exist
-    if (!pricingDisplay && packageSelect) {
-        pricingDisplay = document.createElement('div');
-        pricingDisplay.id = 'pricingBreakdown';
-        pricingDisplay.style.cssText = 'display: none; background: #f9fafb; border: 2px solid #e5e7eb; border-radius: 12px; padding: 1.5rem; margin: 1.5rem 0;';
-
-        // Insert before the submit button
-        const submitBtn = document.getElementById("submitBtn");
-        if (submitBtn && submitBtn.parentNode) {
-            submitBtn.parentNode.insertBefore(pricingDisplay, submitBtn);
-        }
-    }
+    const pricingDisplay = document.getElementById("pricingBreakdown");
 
     if (!packageSelect || !pricingDisplay) return;
 
@@ -322,6 +306,10 @@ window.handleContactSubmit = async function (e) {
     const mainGoal = form.querySelector("#mainGoal")?.value.trim() || "";
     const mustHaveFeatures = form.querySelector("#mustHaveFeatures")?.value.trim() || "";
 
+    // ✅ GET LOGO FILE
+    const logoInput = form.querySelector("#logoUpload");
+    const logoFile = logoInput?.files[0] || null;
+
     const packagePrice = getPackagePrice(packageSelected);
     const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
     const totalCost = packagePrice + domainPrice;
@@ -331,27 +319,11 @@ window.handleContactSubmit = async function (e) {
         return;
     }
 
-    const contactData = {
-        name,
-        email,
-        businessName,
-        phone,
-        package: packageSelected,
-        packagePrice: packagePrice,
-        timeline,
-        currentUrl,
-        referenceWebsite,
-        mainGoal,
-        mustHaveFeatures,
-        selectedDomain: window.selectedDomain || "N/A",
-        domainPricing: window.domainPricing ? {
-            initialCost: window.domainPricing.initialCost,
-            renewalCost: window.domainPricing.renewalCost
-        } : null,
-        totalCost: totalCost,
-        timestamp: new Date().toISOString(),
-        status: "pending_payment"
-    };
+    // ✅ VALIDATE LOGO FILE SIZE (5MB max)
+    if (logoFile && logoFile.size > 5 * 1024 * 1024) {
+        showModal("Logo Too Large", "Please upload a logo smaller than 5MB.", false);
+        return;
+    }
 
     const submitBtn = document.getElementById("submitBtn");
     if (!submitBtn) {
@@ -360,23 +332,52 @@ window.handleContactSubmit = async function (e) {
         return;
     }
     const originalText = submitBtn.textContent;
-    submitBtn.textContent = "Creating Payment Session...";
+    submitBtn.textContent = logoFile ? "Uploading Logo..." : "Creating Payment Session...";
     submitBtn.disabled = true;
 
     try {
+        // ✅ USE FormData INSTEAD OF JSON (to support file upload)
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('email', email);
+        formData.append('businessName', businessName);
+        formData.append('phone', phone);
+        formData.append('package', packageSelected);
+        formData.append('packagePrice', packagePrice);
+        formData.append('timeline', timeline);
+        formData.append('currentUrl', currentUrl);
+        formData.append('referenceWebsite', referenceWebsite);
+        formData.append('mainGoal', mainGoal);
+        formData.append('mustHaveFeatures', mustHaveFeatures);
+        formData.append('selectedDomain', window.selectedDomain || "N/A");
+        formData.append('domainPricing', JSON.stringify(window.domainPricing));
+        formData.append('totalCost', totalCost);
+        formData.append('timestamp', new Date().toISOString());
+        formData.append('status', 'pending_payment');
+
+        // ✅ APPEND LOGO FILE IF EXISTS
+        if (logoFile) {
+            formData.append('logo', logoFile);
+        }
+
         const backendResponse = await fetch(ENDPOINTS.createPaymentSession, {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(contactData),
+            // ✅ REMOVE Content-Type header - FormData sets it automatically
+            body: formData,
         });
 
         const backendResult = await backendResponse.json();
 
         if (backendResult.success && backendResult.sessionUrl) {
-            sendToGoogleScript(contactData).catch(err => {
-                console.warn("⚠️ Google Script submission failed, but proceeding to payment:", err);
-            });
-            window.location.href = backendResult.sessionUrl;
+            showModal(
+                "🎉 Request Submitted Successfully!",
+                "Redirecting you to secure payment...",
+                true
+            );
+
+            setTimeout(() => {
+                window.location.href = backendResult.sessionUrl;
+            }, 2000);
         } else {
             throw new Error(backendResult.error || "Failed to create payment session");
         }
@@ -388,6 +389,31 @@ window.handleContactSubmit = async function (e) {
         submitBtn.disabled = false;
     }
 };
+
+// ✅ ADD LOGO PREVIEW FUNCTION
+document.addEventListener('DOMContentLoaded', () => {
+    const logoInput = document.getElementById('logoUpload');
+    const logoPreview = document.getElementById('logoPreview');
+    const logoPreviewImage = document.getElementById('logoPreviewImage');
+
+    if (logoInput) {
+        logoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    logoPreviewImage.src = e.target.result;
+                    logoPreview.style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                logoPreview.style.display = 'none';
+            }
+        });
+    }
+
+    // ... rest of your existing DOMContentLoaded code ...
+});
 
 document.addEventListener('DOMContentLoaded', () => {
     const packageSelect = document.getElementById("package");

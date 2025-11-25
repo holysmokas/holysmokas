@@ -214,3 +214,346 @@
     line-height: 1.6;
     margin-bottom: 20px;
 }
+
+/* new css additions for recent features */
+.modification-info {
+    background: #eff6ff;
+    border: 1px solid #3b82f6;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.modification-info strong {
+    color: #1e40af;
+}
+
+.ai-chat-container {
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.ai-chat-messages {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: #f9fafb;
+    border-radius: 8px 8px 0 0;
+}
+
+.ai-message {
+    background: white;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 3px solid #667eea;
+}
+
+.user-message {
+    background: #eff6ff;
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border-left: 3px solid #3b82f6;
+}
+
+.ai-chat-input-form {
+    padding: 1rem;
+    background: white;
+    border-radius: 0 0 8px 8px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.ai-chat-input-form textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    resize: vertical;
+    margin-bottom: 1rem;
+}
+
+.ai-chat-input-form textarea:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.ai-processing {
+    text-align: center;
+    padding: 2rem;
+}
+
+.spinner {
+    border: 4px solid #f3f4f6;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.project-btn-group {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.btn-view {
+    flex: 1;
+    background: #10b981;
+}
+
+.btn-view:hover {
+    background: #059669;
+}
+
+.btn-modify {
+    flex: 1;
+    background: #667eea;
+}
+
+.btn-modify:hover {
+    background: #5568d3;
+}
+
+.btn-disabled {
+    background: #9ca3af !important;
+    cursor: not-allowed !important;
+    opacity: 0.6;
+}
+
+/* Modification History Styles */
+.modification-history {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+}
+
+.modification-history h4 {
+    margin: 0 0 0.75rem 0;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.modification-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.modification-item {
+    background: white;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    border-left: 3px solid #007bff;
+}
+
+.mod-header {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.mod-number {
+    font-weight: 600;
+    color: #007bff;
+}
+
+.mod-status {
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+.mod-status-processing {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.mod-status-completed {
+    background: #d4edda;
+    color: #155724;
+}
+
+.mod-status-failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.mod-date {
+    color: #6c757d;
+    margin-left: auto;
+    font-size: 0.8rem;
+}
+
+.mod-request {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #495057;
+}
+
+.text-success {
+    color: #28a745;
+    font-weight: 600;
+}
+
+.text-warning {
+    color: #dc3545;
+    font-weight: 600;
+}
+
+.text-muted {
+    color: #6c757d;
+    font-style: italic;
+}
+
+.badge-limit {
+    display: inline-block;
+    padding: 2px 8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-left: 0.5rem;
+}
+
+.btn-purchase {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+}
+
+.btn-purchase:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-link {
+    background: none;
+    border: none;
+    color: #007bff;
+    text-decoration: underline;
+    cursor: pointer;
+    padding: 0.5rem 0;
+    font-size: 0.875rem;
+}
+
+.btn-link:hover {
+    color: #0056b3;
+}
+
+/* Purchase Modal Styles */
+.pricing-options {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+}
+
+.pricing-card {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    border: 2px solid transparent;
+    transition: all 0.3s;
+    position: relative;
+}
+
+.pricing-card:hover {
+    border-color: #007bff;
+    transform: translateY(-4px);
+    box-shadow: 0 4px 12px rgba(0, 123, 255, 0.2);
+}
+
+.pricing-card.featured {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-color: #667eea;
+}
+
+.badge-popular {
+    position: absolute;
+    top: -10px;
+    right: 10px;
+    background: #ffc107;
+    color: #000;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+}
+
+.pricing-card h3 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: 700;
+    margin: 0.5rem 0;
+}
+
+.price-save {
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: #28a745;
+}
+
+.pricing-card.featured .price-save {
+    color: #ffc107;
+}
+
+.pricing-card p {
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
+
+.pricing-card .btn {
+    margin-top: 1rem;
+    width: 100%;
+}
+
+.contact-note {
+    text-align: center;
+    margin: 1rem 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+.modification-list-full {
+    list-style: none;
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.modification-item-full {
+    background: #f8f9fa;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    border-radius: 8px;
+    border-left: 4px solid #007bff;
+}
