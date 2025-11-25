@@ -9,8 +9,10 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: resolve(__dirname, 'index.html'),
-                contact: resolve(__dirname, 'contact.html'),
-                'payment-success': resolve(__dirname, 'payment-success.html'),
+                privacy: resolve(__dirname, 'privacy.html'),
+                terms: resolve(__dirname, 'terms.html'),
+                contact: resolve(__dirname, 'frontend/pages/contact.html'),
+                'payment-success': resolve(__dirname, 'frontend/pages/payment-success.html'),
                 login: resolve(__dirname, 'frontend/pages/login.html'),
                 dashboard: resolve(__dirname, 'frontend/pages/dashboard.html')
             }

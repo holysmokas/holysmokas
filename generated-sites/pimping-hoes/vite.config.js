@@ -1,8 +1,0 @@
-// ===== vite.config.js (HAS CONTENT) =====
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-export default defineConfig({
-    plugins: [react()],
-    base: '/pimping-hoes-1763627522859/'
-})

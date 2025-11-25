@@ -29,7 +29,9 @@ build/
 backend/serviceAccountKey.json
 .env
 *.env
+generated-sites/
 
 # Firebase credentials
 serviceAccountKey.json
 backend/serviceAccountKey.json
+
