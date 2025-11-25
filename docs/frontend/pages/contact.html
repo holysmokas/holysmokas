@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Holy Smokas - Get a Quote</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/holysmokas-thats-cheap-2-Bh4TFw0d.png" />
+
+    <!-- Load CSS -->
+  <script type="module" crossorigin src="/assets/contact-vFkr3YSV.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  <link rel="modulepreload" crossorigin href="/assets/config-Zq-n2hKh.js">
+  <link rel="stylesheet" crossorigin href="/assets/style-BZglE8e5.css">
+</head>
+
+<body>
+    <nav>
+        <div class="nav-container">
+            <div class="logo">
+                <a href="/" style="text-decoration: none; color: inherit;">
+                    Holy Smokas - That's Cheap!
+                    <img src="/assets/holysmokas-thats-cheap-2-Bh4TFw0d.png" alt="Woman looking surprised"
+                        style="height:60px; vertical-align: middle; margin-left: 5px;">
+                </a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/">Home</a></li>
+                <li><a href="/#pricing">Pricing</a></li>
+                <li><a href="/#portfolio">Portfolio</a></li>
+                <li><a href="/#about">About</a></li>
+                <li><a href="/frontend/pages/login.html">Login</a></li>
+            </ul>
+            <div class="nav-cta">
+                <a href="/frontend/pages/contact.html" class="btn btn-primary">Contact Us</a>
+            </div>
+        </div>
+    </nav>
+
+    <div id="contact-page">
+        <div class="auth-container">
+            <div class="auth-box">
+                <h2>Contact Us / Request a Quote</h2>
+                <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">Let us know about your project.
+                    We'll get back to you in 24 hours!</p>
+
+                <div class="domain-search-container">
+                    <h3 style="color: var(--primary); margin-bottom: 0.5rem;">🌐 Check Domain Availability</h3>
+                    <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.95rem;">
+                        Want a custom domain? Search to see pricing and availability before requesting your website.
+                    </p>
+                    <div class="domain-search-box">
+                        <input type="text" id="domainInput" placeholder="Enter your domain (e.g., mybusiness.com)"
+                            style="flex: 1; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem;" />
+                        <button type="button" class="btn btn-primary" onclick="checkDomain()">
+                            Check Availability
+                        </button>
+                    </div>
+                    <div id="domainResult" class="domain-result"></div>
+                </div>
+
+                <form id="contactForm" onsubmit="handleContactSubmit(event)">
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="name" name="name" required placeholder="John Doe">
+                    </div>
+                    <div class="form-group">
+                        <label>Business Name</label>
+                        <input type="text" id="businessName" name="business-name" required placeholder="Your Business">
+                    </div>
+                    <div class="form-group">
+                        <label>Desired Website URL (If Available)
+                            <span style="font-size: 0.875rem; color: var(--gray); font-weight: normal;">
+                                - Use domain search above to check availability
+                            </span>
+                        </label>
+                        <input type="url" id="currentUrl" name="current-url" placeholder="https://yourdomain.com">
+                        <small style="display: block; margin-top: 0.5rem; color: var(--gray); font-size: 0.875rem;">
+                            This will be your website's URL after deployment
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label>Email Address</label>
+                        <input type="email" id="email" name="email" required placeholder="john@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label>Phone Number</label>
+                        <input type="tel" id="phone" name="phone" required placeholder="(555) 123-4567">
+                    </div>
+                    <div class="form-group">
+                        <label>Which Package/Service Interests You?</label>
+                        <select id="package" name="package">
+                            <option>Starter - $599 (New Website)</option>
+                            <option selected>Business - $1,199 (New Website)</option>
+                            <option>Small Shop - $1,699 (New Website)</option>
+                            <option>E-Commerce/Enterprise - Custom Quote</option>
+                            <option>Website Redesign/Updates</option>
+                            <option>Not Sure Yet</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Target Timeline</label>
+                        <select id="timeline" name="timeline">
+                            <option selected>Flexible (3+ Months)</option>
+                            <option>1-2 Months</option>
+                            <option>ASAP (Less than 1 Month)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Website(s) You'd Like Yours to Look Like (Optional)</label>
+                        <input type="url" id="referenceWebsite" name="reference-website"
+                            placeholder="https://www.example.com">
+                        <small style="display: block; margin-top: 0.5rem; color: var(--gray); font-size: 0.875rem;">
+                            Enter a URL of a website whose design/style you admire
+                        </small>
+                    </div>
+                    <div class="form-group">
+                        <label>What is the **Main Goal** of Your Project? (e.g., Generate Leads, Increase Sales)</label>
+                        <textarea id="mainGoal" name="main-goal" required
+                            placeholder="I need a site to generate 20 leads per month for my consulting business."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>What are the **Must-Have Features/Functionality**?</label>
+                        <textarea id="mustHaveFeatures" name="must-have-features"
+                            placeholder="e.g., Contact Form, Appointment Booking, Photo Gallery, Payment Gateway, Client Login."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Upload Your Logo (Optional)
+                            <span style="font-size: 0.875rem; color: var(--gray); font-weight: normal;">
+                                - PNG, JPG, or SVG (Max 5MB)
+                            </span>
+                        </label>
+                        <input type="file" id="logoUpload" name="logo"
+                            accept="image/png,image/jpeg,image/jpg,image/svg+xml"
+                            style="padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; width: 100%;">
+                        <small style="display: block; margin-top: 0.5rem; color: var(--gray); font-size: 0.875rem;">
+                            Your logo will be integrated into your website design automatically
+                        </small>
+                        <div id="logoPreview" style="margin-top: 1rem; display: none;">
+                            <p style="color: var(--secondary); font-weight: bold; margin-bottom: 0.5rem;">📸 Logo
+                                Preview:</p>
+                            <img id="logoPreviewImage"
+                                style="max-width: 200px; max-height: 100px; border: 2px solid #e5e7eb; border-radius: 8px; padding: 0.5rem; background: white;">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary" style="width: 100%;" id="submitBtn">Send
+                        Request</button>
+                    <div class="form-footer">
+                        Prefer to talk? Call us at (415) 691 - 7085
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <div class="footer-content">
+            <div class="footer-section">
+                <h4>Holy Smokas</h4>
+                <p>Professional websites for small businesses without monthly fees. Free hosting included. That's Cheap!
+                </p>
+                <p style="margin-top: 1rem; color: var(--accent); font-weight: bold;">💰 No Monthly Hosting Fees!</p>
+            </div>
+            <div class="footer-section">
+                <h4>Small Business Packages</h4>
+                <ul>
+                    <li><a href="/#pricing">Starter Website - $599</a></li>
+                    <li><a href="/#pricing">Business Website - $1,199</a></li>
+                    <li><a href="/#pricing">Small Shop - $1,699</a></li>
+                    <li><a href="/#pricing">Enterprise/E-Commerce - Custom</a></li>
+                    <li><a href="/#pricing">Website Updates - $75/hr</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Company</h4>
+                <ul>
+                    <ul>
+                        <li><a href="#about">About Us</a></li>
+                        <li><a href="#portfolio">Portfolio</a></li>
+                        <li><a href="#pricing">Pricing</a></li>
+                        <li><a href="/frontend/pages/contact.html">Contact</a></li>
+                        <li><a href="/privacy.html">Privacy Policy</a></li>
+                        <li><a href="/terms.html">Terms of Service</a></li>
+                    </ul>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contact</h4>
+                <ul>
+                    <li>Phone: (415) 691 - 7085</li>
+                    <li>Email: contact@holysmokas.com</li>
+                    <li>Hours: Mon-Fri 9am-6pm</li>
+                </ul>
+                <p style="margin-top: 1rem; font-size: 0.9rem;">Get a quote in 24 hours!</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 Holy Smokas. All rights reserved. | No Monthly Fees. No Subscriptions. Just Great Websites.
+            </p>
+        </div>
+    </footer>
+
+    <div id="formModal" class="modal">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon">✔</div>
+            <h3 id="modalTitle">Success!</h3>
+            <p id="modalMessage">Form submitted successfully!</p>
+            <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 1.5rem;">Close</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
