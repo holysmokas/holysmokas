@@ -17,9 +17,9 @@ onAuthStateChanged(auth, (user) => {
     const currentPath = window.location.pathname;
     if (isRegistering) return;
     if (user && currentPath.includes('login.html')) {
-        window.location.href = '/frontend/pages/dashboard.html';
+        window.location.href = '/dashboard.html';
     } else if (!user && currentPath.includes('dashboard.html')) {
-        window.location.href = '/frontend/pages/login.html';
+        window.location.href = '/login.html';
     }
 });
 
@@ -166,7 +166,7 @@ window.handleRegister = async function (event) {
         console.log('Account created:', user.email);
         await updateProfile(user, { displayName: name });
         const actionCodeSettings = {
-            url: window.location.origin + '/frontend/pages/login.html',
+            url: window.location.origin + '/login.html',
             handleCodeInApp: false
         };
         await sendEmailVerification(user, actionCodeSettings);
