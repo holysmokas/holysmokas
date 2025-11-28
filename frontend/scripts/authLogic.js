@@ -65,7 +65,7 @@ window.handleLogin = async function (event) {
         console.log('Login successful:', user.email);
         await claimUserProjects(user);
         showAuthModal('success', 'Login Successful!', 'Redirecting to your dashboard...');
-        setTimeout(() => { window.location.href = '/frontend/pages/dashboard.html'; }, 1000);
+        setTimeout(() => { window.location.href = '/dashboard.html'; }, 1000);
 
     } catch (error) {
         console.error('Login error:', error);
@@ -91,7 +91,7 @@ window.handleLogout = async function () {
     try {
         await signOut(auth);
         console.log('Logout successful');
-        window.location.href = '/frontend/pages/login.html';
+        window.location.href = '/login.html';
     } catch (error) {
         console.error('Logout error:', error);
         showAuthModal('error', 'Logout Error', 'Error logging out. Please try again.');
