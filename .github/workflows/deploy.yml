@@ -1,17 +1,16 @@
-name: Deploy to GitHub Pages and VM
+name: Deploy Frontend to GitHub Pages
 on:
   push:
     branches: [ main ]
   workflow_dispatch:
 
-# IMPORTANT: Add permissions for GitHub Pages
 permissions:
   contents: write
   pages: write
   id-token: write
 
 jobs:
-  build-and-deploy:
+  deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,117 +22,21 @@ jobs:
           node-version: '20'
           cache: 'npm'
       
-      # -------------------------------
-      # 1️⃣ Create Firebase service key BEFORE build
-      # -------------------------------
-      - name: Create Firebase service account file
-        run: |
-          mkdir -p backend
-          echo "${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}" > backend/serviceAccountKey.json
-      
-      # -------------------------------
-      # 2️⃣ Install dependencies
-      # -------------------------------
       - name: Install dependencies
-        run: npm ci
+        run: npm install
       
-      # -------------------------------
-      # 3️⃣ Build project
-      # -------------------------------
       - name: Build
         run: npm run build
-        env:
-          GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
-          GIT_USERNAME: ${{ secrets.GIT_USERNAME }}
-          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-          NAMECHEAP_API_KEY: ${{ secrets.NAMECHEAP_API_KEY }}
-          NAMECHEAP_API_USER: ${{ secrets.NAMECHEAP_API_USER }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          SMTP_PASS: ${{ secrets.SMTP_PASS }}
       
-      # -------------------------------
-      # 4️⃣ Add CNAME for custom domain
-      # -------------------------------
-      - name: Add CNAME to docs
+      - name: Add CNAME
         run: echo "holysmokas.com" > docs/CNAME
       
-      # -------------------------------
-      # 5️⃣ Deploy to GitHub Pages
-      # -------------------------------
+      - name: Add .nojekyll
+        run: touch docs/.nojekyll
+      
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GIT_TOKEN }}
           publish_dir: ./docs
           cname: holysmokas.com
-      
-      # -------------------------------
-      # 6️⃣ Deploy to VM - ROOT LEVEL SETUP WITH DEBUGGING
-      # -------------------------------
-      - name: Deploy to VM
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.VM_HOST }}
-          username: ${{ secrets.VM_USER }}
-          key: ${{ secrets.VM_SSH_KEY }}
-          script: |
-            # Exit immediately if any command fails
-            set -e 
-            echo "--- Starting VM Deployment Script ---"
-            echo "Current directory before CD: $(pwd)"
-            echo "VM_PROJECT_PATH secret value: ${{ secrets.VM_PROJECT_PATH }}"
-            
-            # Navigate to the project root directory on your VM
-            cd ${{ secrets.VM_PROJECT_PATH }}
-            echo "Current directory after CD: $(pwd)"
-            echo "Contents of current directory after CD: $(ls -a)"
-            
-            # Ensure the local Git repository is clean and up-to-date
-            echo "🧹 Cleaning Git repository and pulling latest code..."
-            git fetch origin main
-            git reset --hard origin/main
-            git clean -fd
-            echo "Contents of current directory after Git clean/pull: $(ls -a)"
-            
-            # Create Firebase service account file in backend directory
-            echo "🔥 Creating Firebase service account in backend/..."
-            echo '${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}' > backend/serviceAccountKey.json
-            echo "Contents of backend directory: $(ls -a backend/)"
-            
-            # Install/update dependencies (now using package.json in the root on VM)
-            echo "📦 Installing dependencies..."
-            npm install
-            echo "Contents of current directory after npm install: $(ls -a)"
-            
-            # Create .env file with secrets in the root on VM
-            echo "📝 Creating .env file with secrets..."
-            cat <<EOF > .env
-            PORT=3001
-            BYPASS_PAYMENT=true
-            STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
-            STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
-            NAMECHEAP_API_USER=${{ secrets.NAMECHEAP_API_USER }}
-            NAMECHEAP_API_KEY=${{ secrets.NAMECHEAP_API_KEY }}
-            NAMECHEAP_CLIENT_IP=${{ secrets.NAMECHEAP_CLIENT_IP }}
-            NAMECHEAP_API_URL=https://api.namecheap.com/xml.response
-            SMTP_HOST=smtppro.zoho.com
-            SMTP_PORT=465
-            SMTP_USER=support@holysmokas.com
-            SMTP_PASS=${{ secrets.SMTP_PASS }}
-            SMTP_SECURE=true
-            OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}
-            GIT_USERNAME=${{ secrets.GIT_USERNAME }}
-            GIT_TOKEN=${{ secrets.GIT_TOKEN }}
-            EOF
-            echo "Contents of current directory after .env creation: $(ls -a)"
-            
-            # Restart the application using PM2
-            echo "🔄 Restarting the application..."
-            pm2 stop holysmokas-backend || true
-            pm2 delete holysmokas-backend || true
-            pm2 start server.js --name holysmokas-backend --update-env
-            pm2 save
-            
-            echo "✅ Deployment to VM complete!"
-            echo "--- VM Deployment Script Finished ---"
