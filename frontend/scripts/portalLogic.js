@@ -1,5 +1,5 @@
 // portalLogic.js
-import { auth } from "../../frontend/scripts/config.js";
+import { auth } from "/frontend/scripts/config.js";
 import { ENDPOINTS } from './config.js';
 
 export async function submitContactForm(formData) {

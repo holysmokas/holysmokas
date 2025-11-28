@@ -4,7 +4,7 @@
 // ============================================
 
 import { auth } from '/frontend/scripts/config.js';
-import { onAuthStateChanged } from 'firebase/auth';
+import { onAuthStateChanged } from '/frontend/scripts/config.js';
 import { ENDPOINTS } from '/frontend/scripts/config.js';
 
 // Get API URL from config or default

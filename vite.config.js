@@ -6,6 +6,7 @@ export default defineConfig({
     build: {
         outDir: 'docs',
         emptyOutDir: true,
+        copyPublicDir: true,
         rollupOptions: {
             input: {
                 // Root level pages
