@@ -1,4 +1,4 @@
-import { db } from '../../backend/firebase.js';
+import { db } from '../../frontend/scripts/config.js';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { ENDPOINTS } from './config.js';
 

@@ -1,9 +1,16 @@
-// config.js - API Configuration with auto-detection
+// config.js - API Configuration with auto-detection and Firebase initialization
+import { initializeApp } from 'firebase/app';
+import { getFirestore } from 'firebase/firestore';
+import { getAuth } from 'firebase/auth';
+import { getStorage } from 'firebase/storage';
+
+// Detect environment
 const isLocalhost = window.location.hostname === 'localhost' ||
     window.location.hostname === '127.0.0.1';
 
 const ENV = isLocalhost ? 'development' : 'production';
 
+// API Configuration
 const CONFIG = {
     development: {
         API_BASE_URL: 'http://localhost:8080',
@@ -32,6 +39,25 @@ export const ENDPOINTS = {
     contactFormSubmission: GOOGLE_SHEETS_URL
 };
 
+// Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyC0qVQm59S1_OFJcYLr2ILyGB9m-SoxHro",
+    authDomain: "holysmokas-4ef36.firebaseapp.com",
+    projectId: "holysmokas-4ef36",
+    storageBucket: "holysmokas-4ef36.firebasestorage.app",
+    messagingSenderId: "236391401471",
+    appId: "1:236391401471:web:16780dc40257205caf09ca",
+    measurementId: "G-LRKVZGKNLD"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const auth = getAuth(app);
+export const storage = getStorage(app);
+
+// Console logs
 console.log(`🔧 Config Mode: ${ENV === 'development' ? '🛠️ LOCAL DEV' : '🚀 PRODUCTION'}`);
 console.log(`📡 API URL: ${API_BASE_URL}`);
 console.log('📋 Request Modification Endpoint:', ENDPOINTS.requestModification);
+console.log('🔥 Firebase initialized');

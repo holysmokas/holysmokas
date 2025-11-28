@@ -3,7 +3,7 @@
 // frontend/scripts/driveUI.js
 // ============================================
 
-import { auth } from '/backend/firebase.js';
+import { auth } from '/frontend/scripts/config.js';
 import { onAuthStateChanged } from 'firebase/auth';
 import { ENDPOINTS } from '/frontend/scripts/config.js';
 

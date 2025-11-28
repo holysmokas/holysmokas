@@ -1,5 +1,5 @@
 // authLogic.js
-import { auth } from '../../backend/firebase.js';
+import { auth } from '../../frontend/scripts/config.js';
 import {
     signInWithEmailAndPassword,
     createUserWithEmailAndPassword,
