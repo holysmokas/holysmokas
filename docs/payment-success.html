@@ -39,22 +39,25 @@
                 Thank you for your payment! Your website is now being generated.
             </p>
 
-            <div
+            <!-- Generation Status -->
+            <div id="generationStatus"
                 style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
                 <h2 style="color: #065f46; font-size: 1.5rem; margin-bottom: 1rem;">
                     🤖 What's Happening Now
                 </h2>
                 <div style="text-align: left; margin: 0 auto; max-width: 500px;">
-                    <p style="color: #6b7280; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <p id="step1"
+                        style="color: #6b7280; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 1.5rem;">⚡</span>
                         <span>Our Team is generating your custom website</span>
                     </p>
 
-                    <p style="color: #6b7280; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <p id="step2"
+                        style="color: #6b7280; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 1.5rem;">🚀</span>
                         <span>Deploying to live hosting</span>
                     </p>
-                    <p style="color: #6b7280; display: flex; align-items: center; gap: 0.5rem;">
+                    <p id="step3" style="color: #6b7280; display: flex; align-items: center; gap: 0.5rem;">
                         <span style="font-size: 1.5rem;">📧</span>
                         <span>You'll receive an email when it's ready</span>
                     </p>
@@ -104,13 +107,13 @@
                 <h4>Contact</h4>
                 <ul>
                     <li>Phone: (415) 691 - 7085</li>
-                    <li>Email: <a href="mailto:contact@holysmokas.com">contact@holysmokas.com</a></li>
+                    <li>Email: contact@holysmokas.com</li>
                     <li>Hours: Mon-Fri 9am-6pm</li>
                 </ul>
                 <ul>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#portfolio">Portfolio</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
+                    <li><a href="/#about">About Us</a></li>
+                    <li><a href="/#portfolio">Portfolio</a></li>
+                    <li><a href="/#pricing">Pricing</a></li>
                     <li><a href="/frontend/pages/contact.html">Contact</a></li>
                     <li><a href="/privacy.html">Privacy Policy</a></li>
                     <li><a href="/terms.html">Terms of Service</a></li>
@@ -121,6 +124,95 @@
             <p>&copy; 2025 Holy Smokas. All rights reserved.</p>
         </div>
     </footer>
+
+    <script>
+        // Get API URL based on environment
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8080'
+            : 'https://api.holysmokas.com';
+
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const sessionId = urlParams.get('session_id');
+        const projectId = urlParams.get('project_id');
+        const bypassed = urlParams.get('bypassed');
+
+        console.log('📋 Payment success page loaded');
+        console.log('   Session ID:', sessionId);
+        console.log('   Project ID:', projectId);
+        console.log('   Bypassed:', bypassed);
+
+        // Trigger generation automatically when page loads
+        async function triggerGeneration() {
+            if (!projectId) {
+                console.error('❌ No project ID found in URL');
+                return;
+            }
+
+            console.log('🚀 Triggering website generation...');
+
+            // Update UI to show generation started
+            const step1 = document.getElementById('step1');
+            if (step1) {
+                step1.innerHTML = `
+                    <span style="font-size: 1.5rem;">⏳</span>
+                    <span><strong>Generating your website...</strong></span>
+                `;
+                step1.style.color = '#059669';
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/trigger-generation`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        projectId: projectId,
+                        sessionId: sessionId
+                    })
+                });
+
+                const data = await response.json();
+                console.log('📡 Trigger response:', data);
+
+                if (data.success) {
+                    if (data.alreadyGenerated) {
+                        // Already done - show link
+                        const statusDiv = document.getElementById('generationStatus');
+                        statusDiv.innerHTML = `
+                            <h2 style="color: #065f46; font-size: 1.5rem; margin-bottom: 1rem;">
+                                ✅ Your Website is Ready!
+                            </h2>
+                            <p style="margin-bottom: 1rem;">Your website has already been generated.</p>
+                            <a href="${data.liveUrl}" target="_blank" class="btn btn-primary">
+                                🌐 View Your Website
+                            </a>
+                        `;
+                    } else {
+                        console.log('✅ Generation started successfully');
+                        // Update step 1 to show success
+                        if (step1) {
+                            step1.innerHTML = `
+                                <span style="font-size: 1.5rem;">✅</span>
+                                <span><strong>Generation started!</strong> This takes 5-15 minutes.</span>
+                            `;
+                        }
+                    }
+                } else {
+                    console.error('❌ Trigger failed:', data.error);
+                }
+            } catch (error) {
+                console.error('❌ Error triggering generation:', error);
+            }
+        }
+
+        // Auto-trigger on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Small delay to ensure page is fully loaded
+            setTimeout(triggerGeneration, 1000);
+        });
+    </script>
 </body>
 
 </html>

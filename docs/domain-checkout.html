@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Registration - HolySmokas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            max-width: 550px;
+            width: 100%;
+            text-align: center;
+            animation: slideUp 0.5s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .checkmark {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #28a745, #20c997);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            font-size: 40px;
+            color: white;
+            animation: bounce 0.6s ease-out;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #6c757d;
+            margin-bottom: 35px;
+            font-size: 16px;
+        }
+
+        .domain-box {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border: 2px solid #667eea;
+        }
+
+        .domain-box h2 {
+            color: #667eea;
+            font-size: 26px;
+            margin: 0;
+            word-break: break-word;
+        }
+
+        .price {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin: 25px 0;
+        }
+
+        .features {
+            text-align: left;
+            margin: 25px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .features li {
+            color: #495057;
+            margin: 12px 0;
+            padding-left: 30px;
+            position: relative;
+            list-style: none;
+        }
+
+        .features li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        #checkoutBtn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 18px 40px;
+            border: none;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 30px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        #checkoutBtn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+        }
+
+        #checkoutBtn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+            display: none;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            color: #6c757d;
+            font-size: 13px;
+        }
+
+        .powered-by {
+            margin-top: 15px;
+            color: #adb5bd;
+            font-size: 12px;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="checkmark">✓</div>
+        <h1>Website Payment Successful!</h1>
+        <p class="subtitle">Now let's secure your custom domain</p>
+
+        <div class="domain-box">
+            <h2 id="domainName">Loading...</h2>
+        </div>
+
+        <div class="price" id="domainPrice">$0.00</div>
+
+        <ul class="features">
+            <li>First year registration included</li>
+            <li>Automatic SSL certificate</li>
+            <li>DNS management included</li>
+            <li>Email forwarding available</li>
+        </ul>
+
+        <div class="error-message" id="errorMessage"></div>
+
+        <button id="checkoutBtn">Complete Domain Registration</button>
+        <div class="spinner" id="spinner"></div>
+
+        <p class="footer-note">
+            Your domain will be automatically configured with your new website
+        </p>
+        <p class="powered-by">
+            🔒 Secure payment powered by Stripe
+        </p>
+    </div>
+
+    <script>
+        // Get URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project_id');
+        const domain = urlParams.get('domain');
+        const price = urlParams.get('price') || '12.99';
+
+        // Validate parameters
+        if (!projectId || !domain) {
+            document.getElementById('errorMessage').textContent = 'Missing required information. Please contact support.';
+            document.getElementById('errorMessage').style.display = 'block';
+            document.getElementById('checkoutBtn').disabled = true;
+        } else {
+            // Display domain and price
+            document.getElementById('domainName').textContent = decodeURIComponent(domain);
+            document.getElementById('domainPrice').textContent = '$' + parseFloat(price).toFixed(2);
+        }
+
+        // Determine API URL based on environment
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8080'
+            : 'https://holysmokas.com';
+
+        console.log('Domain Checkout Page Loaded');
+        console.log('Project ID:', projectId);
+        console.log('Domain:', domain);
+        console.log('Price:', price);
+        console.log('API URL:', API_URL);
+
+        // Handle checkout button
+        async function startCheckout() {
+            const btn = document.getElementById('checkoutBtn');
+            const spinner = document.getElementById('spinner');
+            const errorMsg = document.getElementById('errorMessage');
+
+            btn.disabled = true;
+            btn.textContent = 'Creating checkout...';
+            spinner.style.display = 'block';
+            errorMsg.style.display = 'none';
+
+            try {
+                console.log('Sending request to:', API_URL + '/create-domain-session');
+
+                const response = await fetch(API_URL + '/create-domain-session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        projectId: projectId,
+                        domain: domain,
+                        price: parseFloat(price)
+                    })
+                });
+
+                console.log('Response status:', response.status);
+
+                const data = await response.json();
+                console.log('Response data:', data);
+
+                if (data.success && data.sessionUrl) {
+                    console.log('Redirecting to:', data.sessionUrl);
+                    window.location.href = data.sessionUrl;
+                } else {
+                    throw new Error(data.error || 'Failed to create checkout session');
+                }
+
+            } catch (error) {
+                console.error('Checkout error:', error);
+                errorMsg.textContent = 'Error: ' + error.message + '. Please contact support at (415) 691-7085';
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+                btn.textContent = 'Complete Domain Registration';
+                spinner.style.display = 'none';
+            }
+        }
+
+        // Add click handler
+        document.getElementById('checkoutBtn').addEventListener('click', startCheckout);
+
+        // Auto-trigger after 3 seconds for seamless experience
+        let autoTriggerTimeout;
+        if (projectId && domain) {
+            autoTriggerTimeout = setTimeout(() => {
+                if (!document.getElementById('checkoutBtn').disabled) {
+                    console.log('Auto-triggering domain checkout...');
+                    startCheckout();
+                }
+            }, 3000);
+        }
+
+        // Clear timeout if user clicks manually
+        document.getElementById('checkoutBtn').addEventListener('click', () => {
+            if (autoTriggerTimeout) {
+                clearTimeout(autoTriggerTimeout);
+            }
+        }, { once: true });
+    </script>
+</body>
+
+</html>

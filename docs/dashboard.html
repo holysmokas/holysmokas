@@ -413,10 +413,39 @@
             margin: 0 auto;
             padding: 0 1rem;
         }
+
+        /* Dashboard Grid Layout */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            margin: 2rem 0;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Drive Section Sidebar */
+        .drive-sidebar {
+            position: sticky;
+            top: 2rem;
+        }
+
+        .drive-section-title {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
     </style>
-  <script type="module" crossorigin src="/assets/dashboard-CJPCUx_d.js"></script>
+  <script type="module" crossorigin src="/assets/dashboard-DQ4pzN1M.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-  <link rel="modulepreload" crossorigin href="/assets/config-Zq-n2hKh.js">
+  <link rel="modulepreload" crossorigin href="/assets/config-Ci-ZL9Yi.js">
   <link rel="stylesheet" crossorigin href="/assets/dashboard-DRjAGkAH.css">
   <link rel="stylesheet" crossorigin href="/assets/style-BZglE8e5.css">
 </head>
@@ -440,8 +469,22 @@
             <h1>Your Projects</h1>
         </div>
 
-        <div id="projectsContainer" class="projects-grid">
-            <div class="loading-state">Loading your projects...</div>
+        <div class="dashboard-grid">
+            <!-- Main Projects Column -->
+            <div class="projects-column">
+                <div id="projectsContainer" class="projects-grid">
+                    <div class="loading-state">Loading your projects...</div>
+                </div>
+            </div>
+
+            <!-- Sidebar with Google Drive -->
+            <div class="drive-sidebar">
+                <h3 class="drive-section-title">📁 Storage Settings</h3>
+                <div id="driveSection">
+                    <!-- Drive UI will be injected here by driveUI.js -->
+                    <div class="loading-state" style="padding: 1rem;">Loading storage info...</div>
+                </div>
+            </div>
         </div>
 
         <!-- AI Modification Modal -->
@@ -527,6 +570,8 @@
             </div>
         </div>
     </div>
+
+    <!-- Load Google Drive UI -->
 
     <script>
         // Global logout function
