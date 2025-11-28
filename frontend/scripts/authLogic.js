@@ -19,7 +19,7 @@ onAuthStateChanged(auth, (user) => {
     if (user && currentPath.includes('login.html')) {
         window.location.href = './dashboard.html';
     } else if (!user && currentPath.includes('dashboard.html')) {
-        window.location.href = '/login.html';
+        window.location.href = './login.html';
     }
 });
 
