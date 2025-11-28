@@ -181,10 +181,15 @@ window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
 };
 
 function getPackagePrice(packageName) {
+    // Return null for placeholder/unselected state
+    if (!packageName || packageName.includes("Select a package")) {
+        return null;
+    }
+
     const priceMap = {
         "Starter - $599 (New Website)": 599,
         "Business - $1,199 (New Website)": 1199,
-        "Small Shop - $1,699 (New Website)": 1699
+        "Small Shop - $0.99 (New Website)": 0.99
     };
 
     for (const [key, value] of Object.entries(priceMap)) {
@@ -193,7 +198,30 @@ function getPackagePrice(packageName) {
         }
     }
 
+    // Return 0 for custom quotes and "Not Sure Yet"
     return 0;
+}
+
+function extractCategoryFromPackage(packageName) {
+    if (!packageName) return 'business';
+
+    const normalized = packageName.toLowerCase();
+
+    // Check in specific order to avoid conflicts
+    if (normalized.includes('small shop') || normalized.includes('smallshop')) {
+        return 'smallshop';
+    }
+    if (normalized.includes('starter')) {
+        return 'starter';
+    }
+    if (normalized.includes('business')) {
+        return 'business';
+    }
+    if (normalized.includes('enterprise') || normalized.includes('e-commerce')) {
+        return 'enterprise';
+    }
+
+    return 'business'; // default
 }
 
 function updatePricingBreakdown() {
@@ -204,6 +232,13 @@ function updatePricingBreakdown() {
 
     const selectedPackage = packageSelect.value;
     const packagePrice = getPackagePrice(selectedPackage);
+
+    // Hide pricing if no valid package selected
+    if (packagePrice === null || selectedPackage.includes("Select a package")) {
+        pricingDisplay.style.display = 'none';
+        return;
+    }
+
     const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
     const total = packagePrice + domainPrice;
 
@@ -306,20 +341,25 @@ window.handleContactSubmit = async function (e) {
     const mainGoal = form.querySelector("#mainGoal")?.value.trim() || "";
     const mustHaveFeatures = form.querySelector("#mustHaveFeatures")?.value.trim() || "";
 
-    // ✅ GET LOGO FILE
     const logoInput = form.querySelector("#logoUpload");
     const logoFile = logoInput?.files[0] || null;
 
+    // NEW VALIDATION: Check if a package was actually selected
     const packagePrice = getPackagePrice(packageSelected);
-    const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
-    const totalCost = packagePrice + domainPrice;
 
-    if (packagePrice === 0 && !packageSelected.includes('Custom Quote') && !packageSelected.includes('Not Sure Yet')) {
-        showModal("Please Select a Package", "Please select a website package before submitting.", false);
+    if (packagePrice === null || packageSelected.includes("Select a package")) {
+        showModal(
+            "Please Select a Package",
+            "Please choose a website package before submitting your request.",
+            false
+        );
         return;
     }
 
-    // ✅ VALIDATE LOGO FILE SIZE (5MB max)
+    const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
+    const totalCost = packagePrice + domainPrice;
+
+    // Validate logo file size (5MB max)
     if (logoFile && logoFile.size > 5 * 1024 * 1024) {
         showModal("Logo Too Large", "Please upload a logo smaller than 5MB.", false);
         return;
@@ -331,12 +371,12 @@ window.handleContactSubmit = async function (e) {
         showModal("Error", "Form submission error. Please refresh the page and try again.", false);
         return;
     }
+
     const originalText = submitBtn.textContent;
     submitBtn.textContent = logoFile ? "Uploading Logo..." : "Creating Payment Session...";
     submitBtn.disabled = true;
 
     try {
-        // ✅ USE FormData INSTEAD OF JSON (to support file upload)
         const formData = new FormData();
         formData.append('name', name);
         formData.append('email', email);
@@ -355,14 +395,17 @@ window.handleContactSubmit = async function (e) {
         formData.append('timestamp', new Date().toISOString());
         formData.append('status', 'pending_payment');
 
-        // ✅ APPEND LOGO FILE IF EXISTS
+        // ✅ ADD CATEGORY FIELD - This is critical!
+        const category = extractCategoryFromPackage(packageSelected);
+        formData.append('category', category);
+        console.log('📦 Package category:', category, 'from package:', packageSelected);
+
         if (logoFile) {
             formData.append('logo', logoFile);
         }
 
         const backendResponse = await fetch(ENDPOINTS.createPaymentSession, {
             method: "POST",
-            // ✅ REMOVE Content-Type header - FormData sets it automatically
             body: formData,
         });
 
@@ -384,22 +427,35 @@ window.handleContactSubmit = async function (e) {
 
     } catch (error) {
         console.error("Error creating payment session:", error);
-        showModal("Error", "There was an error processing your request. Please try again or contact us at (415) 691-7085.", false);
+        showModal(
+            "Error",
+            "There was an error processing your request. Please try again or contact us at (415) 691-7085.",
+            false
+        );
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
     }
 };
 
-// ✅ ADD LOGO PREVIEW FUNCTION
+
+// ✅ ADD LOGO PREVIEW FUNCTION WITH REMOVE OPTION
 document.addEventListener('DOMContentLoaded', () => {
     const logoInput = document.getElementById('logoUpload');
     const logoPreview = document.getElementById('logoPreview');
     const logoPreviewImage = document.getElementById('logoPreviewImage');
+    const removeLogo = document.getElementById('removeLogo');
 
     if (logoInput) {
         logoInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
+                // Validate file size (5MB max)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert('Logo file must be less than 5MB');
+                    logoInput.value = '';
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = (e) => {
                     logoPreviewImage.src = e.target.result;
@@ -412,7 +468,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ... rest of your existing DOMContentLoaded code ...
+    // Remove logo button
+    if (removeLogo) {
+        removeLogo.addEventListener('click', () => {
+            logoInput.value = '';
+            logoPreview.style.display = 'none';
+            logoPreviewImage.src = '';
+        });
+    }
 });
 
 document.addEventListener('DOMContentLoaded', () => {
