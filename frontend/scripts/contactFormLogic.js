@@ -187,8 +187,8 @@ function getPackagePrice(packageName) {
     }
 
     const priceMap = {
-        "Starter - $599 (New Website)": 599,
-        "Business - $1,199 (New Website)": 1199,
+        "Starter - $599 (New Website)": 0.99,
+        "Business - $1,199 (New Website)": 0.99,
         "Small Shop - $0.99 (New Website)": 0.99
     };
 
