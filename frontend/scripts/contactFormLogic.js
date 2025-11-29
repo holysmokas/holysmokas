@@ -411,16 +411,35 @@ window.handleContactSubmit = async function (e) {
 
         const backendResult = await backendResponse.json();
 
-        if (backendResult.success && backendResult.sessionUrl) {
-            showModal(
-                "🎉 Request Submitted Successfully!",
-                "Redirecting you to secure payment...",
-                true
-            );
+        if (backendResult.success) {
+            if (backendResult.requiresPayment === false) {
+                // No payment needed - inquiry/custom quote
+                showModal(
+                    "📧 Check Your Email!",
+                    backendResult.message || "Thank you! We've sent you a package recommendation. Check your email and click the link to continue.",
+                    true
+                );
 
-            setTimeout(() => {
-                window.location.href = backendResult.sessionUrl;
-            }, 2000);
+                setTimeout(() => {
+                    form.reset();
+                    window.selectedDomain = null;
+                    window.domainPricing = null;
+                    if (typeof updatePricingBreakdown === 'function') {
+                        updatePricingBreakdown();
+                    }
+                }, 4000);
+            } else if (backendResult.sessionUrl) {
+                // Payment required - redirect to Stripe
+                showModal(
+                    "🎉 Request Submitted Successfully!",
+                    "Redirecting you to secure payment...",
+                    true
+                );
+
+                setTimeout(() => {
+                    window.location.href = backendResult.sessionUrl;
+                }, 2000);
+            }
         } else {
             throw new Error(backendResult.error || "Failed to create payment session");
         }

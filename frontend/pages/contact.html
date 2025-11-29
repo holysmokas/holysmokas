@@ -215,6 +215,118 @@
     </div>
 
     <script type="module" src="/frontend/scripts/contactFormLogic.js"></script>
+    <!-- Pre-fill form from URL parameters -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+
+            // Check if there are pre-fill parameters
+            if (urlParams.has('suggested')) {
+                console.log('🎯 Pre-filling form from URL parameters...');
+
+                // Pre-fill all fields
+                const fields = {
+                    'name': urlParams.get('name'),
+                    'email': urlParams.get('email'),
+                    'businessName': urlParams.get('business'),
+                    'phone': urlParams.get('phone'),
+                    'package': urlParams.get('suggested'),
+                    'mainGoal': urlParams.get('goal'),
+                    'mustHaveFeatures': urlParams.get('features')
+                };
+
+                // Fill in the form
+                for (const [fieldId, value] of Object.entries(fields)) {
+                    const input = document.getElementById(fieldId);
+                    if (input && value) {
+                        input.value = decodeURIComponent(value);
+                        // Highlight the field briefly
+                        input.style.background = '#fef3c7';
+                        setTimeout(() => { input.style.background = ''; }, 2000);
+                    }
+                }
+
+                // Handle domain if provided
+                const domain = urlParams.get('domain');
+                if (domain && domain !== 'N/A' && domain !== '') {
+                    const domainInput = document.getElementById('domainInput');
+                    const currentUrlInput = document.getElementById('currentUrl');
+
+                    if (domainInput) domainInput.value = decodeURIComponent(domain);
+                    if (currentUrlInput) currentUrlInput.value = `https://${decodeURIComponent(domain)}`;
+
+                    window.selectedDomain = decodeURIComponent(domain);
+
+                    // Show a "domain selected" indicator
+                    const domainResult = document.getElementById('domainResult');
+                    if (domainResult) {
+                        domainResult.innerHTML = `
+                    <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <span style="font-size: 1.5rem;">✅</span>
+                            <strong style="color: #065f46;">${domain} - Previously selected</strong>
+                        </div>
+                        <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem; margin-bottom: 0;">
+                            This domain will be included in your order
+                        </p>
+                    </div>
+                `;
+                    }
+                }
+
+                // Update pricing display
+                if (typeof updatePricingBreakdown === 'function') {
+                    updatePricingBreakdown();
+                }
+
+                // Scroll to form
+                setTimeout(() => {
+                    const form = document.getElementById('contactForm');
+                    if (form) {
+                        form.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    }
+                }, 500);
+
+                // Show a notification
+                const notification = document.createElement('div');
+                notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 10000;
+            animation: slideIn 0.5s ease-out;
+        `;
+                notification.innerHTML = `
+            <strong>✨ Form Pre-filled!</strong><br>
+            <span style="font-size: 0.9rem;">Review and submit when ready</span>
+        `;
+                document.body.appendChild(notification);
+
+                // Add animation
+                const style = document.createElement('style');
+                style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+        `;
+                document.head.appendChild(style);
+
+                // Remove notification after 4 seconds
+                setTimeout(() => {
+                    notification.style.animation = 'slideIn 0.5s ease-out reverse';
+                    setTimeout(() => notification.remove(), 500);
+                }, 4000);
+
+                console.log('✅ Form pre-filled successfully!');
+            }
+        });
+    </script>
 </body>
 
 </html>
