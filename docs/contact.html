@@ -7,7 +7,191 @@
     <title>Contact Holy Smokas - Get a Quote</title>
     <link rel="icon" type="image/svg+xml" href="/assets/holysmokas-thats-cheap-2-Bh4TFw0d.png" />
 
-    <!-- Load CSS -->
+    <style>
+        /* Info Popup Styles */
+        .info-popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .info-popup.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .info-popup-content {
+            background: white;
+            border-radius: 16px;
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.4s ease-out;
+        }
+
+        .info-popup-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 2rem;
+            border-radius: 16px 16px 0 0;
+            text-align: center;
+        }
+
+        .info-popup-header h2 {
+            margin: 0;
+            font-size: 1.8rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .info-popup-header p {
+            margin: 0;
+            opacity: 0.95;
+            font-size: 1rem;
+        }
+
+        .info-popup-body {
+            padding: 2rem;
+        }
+
+        .info-item {
+            background: #f9fafb;
+            border-left: 4px solid #667eea;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            border-radius: 8px;
+        }
+
+        .info-item h3 {
+            color: #667eea;
+            margin: 0 0 1rem 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .info-item p {
+            color: #4b5563;
+            margin: 0;
+            line-height: 1.6;
+        }
+
+        .info-item ul {
+            margin: 1rem 0 0 0;
+            padding-left: 1.5rem;
+            color: #4b5563;
+        }
+
+        .info-item ul li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+
+        .highlight-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .highlight-box h3 {
+            color: #b45309;
+            margin: 0 0 0.75rem 0;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .highlight-box p {
+            color: #78350f;
+            margin: 0;
+            line-height: 1.6;
+            font-weight: 500;
+        }
+
+        .info-popup-footer {
+            padding: 0 2rem 2rem 2rem;
+            display: flex;
+            gap: 1rem;
+        }
+
+        .info-popup-footer button {
+            flex: 1;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-understand {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-understand:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .info-popup-content {
+                margin: 20px;
+            }
+
+            .info-popup-header {
+                padding: 1.5rem;
+            }
+
+            .info-popup-header h2 {
+                font-size: 1.5rem;
+            }
+
+            .info-popup-body {
+                padding: 1.5rem;
+            }
+
+            .info-item {
+                padding: 1rem;
+            }
+        }
+    </style>
   <script type="module" crossorigin src="/assets/contact-CQq0juXh.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
   <link rel="modulepreload" crossorigin href="/assets/config-B_OJIxiv.js">
@@ -36,6 +220,64 @@
             </div>
         </div>
     </nav>
+
+    <!-- Important Information Popup -->
+    <div id="infoPopup" class="info-popup">
+        <div class="info-popup-content">
+            <div class="info-popup-header">
+                <h2>📋 Important Information</h2>
+                <p>Please read before submitting your request</p>
+            </div>
+
+            <div class="info-popup-body">
+                <div class="highlight-box">
+                    <h3>⚠️ 3 Free Changes Policy</h3>
+                    <p>Once you submit payment, you will receive your completed website plus <strong>THREE (3) FREE
+                            changes</strong>. After these free changes are used, additional modifications will be
+                        charged at our standard hourly rate of $75/hour.</p>
+                </div>
+
+                <div class="info-item">
+                    <h3>📝 Be As Detailed As Possible</h3>
+                    <p>The more information you provide in this form, the better we can deliver exactly what you need on
+                        the first try. This helps maximize your 3 free changes!</p>
+                    <ul>
+                        <li><strong>Main Goal:</strong> Describe what you want your website to achieve (leads, sales,
+                            bookings, etc.)</li>
+                        <li><strong>Must-Have Features:</strong> List every feature you need (contact forms, galleries,
+                            payment systems, etc.)</li>
+                        <li><strong>Reference Websites:</strong> Share examples of designs you like</li>
+                        <li><strong>Upload Your Logo:</strong> Provide your logo so we can integrate it from the start
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="info-item">
+                    <h3>✨ What Happens After Payment</h3>
+                    <p>After you complete payment:</p>
+                    <ul>
+                        <li>We'll build your website based on the details you provide</li>
+                        <li>You'll receive your completed website within the agreed timeline</li>
+                        <li>You can request up to 3 changes/revisions at no additional cost</li>
+                        <li>Changes beyond the 3 free ones are billed at $75/hour</li>
+                    </ul>
+                </div>
+
+                <div class="info-item">
+                    <h3>💡 Pro Tip</h3>
+                    <p>Take your time filling out this form! The clearer and more detailed your requirements are now,
+                        the less likely you'll need to use all 3 free changes later. Think of it as your blueprint for
+                        success!</p>
+                </div>
+            </div>
+
+            <div class="info-popup-footer">
+                <button class="btn-understand" onclick="closeInfoPopup()">
+                    ✓ I Understand - Continue to Form
+                </button>
+            </div>
+        </div>
+    </div>
 
     <div id="contact-page">
         <div class="auth-container">
@@ -123,8 +365,7 @@
                     <div class="form-group">
                         <label>What are the **Must-Have Features/Functionality**?</label>
                         <textarea id="mustHaveFeatures" name="must-have-features"
-                            placeholder="e.g., Contact Form, Appointment Booking, Photo Gallery, Payment Gateway, Client Login. 
-                            Describe how you want your website in detail. Be as specific as possible. After you submit the form, you will get your website and 3 free change requests."></textarea>
+                            placeholder="e.g., Contact Form, Appointment Booking, Photo Gallery, Payment Gateway, Client Login."></textarea>
                     </div>
                     <div class="form-group">
                         <label>Upload Your Logo (Optional)
@@ -211,12 +452,34 @@
     <div id="formModal" class="modal">
         <div class="modal-overlay" onclick="closeModal()"></div>
         <div class="modal-content">
-            <div class="modal-icon" id="modalIcon">✔</div>
+            <div class="modal-icon" id="modalIcon">✓</div>
             <h3 id="modalTitle">Success!</h3>
             <p id="modalMessage">Form submitted successfully!</p>
             <button class="btn btn-primary" onclick="closeModal()" style="margin-top: 1.5rem;">Close</button>
         </div>
     </div>
+
+
+    <!-- Info Popup Script -->
+    <script>
+        function closeInfoPopup() {
+            const popup = document.getElementById('infoPopup');
+            popup.classList.remove('show');
+            // Store in sessionStorage so it doesn't show again during this session
+            sessionStorage.setItem('infoPopupSeen', 'true');
+        }
+
+        // Show popup on page load (unless already seen in this session)
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if user hasn't seen the popup in this session
+            if (!sessionStorage.getItem('infoPopupSeen')) {
+                setTimeout(() => {
+                    const popup = document.getElementById('infoPopup');
+                    popup.classList.add('show');
+                }, 500); // Small delay for better UX
+            }
+        });
+    </script>
 
     <!-- Pre-fill form from URL parameters -->
     <script>
