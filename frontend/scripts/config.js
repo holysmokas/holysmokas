@@ -34,6 +34,7 @@ export const ENDPOINTS = {
     userProjects: (userId) => `${API_BASE_URL}/user-projects/${userId}`,
     claimProjects: `${API_BASE_URL}/claim-projects`,
     requestModification: `${API_BASE_URL}/request-modification`,
+    createModificationCheckout: `${API_BASE_URL}/create-modification-checkout`,  // ← ADD THIS
     checkDomain: `${API_BASE_URL}/check-domain`,
     deploy: `${API_BASE_URL}/deploy`,
     contactFormSubmission: GOOGLE_SHEETS_URL

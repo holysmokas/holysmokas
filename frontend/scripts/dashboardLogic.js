@@ -275,56 +275,80 @@ window.openPurchaseModal = function (project) {
 
     content.innerHTML = `
         <h2>💳 Purchase Additional Modifications</h2>
-        <p>You've used all 3 free modifications for <strong>${project.businessName}</strong>.</p>
+        <p>You've used all your free modifications for <strong>${project.businessName}</strong>.</p>
         
-        <div class="pricing-options">
-            <div class="pricing-card">
-                <h3>Single Modification</h3>
-                <p class="price">$49</p>
-                <p>One AI-powered change to your website</p>
-                <button onclick="purchaseModifications('${project.id}', 1)" class="btn btn-primary">Purchase 1 Modification</button>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 2rem 0;">
+            <div style="background: #f8f9fa; border: 2px solid #e9ecef; border-radius: 12px; padding: 1.5rem; text-align: center;">
+                <h3 style="margin: 0 0 0.5rem 0; color: #333;">3 Modifications</h3>
+                <p style="font-size: 2.5rem; font-weight: 700; color: #3b82f6; margin: 0.5rem 0;">$29</p>
+                <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">$9.67 per modification</p>
+                <button onclick="purchaseModifications('${project.id}', '3-mods')" class="btn btn-primary" style="width: 100%;">
+                    Buy 3 Mods
+                </button>
             </div>
             
-            <div class="pricing-card featured">
-                <span class="badge-popular">Most Popular</span>
-                <h3>5 Modifications Pack</h3>
-                <p class="price">$199 <span class="price-save">Save $46</span></p>
-                <p>Five AI-powered changes to your website</p>
-                <button onclick="purchaseModifications('${project.id}', 5)" class="btn btn-primary">Purchase 5 Modifications</button>
-            </div>
-            
-            <div class="pricing-card">
-                <h3>Unlimited Monthly</h3>
-                <p class="price">$299/mo</p>
-                <p>Unlimited modifications for one month</p>
-                <button onclick="purchaseModifications('${project.id}', 'unlimited')" class="btn btn-primary">Get Unlimited</button>
+            <div style="background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border: 2px solid #3b82f6; border-radius: 12px; padding: 1.5rem; text-align: center; position: relative;">
+                <span style="position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 2px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">BEST VALUE</span>
+                <h3 style="margin: 0 0 0.5rem 0; color: #333;">10 Modifications</h3>
+                <p style="font-size: 2.5rem; font-weight: 700; color: #3b82f6; margin: 0.5rem 0;">$69</p>
+                <p style="color: #6b7280; font-size: 0.9rem; margin-bottom: 1rem;">$6.90 per modification</p>
+                <button onclick="purchaseModifications('${project.id}', '10-mods')" class="btn btn-primary" style="width: 100%; background: #10b981;">
+                    Buy 10 Mods
+                </button>
             </div>
         </div>
         
-        <p class="contact-note">Need something custom? Call us at <strong>(415) 691-7085</strong></p>
-        <button onclick="closeResponseModal()" class="btn btn-outline">Maybe Later</button>
+        <p style="color: #6b7280; font-size: 0.9rem; text-align: center;">
+            Need something custom? Call us at <strong>(415) 691-7085</strong>
+        </p>
+        <button onclick="closeResponseModal()" class="btn btn-outline" style="width: 100%; margin-top: 1rem;">Maybe Later</button>
     `;
     modal.classList.add('show');
 };
 
-window.purchaseModifications = async function (projectId, quantity) {
-    // TODO: Integrate with Stripe payment
-    console.log(`Purchase request: ${quantity} modifications for project ${projectId}`);
+window.purchaseModifications = async function (projectId, packageType) {
+    console.log(`💳 Purchase request: ${packageType} for project ${projectId}`);
 
-    // For now, show contact message
     const modal = document.getElementById('responseModal');
     const content = document.getElementById('responseContent');
 
+    // Show loading state
     content.innerHTML = `
-        <h2>💳 Complete Your Purchase</h2>
-        <p>To purchase ${quantity === 'unlimited' ? 'unlimited' : quantity} modification${quantity !== 1 && quantity !== 'unlimited' ? 's' : ''}, please contact us:</p>
-        <div style="text-align: center; margin: 2rem 0;">
-            <p style="font-size: 1.5rem; font-weight: 700; color: #007bff;">📞 (415) 691-7085</p>
-            <p>or email: <strong>support@holysmokas.com</strong></p>
+        <div style="text-align: center; padding: 3rem;">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem;">Creating checkout session...</p>
         </div>
-        <p>We'll process your payment and add the modifications to your account immediately.</p>
-        <button onclick="closeResponseModal()" class="btn btn-primary">Got It</button>
     `;
+
+    try {
+        const response = await fetch(ENDPOINTS.createModificationCheckout || `${ENDPOINTS.requestModification.replace('/request-modification', '/create-modification-checkout')}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                projectId: projectId,
+                userId: currentUser.uid,
+                package: packageType
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.sessionUrl) {
+            // Redirect to Stripe checkout
+            window.location.href = data.sessionUrl;
+        } else {
+            throw new Error(data.error || 'Failed to create checkout session');
+        }
+
+    } catch (error) {
+        console.error('Error creating checkout:', error);
+        content.innerHTML = `
+            <h2>❌ Error</h2>
+            <p>Failed to create checkout session: ${error.message}</p>
+            <p>Please call us at <strong>(415) 691-7085</strong> to complete your purchase.</p>
+            <button onclick="closeResponseModal()" class="btn btn-primary" style="margin-top: 1rem;">Close</button>
+        `;
+    }
 };
 
 // ============================================
