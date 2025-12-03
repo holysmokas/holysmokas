@@ -89,7 +89,7 @@ async function loadProjects(userId) {
                 const modifications = project.modifications || [];
 
                 // Check if SmallShop and needs payment setup
-                const isSmallShop = project.packageType && project.packageType.toLowerCase().includes('smallshop');
+                const isSmallShop = project.packageType && (project.packageType.toLowerCase().includes('smallshop') || project.packageType.toLowerCase().includes('small shop'));
                 let paymentStatus = null;
 
                 if (isSmallShop) {
