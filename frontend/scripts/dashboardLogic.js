@@ -27,7 +27,7 @@ if (urlParams.get('connect_success') === 'true') {
     console.log('✅ Connect onboarding completed for project:', projectId);
 
     setTimeout(() => {
-        alert('🎉 Payment setup complete! Your shop can now accept payments.');
+        showResponseModal('🎉 Payment Setup Complete!', 'Your shop can now accept payments from customers.');
         window.history.replaceState({}, document.title, window.location.pathname);
     }, 500);
 }
