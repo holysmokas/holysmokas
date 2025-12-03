@@ -8,7 +8,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import{o as C,a as I,E as u}from"./
                 <p class="log-prompt"><strong>Request:</strong> ${o.request||"No description"}</p>
                 <p class="log-user">👤 Requested by: ${l}</p>
             </div>
-        `}).join("")}async function P(e){try{const s=await(await fetch(u.userProjects(e))).json(),o=document.getElementById("projectsContainer");if(s.success&&s.projects.length>0){const n=await Promise.all(s.projects.map(async i=>{const d=i.modificationsUsed||0,l=i.modificationsLimit||3,p=l-d,r=p>0,a=i.modifications||[],E=i.packageType&&i.packageType.toLowerCase().includes("smallshop");let g=null;E&&(g=await checkConnectStatus(i.id));let h="";return E&&(g&&g.connected&&g.status==="active"?h=`
+        `}).join("")}async function P(e){try{const s=await(await fetch(u.userProjects(e))).json(),o=document.getElementById("projectsContainer");if(s.success&&s.projects.length>0){const n=await Promise.all(s.projects.map(async i=>{const d=i.modificationsUsed||0,l=i.modificationsLimit||3,p=l-d,r=p>0,a=i.modifications||[],E=i.packageType&&(i.packageType.toLowerCase().includes("smallshop")||i.packageType.toLowerCase().includes("small shop"));let g=null;E&&(g=await checkConnectStatus(i.id));let h="";return E&&(g&&g.connected&&g.status==="active"?h=`
                             <div style="background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
                                 <p style="margin: 0; color: #155724;">
                                     <strong>✅ Payments Active</strong> - Your shop can accept payments
