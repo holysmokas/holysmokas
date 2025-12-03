@@ -16,9 +16,32 @@ onAuthStateChanged(auth, async (user) => {
     }
 });
 
+
 // Make auth globally available for logout
 window.auth = auth;
 
+// Handle Connect return from Stripe onboarding
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('connect_success') === 'true') {
+    const projectId = urlParams.get('project_id');
+    console.log('✅ Connect onboarding completed for project:', projectId);
+
+    setTimeout(() => {
+        alert('🎉 Payment setup complete! Your shop can now accept payments.');
+        window.history.replaceState({}, document.title, window.location.pathname);
+    }, 500);
+}
+
+if (urlParams.get('connect_refresh') === 'true') {
+    const projectId = urlParams.get('project_id');
+    console.log('🔄 Connect onboarding needs refresh for project:', projectId);
+
+    setTimeout(() => {
+        if (projectId && typeof setupPayments === 'function') {
+            setupPayments(projectId);
+        }
+    }, 1000);
+}
 /**
  * Format modification log entry HTML
  */
@@ -57,12 +80,60 @@ async function loadProjects(userId) {
         const container = document.getElementById('projectsContainer');
 
         if (data.success && data.projects.length > 0) {
-            container.innerHTML = data.projects.map(project => {
+            // Use Promise.all since we need to await async operations
+            const projectCards = await Promise.all(data.projects.map(async (project) => {
                 const modsUsed = project.modificationsUsed || 0;
                 const modsLimit = project.modificationsLimit || 3;
                 const modsRemaining = modsLimit - modsUsed;
                 const canModify = modsRemaining > 0;
                 const modifications = project.modifications || [];
+
+                // Check if SmallShop and needs payment setup
+                const isSmallShop = project.packageType && project.packageType.toLowerCase().includes('smallshop');
+                let paymentStatus = null;
+
+                if (isSmallShop) {
+                    paymentStatus = await checkConnectStatus(project.id);
+                }
+
+                // Build payment setup section for SmallShop
+                let paymentSetupHtml = '';
+                if (isSmallShop) {
+                    if (paymentStatus && paymentStatus.connected && paymentStatus.status === 'active') {
+                        paymentSetupHtml = `
+                            <div style="background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                                <p style="margin: 0; color: #155724;">
+                                    <strong>✅ Payments Active</strong> - Your shop can accept payments
+                                </p>
+                            </div>
+                        `;
+                    } else if (paymentStatus && paymentStatus.connected && paymentStatus.status === 'pending') {
+                        paymentSetupHtml = `
+                            <div style="background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                                <p style="margin: 0 0 0.5rem 0; color: #856404;">
+                                    <strong>⏳ Payment Setup Incomplete</strong>
+                                </p>
+                                <button onclick="setupPayments('${project.id}')" class="btn btn-purchase" style="margin-top: 0.5rem;">
+                                    Complete Payment Setup
+                                </button>
+                            </div>
+                        `;
+                    } else {
+                        paymentSetupHtml = `
+                            <div style="background: #e7f3ff; border: 1px solid #007bff; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                                <p style="margin: 0 0 0.5rem 0; color: #004085;">
+                                    <strong>💳 Accept Payments from Customers</strong>
+                                </p>
+                                <p style="margin: 0 0 0.5rem 0; color: #666; font-size: 0.9rem;">
+                                    Set up Stripe to receive payments directly to your bank account.
+                                </p>
+                                <button onclick="setupPayments('${project.id}')" class="btn btn-primary" style="margin-top: 0.5rem;">
+                                    🔗 Setup Payments
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
 
                 return `
                 <div class="project-card">
@@ -78,6 +149,8 @@ async function loadProjects(userId) {
                             ${modsRemaining === 0 ? '<span class="badge-limit">Limit Reached</span>' : ''}
                         </p>
                     </div>
+
+                    ${paymentSetupHtml}
 
                     ${modifications.length > 0 ? `
                     <div class="modification-log">
@@ -109,7 +182,10 @@ async function loadProjects(userId) {
                         `}
                     </div>
                 </div>
-            `}).join('');
+                `;
+            }));
+
+            container.innerHTML = projectCards.join('');
         } else {
             container.innerHTML = `
                 <div class="empty-state">
@@ -350,6 +426,68 @@ window.purchaseModifications = async function (projectId, packageType) {
         `;
     }
 };
+
+// ============================================
+// STRIPE CONNECT FUNCTIONS (SmallShop Payments)
+// ============================================
+
+window.checkConnectStatus = async function (projectId) {
+    try {
+        const response = await fetch(`${ENDPOINTS.requestModification.replace('/request-modification', '/connect-status')}/${projectId}`);
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error checking connect status:', error);
+        return { success: false, connected: false };
+    }
+};
+
+window.setupPayments = async function (projectId) {
+    console.log('🔗 Setting up payments for project:', projectId);
+
+    const modal = document.getElementById('responseModal');
+    const content = document.getElementById('responseContent');
+
+    // Show loading
+    content.innerHTML = `
+        <div style="text-align: center; padding: 3rem;">
+            <div class="spinner"></div>
+            <p style="margin-top: 1rem;">Setting up payment account...</p>
+        </div>
+    `;
+    modal.classList.add('show');
+
+    try {
+        const response = await fetch(`${ENDPOINTS.requestModification.replace('/request-modification', '/create-connect-account')}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                projectId: projectId,
+                userId: currentUser.uid
+            })
+        });
+
+        const data = await response.json();
+
+        if (data.success && data.onboardingUrl) {
+            // Redirect to Stripe onboarding
+            window.location.href = data.onboardingUrl;
+        } else {
+            throw new Error(data.error || 'Failed to create payment account');
+        }
+
+    } catch (error) {
+        console.error('Error setting up payments:', error);
+        content.innerHTML = `
+            <h2>❌ Error</h2>
+            <p>Failed to set up payments: ${error.message}</p>
+            <p>Please call us at <strong>(415) 691-7085</strong> for assistance.</p>
+            <button onclick="closeResponseModal()" class="btn btn-primary" style="margin-top: 1rem;">Close</button>
+        `;
+    }
+};
+
+
 
 // ============================================
 // SUPPORT MODAL FUNCTIONS
