@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connect Your Domain - Holy Smokas</title>
+    <link rel="icon" type="image/svg+xml" href="/assets/holysmokas-thats-cheap-2-Bh4TFw0d.png" />
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .card-header {
+            background: #f8f9fa;
+            padding: 20px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .card-header h2 {
+            font-size: 1.2rem;
+            color: #1a1a1a;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        /* Status Badge */
+        .status-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 600;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .status-connected {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        /* Domain Display */
+        .domain-display {
+            background: #f8f9fa;
+            border: 2px solid #667eea;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .domain-name {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        /* Progress Steps */
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 25px 0;
+            position: relative;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: 40px;
+            right: 40px;
+            height: 3px;
+            background: #e5e7eb;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            z-index: 1;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #e5e7eb;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .step.done .step-circle {
+            background: #10b981;
+            color: white;
+        }
+
+        .step.active .step-circle {
+            background: #667eea;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.3);
+        }
+
+        .step-label {
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+        }
+
+        .step.done .step-label,
+        .step.active .step-label {
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        /* Nameserver Box */
+        .ns-box {
+            background: #f0fdf4;
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .ns-title {
+            color: #065f46;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .ns-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #d1fae5;
+        }
+
+        .ns-value {
+            font-family: monospace;
+            font-size: 1rem;
+            color: #1a1a1a;
+            font-weight: 600;
+        }
+
+        .copy-btn {
+            background: #10b981;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .copy-btn:hover {
+            background: #059669;
+        }
+
+        .copy-btn.copied {
+            background: #667eea;
+        }
+
+        /* Instructions */
+        .instructions {
+            background: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .instructions h3 {
+            color: #1e40af;
+            margin-bottom: 12px;
+        }
+
+        .instructions ol {
+            color: #1e3a8a;
+            padding-left: 20px;
+            margin: 0;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        /* Success State */
+        .success-box {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            border: 2px solid #10b981;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .success-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+        }
+
+        .success-box h2 {
+            color: #065f46;
+            margin-bottom: 10px;
+        }
+
+        .live-url {
+            display: inline-block;
+            background: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #059669;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid #e5e7eb;
+            border-top-color: #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Help Box */
+        .help-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .help-box h3 {
+            color: #92400e;
+            margin-bottom: 10px;
+        }
+
+        .help-box p {
+            color: #78350f;
+            margin: 0;
+        }
+
+        .help-box a {
+            color: #b45309;
+            font-weight: 600;
+        }
+
+        /* Registrar Links */
+        .registrar-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .registrar-link {
+            padding: 8px 14px;
+            background: white;
+            border-radius: 6px;
+            color: #374151;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .registrar-link:hover {
+            background: #f9fafb;
+            color: #667eea;
+        }
+
+        /* Responsive */
+        @media (max-width: 600px) {
+            .progress-steps::before {
+                display: none;
+            }
+
+            .progress-steps {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .step {
+                flex-direction: row;
+                gap: 12px;
+            }
+
+            .step-circle {
+                margin-bottom: 0;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🌐 Connect Your Domain</h1>
+            <p>Follow these steps to connect your domain</p>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>📋 Domain Connection Status</h2>
+            </div>
+            <div class="card-body">
+                <!-- Domain Display -->
+                <div class="domain-display">
+                    <div class="domain-name" id="domainName">Loading...</div>
+                    <div style="margin-top: 10px;">
+                        <span id="statusBadge" class="status-badge status-pending">⏳ Checking...</span>
+                    </div>
+                </div>
+
+                <!-- Progress Steps -->
+                <div class="progress-steps">
+                    <div class="step done" id="step1">
+                        <div class="step-circle">✓</div>
+                        <div class="step-label">Website<br>Created</div>
+                    </div>
+                    <div class="step active" id="step2">
+                        <div class="step-circle">2</div>
+                        <div class="step-label">Update<br>Nameservers</div>
+                    </div>
+                    <div class="step" id="step3">
+                        <div class="step-circle">3</div>
+                        <div class="step-label">Verify</div>
+                    </div>
+                    <div class="step" id="step4">
+                        <div class="step-circle">4</div>
+                        <div class="step-label">Live!</div>
+                    </div>
+                </div>
+
+                <!-- Pending Section -->
+                <div id="pendingSection">
+                    <div class="ns-box">
+                        <div class="ns-title">🔧 Update Your Nameservers To:</div>
+                        <div id="nameserversList">
+                            <div class="ns-item">
+                                <span class="ns-value">Loading...</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="instructions">
+                        <h3>📝 How To Update Nameservers</h3>
+                        <ol>
+                            <li><strong>Log in</strong> to where you bought your domain (GoDaddy, Namecheap, etc.)</li>
+                            <li><strong>Find</strong> "Nameservers" or "DNS Settings"</li>
+                            <li><strong>Select</strong> "Custom Nameservers"</li>
+                            <li><strong>Replace</strong> existing nameservers with the ones above</li>
+                            <li><strong>Save</strong> your changes</li>
+                            <li><strong>Wait</strong> 1-24 hours for propagation</li>
+                        </ol>
+                    </div>
+
+                    <div class="btn-group">
+                        <button class="btn btn-primary" onclick="verifyConnection()" id="verifyBtn">
+                            🔍 Verify Connection
+                        </button>
+                        <button class="btn btn-secondary" onclick="copyAllNameservers()">
+                            📋 Copy All
+                        </button>
+                    </div>
+
+                    <div class="help-box">
+                        <h3>❓ Need Help?</h3>
+                        <p>Quick links to nameserver settings:</p>
+                        <div class="registrar-links">
+                            <a href="https://www.godaddy.com/help/change-nameservers-for-my-domains-664" target="_blank"
+                                class="registrar-link">GoDaddy</a>
+                            <a href="https://www.namecheap.com/support/knowledgebase/article.aspx/767/10/how-to-change-dns-for-a-domain/"
+                                target="_blank" class="registrar-link">Namecheap</a>
+                            <a href="https://support.google.com/domains/answer/3290309" target="_blank"
+                                class="registrar-link">Google</a>
+                        </div>
+                        <p style="margin-top: 15px;">
+                            <strong>Still stuck?</strong> Call <a href="tel:+14156917085">(415) 691-7085</a>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Success Section -->
+                <div id="successSection" style="display: none;">
+                    <div class="success-box">
+                        <div class="success-icon">🎉</div>
+                        <h2>Domain Connected!</h2>
+                        <p>Your website is now live at:</p>
+                        <a class="live-url" id="liveUrl" href="#" target="_blank">
+                            https://<span id="liveDomain">yourdomain.com</span>
+                        </a>
+                    </div>
+
+                    <div class="btn-group" style="justify-content: center; margin-top: 25px;">
+                        <a class="btn btn-primary" id="visitBtn" href="#" target="_blank">
+                            🌍 Visit Website
+                        </a>
+                        <a class="btn btn-secondary" href="/login.html">
+                            ← Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Card -->
+        <div class="card" id="infoCard">
+            <div class="card-header">
+                <h2>ℹ️ About DNS Propagation</h2>
+            </div>
+            <div class="card-body">
+                <p style="color: #4b5563; line-height: 1.7;">
+                    After updating nameservers, changes take <strong>1-24 hours</strong> to spread globally
+                    (sometimes up to 48 hours). During this time, some visitors may see your old site.
+                    This is normal!
+                </p>
+                <p style="color: #6b7280; margin-top: 12px; font-size: 0.9rem;">
+                    <strong>Tip:</strong> Your site is already live at a temporary URL while you wait.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Get project ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project_id') || urlParams.get('projectId');
+
+        // API URL
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://localhost:8080'
+            : 'https://api.holysmokas.com';
+
+        let nameservers = [];
+
+        // Load on page ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            if (!projectId) {
+                document.getElementById('domainName').textContent = 'Error: No project ID';
+                return;
+            }
+            await loadStatus();
+        });
+
+        // Load domain status
+        async function loadStatus() {
+            try {
+                const response = await fetch(`${API_URL}/api/domain-connection-status/${projectId}`);
+                const data = await response.json();
+
+                if (!data.success || !data.hasConnection) {
+                    document.getElementById('domainName').textContent = 'No domain found';
+                    document.getElementById('statusBadge').textContent = '❌ Not Set Up';
+                    return;
+                }
+
+                nameservers = data.nameservers || [];
+
+                // Update UI
+                document.getElementById('domainName').textContent = data.domain;
+                updateStatus(data.status, data.isActive);
+                updateNameservers(nameservers);
+                updateSteps(data.isActive);
+
+                if (data.isActive || data.status === 'connected') {
+                    showSuccess(data.domain);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('domainName').textContent = 'Error loading';
+            }
+        }
+
+        // Update status badge
+        function updateStatus(status, isActive) {
+            const badge = document.getElementById('statusBadge');
+            if (isActive || status === 'connected') {
+                badge.textContent = '✅ Connected';
+                badge.className = 'status-badge status-connected';
+            } else {
+                badge.textContent = '⏳ Waiting for Nameservers';
+                badge.className = 'status-badge status-pending';
+            }
+        }
+
+        // Update nameservers list
+        function updateNameservers(servers) {
+            const list = document.getElementById('nameserversList');
+            if (!servers.length) {
+                list.innerHTML = '<div class="ns-item"><span class="ns-value">No nameservers</span></div>';
+                return;
+            }
+            list.innerHTML = servers.map(ns => `
+                <div class="ns-item">
+                    <span class="ns-value">${ns}</span>
+                    <button class="copy-btn" onclick="copyOne('${ns}', this)">Copy</button>
+                </div>
+            `).join('');
+        }
+
+        // Update progress steps
+        function updateSteps(isActive) {
+            if (isActive) {
+                ['step2', 'step3', 'step4'].forEach(id => {
+                    const el = document.getElementById(id);
+                    el.className = 'step done';
+                    el.querySelector('.step-circle').textContent = '✓';
+                });
+            }
+        }
+
+        // Show success state
+        function showSuccess(domain) {
+            document.getElementById('pendingSection').style.display = 'none';
+            document.getElementById('successSection').style.display = 'block';
+            document.getElementById('infoCard').style.display = 'none';
+            document.getElementById('liveDomain').textContent = domain;
+            document.getElementById('liveUrl').href = `https://${domain}`;
+            document.getElementById('visitBtn').href = `https://${domain}`;
+        }
+
+        // Verify connection
+        async function verifyConnection() {
+            const btn = document.getElementById('verifyBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span> Checking...';
+
+            try {
+                const response = await fetch(`${API_URL}/api/verify-domain-connection`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ projectId })
+                });
+
+                const data = await response.json();
+
+                if (data.isActive || data.status === 'connected') {
+                    showSuccess(data.domain);
+                    updateStatus('connected', true);
+                    updateSteps(true);
+                } else {
+                    alert(data.message || 'Nameservers not verified yet. Please wait and try again.');
+                }
+
+            } catch (error) {
+                alert('Error verifying. Please try again.');
+            } finally {
+                btn.disabled = false;
+                btn.innerHTML = '🔍 Verify Connection';
+            }
+        }
+
+        // Copy single nameserver
+        function copyOne(text, btn) {
+            navigator.clipboard.writeText(text).then(() => {
+                btn.textContent = 'Copied!';
+                btn.classList.add('copied');
+                setTimeout(() => {
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('copied');
+                }, 2000);
+            });
+        }
+
+        // Copy all nameservers
+        function copyAllNameservers() {
+            navigator.clipboard.writeText(nameservers.join('\n')).then(() => {
+                alert('Nameservers copied!');
+            });
+        }
+    </script>
+</body>
+
+</html>
