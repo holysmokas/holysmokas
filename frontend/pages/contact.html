@@ -288,20 +288,121 @@
                 <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">Let us know about your project.
                     We'll get back to you in 24 hours!</p>
 
-                <div class="domain-search-container">
-                    <h3 style="color: var(--primary); margin-bottom: 0.5rem;">🌐 Check Domain Availability</h3>
+                <!-- 
+  DOMAIN SELECTION SECTION
+  Replace your existing domain search section in contact.html with this
+  Location: Find the <div class="domain-search-container"> section and replace it
+-->
+
+                <div class="domain-selection-container" style="margin-bottom: 2rem;">
+                    <h3 style="color: var(--primary); margin-bottom: 0.5rem;">🌐 Domain Options</h3>
                     <p style="color: var(--gray); margin-bottom: 1rem; font-size: 0.95rem;">
-                        Want a custom domain? Search to see pricing and availability before requesting your website.
+                        Choose how you want to set up your website's domain
                     </p>
-                    <div class="domain-search-box">
-                        <input type="text" id="domainInput" placeholder="Enter your domain (e.g., mybusiness.com)"
-                            style="flex: 1; padding: 0.75rem; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 1rem;" />
-                        <button type="button" class="btn btn-primary" onclick="checkDomain()">
-                            Check Availability
-                        </button>
+
+                    <!-- Domain Option Selection -->
+                    <div class="domain-options"
+                        style="display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.5rem;">
+
+                        <!-- Option 1: Need New Domain -->
+                        <label class="domain-option-card" id="cardNew" onclick="selectDomainCard('new')">
+                            <input type="radio" name="domainOption" value="new" id="domainOptionNew">
+                            <div class="card-content">
+                                <div class="card-title">🆕 I need a new domain</div>
+                                <div class="card-desc">We'll register a domain for you (starting at ~$12/year)</div>
+                            </div>
+                        </label>
+
+                        <!-- Option 2: Own Domain -->
+                        <label class="domain-option-card" id="cardOwn" onclick="selectDomainCard('own')">
+                            <input type="radio" name="domainOption" value="own" id="domainOptionOwn">
+                            <div class="card-content">
+                                <div class="card-title">🔗 I already own a domain</div>
+                                <div class="card-desc">Connect your existing domain (free - just update nameservers)
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Option 3: No Custom Domain -->
+                        <label class="domain-option-card" id="cardNone" onclick="selectDomainCard('none')">
+                            <input type="radio" name="domainOption" value="none" id="domainOptionNone">
+                            <div class="card-content">
+                                <div class="card-title">🆓 I don't need a custom domain</div>
+                                <div class="card-desc">Use free URL: holysmokas.com/your-business-name</div>
+                            </div>
+                        </label>
                     </div>
-                    <div id="domainResult" class="domain-result"></div>
+
+                    <!-- NEW DOMAIN: Search Section -->
+                    <div id="newDomainSection" style="display: none;">
+                        <div class="info-box info-blue">
+                            <div class="info-title">🔍 Search for Available Domains</div>
+                            <p>Check if your desired domain is available. We'll register it for you after payment.</p>
+                        </div>
+
+                        <div class="domain-search-box">
+                            <input type="text" id="domainInput" placeholder="Enter domain (e.g., mybusiness.com)">
+                            <button type="button" class="btn btn-primary" onclick="checkDomain()">
+                                Check Availability
+                            </button>
+                        </div>
+                        <div id="domainResult" class="domain-result"></div>
+                    </div>
+
+                    <!-- OWN DOMAIN: Input Section -->
+                    <div id="ownDomainSection" style="display: none;">
+                        <div class="info-box info-green">
+                            <div class="info-title">✅ Connect Your Existing Domain</div>
+                            <p>After your website is built, we'll send you simple instructions to connect your domain.
+                                You'll just need to update 2 nameserver settings - takes about 5 minutes!</p>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Your Domain
+                                Name</label>
+                            <input type="text" id="ownDomainInput" placeholder="mybusiness.com"
+                                oninput="handleOwnDomainInput(this.value)">
+                            <small style="display: block; margin-top: 0.5rem; color: var(--gray);">
+                                Enter without http:// or www (e.g., mybusiness.com)
+                            </small>
+                        </div>
+
+                        <div id="ownDomainConfirmation" style="display: none;">
+                            <div class="info-box info-yellow">
+                                <div class="info-title">📋 What happens after purchase:</div>
+                                <ol style="margin: 0.5rem 0 0 1.25rem; padding: 0;">
+                                    <li>We build your website</li>
+                                    <li>We email you 2 nameserver values</li>
+                                    <li>You update nameservers at your registrar (GoDaddy, Namecheap, etc.)</li>
+                                    <li>Your site goes live (usually 1-24 hours)</li>
+                                </ol>
+                                <p style="margin-top: 0.75rem; font-weight: 500;">
+                                    💡 Need help? We'll walk you through it - call (415) 691-7085
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- NO DOMAIN: Info Section -->
+                    <div id="noDomainSection" style="display: none;">
+                        <div class="info-box info-purple">
+                            <div class="info-title">🆓 Free Subdomain Included</div>
+                            <p>Your website will be hosted at:</p>
+                            <code
+                                class="free-url-display">holysmokas.com/<span id="freeUrlPreview">your-business-name</span></code>
+                            <p style="margin-top: 0.75rem; font-size: 0.85rem;">
+                                You can always add a custom domain later for ~$12/year
+                            </p>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- Hidden fields for form submission -->
+                <input type="hidden" id="domainSelectionType" name="domainSelectionType" value="">
+                <input type="hidden" id="selectedDomainValue" name="selectedDomain" value="">
+                <input type="hidden" id="isOwnDomain" name="isOwnDomain" value="false">
+
+
 
                 <form id="contactForm" onsubmit="handleContactSubmit(event)">
                     <div class="form-group">
@@ -594,6 +695,139 @@
                 }, 4000);
 
                 console.log('✅ Form pre-filled successfully!');
+            }
+        });
+    </script>
+    <script>
+        // Track domain selection state
+        window.domainOption = null;
+        window.selectedDomain = null;
+        window.ownDomain = null;
+        window.domainPricing = null;
+        window.isOwnDomain = false;
+
+        // Select domain card
+        function selectDomainCard(option) {
+            // Remove selected class from all cards
+            document.querySelectorAll('.domain-option-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+
+            // Add selected class to clicked card
+            const cardId = 'card' + option.charAt(0).toUpperCase() + option.slice(1);
+            document.getElementById(cardId).classList.add('selected');
+
+            // Check the radio button
+            document.getElementById('domainOption' + option.charAt(0).toUpperCase() + option.slice(1)).checked = true;
+
+            // Handle the selection
+            handleDomainOptionChange(option);
+        }
+
+        // Handle domain option change
+        function handleDomainOptionChange(option) {
+            // Hide all sections
+            document.getElementById('newDomainSection').style.display = 'none';
+            document.getElementById('ownDomainSection').style.display = 'none';
+            document.getElementById('noDomainSection').style.display = 'none';
+
+            // Update hidden fields
+            document.getElementById('domainSelectionType').value = option;
+            document.getElementById('isOwnDomain').value = 'false';
+
+            // Reset domain values
+            window.domainOption = option;
+            window.selectedDomain = null;
+            window.ownDomain = null;
+            window.domainPricing = null;
+            window.isOwnDomain = false;
+            document.getElementById('selectedDomainValue').value = '';
+
+            // Show appropriate section
+            switch (option) {
+                case 'new':
+                    document.getElementById('newDomainSection').style.display = 'block';
+                    break;
+                case 'own':
+                    document.getElementById('ownDomainSection').style.display = 'block';
+                    document.getElementById('isOwnDomain').value = 'true';
+                    window.isOwnDomain = true;
+                    break;
+                case 'none':
+                    document.getElementById('noDomainSection').style.display = 'block';
+                    updateFreeUrlPreview();
+                    break;
+            }
+
+            // Update pricing if function exists
+            if (typeof updatePricingBreakdown === 'function') {
+                updatePricingBreakdown();
+            }
+        }
+
+        // Handle own domain input
+        function handleOwnDomainInput(value) {
+            const cleanedDomain = cleanDomainForDisplay(value);
+
+            if (cleanedDomain && cleanedDomain.includes('.')) {
+                document.getElementById('ownDomainConfirmation').style.display = 'block';
+                window.selectedDomain = cleanedDomain;
+                window.ownDomain = cleanedDomain;
+                window.isOwnDomain = true;
+                window.domainPricing = { initialCost: 0, renewalCost: 0 };
+                document.getElementById('selectedDomainValue').value = cleanedDomain;
+                document.getElementById('isOwnDomain').value = 'true';
+
+                // Update currentUrl field
+                const currentUrlInput = document.getElementById('currentUrl');
+                if (currentUrlInput) {
+                    currentUrlInput.value = 'https://' + cleanedDomain;
+                }
+            } else {
+                document.getElementById('ownDomainConfirmation').style.display = 'none';
+                window.selectedDomain = null;
+                window.ownDomain = null;
+                document.getElementById('selectedDomainValue').value = '';
+            }
+
+            if (typeof updatePricingBreakdown === 'function') {
+                updatePricingBreakdown();
+            }
+        }
+
+        // Clean domain for display
+        function cleanDomainForDisplay(domain) {
+            if (!domain) return '';
+            let cleaned = domain.toLowerCase().trim();
+            cleaned = cleaned.replace(/^https?:\/\//, '');
+            cleaned = cleaned.replace(/^www\./, '');
+            cleaned = cleaned.split('/')[0];
+            return cleaned;
+        }
+
+        // Update free URL preview
+        function updateFreeUrlPreview() {
+            const businessNameInput = document.getElementById('businessName');
+            const preview = document.getElementById('freeUrlPreview');
+
+            if (businessNameInput && businessNameInput.value && preview) {
+                const slug = businessNameInput.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9]+/g, '-')
+                    .replace(/^-|-$/g, '');
+                preview.textContent = slug || 'your-business-name';
+            }
+        }
+
+        // Listen for business name changes
+        document.addEventListener('DOMContentLoaded', function () {
+            const businessNameInput = document.getElementById('businessName');
+            if (businessNameInput) {
+                businessNameInput.addEventListener('input', function () {
+                    if (window.domainOption === 'none') {
+                        updateFreeUrlPreview();
+                    }
+                });
             }
         });
     </script>

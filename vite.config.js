@@ -18,7 +18,8 @@ export default defineConfig({
                 dashboard: resolve(__dirname, 'frontend/pages/dashboard.html'),
                 'payment-success': resolve(__dirname, 'frontend/pages/payment-success.html'),
                 'renewal-success': resolve(__dirname, 'frontend/pages/renewal-success.html'),
-                'domain-checkout': resolve(__dirname, 'frontend/pages/domain-checkout.html')
+                'domain-checkout': resolve(__dirname, 'frontend/pages/domain-checkout.html'),
+                'connect-domain': resolve(__dirname, 'connect-domain.html')
             },
             output: {
                 // Ensure HTML files go to root
