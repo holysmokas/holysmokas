@@ -557,3 +557,146 @@
     border-radius: 8px;
     border-left: 4px solid #007bff;
 }
+
+/*domain status connection status*/
+.domain-status-section {
+    background: #f9fafb;
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #e5e7eb;
+}
+
+.domain-status-section .section-header {
+    margin-bottom: 15px;
+}
+
+.domain-status-section .section-header h3 {
+    margin: 0;
+    color: #1a1a1a;
+    font-size: 1.1rem;
+}
+
+/* Status Cards */
+.domain-status-card {
+    background: white;
+    border-radius: 10px;
+    padding: 20px;
+    border: 2px solid #e5e7eb;
+}
+
+.domain-status-card.pending {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #fffbeb, #fef3c7);
+}
+
+.domain-status-card.connected {
+    border-color: #10b981;
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+}
+
+.domain-status-card.no-domain {
+    border-color: #6b7280;
+    background: #f9fafb;
+}
+
+.domain-name-display {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+.domain-status-card.pending .domain-name-display {
+    color: #b45309;
+}
+
+.domain-status-card.connected .domain-name-display {
+    color: #059669;
+}
+
+.status-badge-domain {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 50px;
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.status-badge-domain.pending {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge-domain.connected {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.domain-actions {
+    margin-top: 15px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.domain-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+}
+
+.domain-btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+}
+
+.domain-btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.domain-btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: white;
+}
+
+.domain-btn-success:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.domain-btn-secondary {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.domain-btn-secondary:hover {
+    background: #e5e7eb;
+}
+
+.domain-info-text {
+    color: #6b7280;
+    font-size: 0.9rem;
+    margin-top: 12px;
+    line-height: 1.5;
+}
+
+.nameserver-mini {
+    background: #f3f4f6;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 0.85rem;
+    margin-top: 10px;
+    color: #374151;
+}

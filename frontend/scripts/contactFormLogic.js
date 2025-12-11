@@ -224,91 +224,7 @@ function extractCategoryFromPackage(packageName) {
     return 'business'; // default
 }
 
-function updatePricingBreakdown() {
-    const packageSelect = document.getElementById("package");
-    const pricingDisplay = document.getElementById("pricingBreakdown");
 
-    if (!packageSelect || !pricingDisplay) return;
-
-    const selectedPackage = packageSelect.value;
-    const packagePrice = getPackagePrice(selectedPackage);
-
-    // Hide pricing if no valid package selected
-    if (packagePrice === null || selectedPackage.includes("Select a package")) {
-        pricingDisplay.style.display = 'none';
-        return;
-    }
-
-    const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
-    const total = packagePrice + domainPrice;
-
-    if (packagePrice > 0) {
-        pricingDisplay.innerHTML = `
-            <h3 style="color: #6366f1; font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">
-                💰 Price Breakdown
-            </h3>
-            
-            <div style="background: white; padding: 1.5rem; border-radius: 6px;">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
-                    <span style="color: #6b7280; font-size: 1rem;"><strong>Website Package:</strong></span>
-                    <strong style="color: #6366f1; font-size: 1.1rem;">$${packagePrice.toFixed(2)}</strong>
-                </div>
-                
-                ${domainPrice > 0 ? `
-                    <div style="display: flex; justify-content: space-between; margin-bottom: 0.75rem; padding-bottom: 0.75rem; border-bottom: 1px solid #e5e7eb;">
-                        <span style="color: #6b7280; font-size: 1rem;">
-                            <strong>Domain Registration:</strong><br>
-                            <span style="font-size: 0.875rem;">${window.selectedDomain}</span>
-                        </span>
-                        <strong style="color: #059669; font-size: 1.1rem;">$${domainPrice.toFixed(2)}</strong>
-                    </div>
-                ` : ''}
-                
-                <div style="display: flex; justify-content: space-between; padding-top: 0.75rem;">
-                    <strong style="color: #065f46; font-size: 1.2rem;">Total First Year:</strong>
-                    <strong style="color: #065f46; font-size: 1.4rem;">$${total.toFixed(2)}</strong>
-                </div>
-            </div>
-            
-            ${domainPrice > 0 ? `
-                <p style="color: #6b7280; font-size: 0.875rem; text-align: center; margin-top: 1rem; margin-bottom: 0;">
-                    📅 Domain renewal of $${window.domainPricing.renewalCost.toFixed(2)} will be due annually
-                </p>
-            ` : ''}
-            
-            <p style="color: #6b7280; font-size: 0.875rem; text-align: center; margin-top: 0.75rem; margin-bottom: 0;">
-                ✨ This is an estimate. Final quote will be provided after reviewing your requirements.
-            </p>
-        `;
-        pricingDisplay.style.display = 'block';
-    } else if (selectedPackage.includes('Custom Quote')) {
-        pricingDisplay.innerHTML = `
-            <h3 style="color: #6366f1; font-size: 1.3rem; margin-bottom: 1rem; text-align: center;">
-                💼 Custom Enterprise Quote
-            </h3>
-            
-            <div style="background: white; padding: 1.5rem; border-radius: 6px; text-align: center;">
-                <p style="color: #6b7280; margin-bottom: 1rem;">
-                    We'll provide a detailed custom quote based on your specific requirements and features.
-                </p>
-                ${domainPrice > 0 ? `
-                    <div style="padding-top: 1rem; border-top: 1px solid #e5e7eb;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span style="color: #6b7280;">
-                                <strong>Domain Registration:</strong><br>
-                                <span style="font-size: 0.875rem;">${window.selectedDomain}</span>
-                            </span>
-                            <strong style="color: #059669; font-size: 1.1rem;">$${domainPrice.toFixed(2)}</strong>
-                        </div>
-                    </div>
-                ` : ''}
-            </div>
-        `;
-        pricingDisplay.style.display = 'block';
-    } else {
-        pricingDisplay.style.display = 'none';
-    }
-}
 
 window.removeDomainFromForm = function () {
     const currentUrlInput = document.getElementById("currentUrl");
@@ -326,10 +242,23 @@ window.removeDomainFromForm = function () {
     updatePricingBreakdown();
 };
 
+// ============================================
+// CONTACT FORM LOGIC - DOMAIN SYSTEM UPDATE
+// ============================================
+// This file shows the CHANGES needed to your existing contactFormLogic.js
+// Look for comments marked "// NEW:" or "// UPDATED:"
+
+
+// ============================================
+// SECTION 1: UPDATE handleContactSubmit FUNCTION
+// Find your handleContactSubmit function and update it
+// ============================================
+
 window.handleContactSubmit = async function (e) {
     e.preventDefault();
     const form = e.target;
 
+    // Existing fields
     const name = form.querySelector("#name")?.value.trim() || "";
     const email = form.querySelector("#email")?.value.trim() || "";
     const businessName = form.querySelector("#businessName")?.value.trim() || "";
@@ -344,7 +273,30 @@ window.handleContactSubmit = async function (e) {
     const logoInput = form.querySelector("#logoUpload");
     const logoFile = logoInput?.files[0] || null;
 
-    // NEW VALIDATION: Check if a package was actually selected
+    // NEW: Get domain option selection
+    const domainSelectionType = document.getElementById('domainSelectionType')?.value || 'new';
+    const isOwnDomain = document.getElementById('isOwnDomain')?.value === 'true';
+    const selectedDomainValue = document.getElementById('selectedDomainValue')?.value || '';
+
+    // Determine the selected domain based on option
+    let finalSelectedDomain = 'N/A';
+    let finalDomainPricing = null;
+
+    if (domainSelectionType === 'new' && window.selectedDomain) {
+        // Customer wants new domain (Namecheap registration)
+        finalSelectedDomain = window.selectedDomain;
+        finalDomainPricing = window.domainPricing;
+    } else if (domainSelectionType === 'own' && (window.ownDomain || selectedDomainValue)) {
+        // Customer has their own domain (Cloudflare connection)
+        finalSelectedDomain = window.ownDomain || selectedDomainValue;
+        finalDomainPricing = { initialCost: 0, renewalCost: 0 }; // Free for own domain
+    } else if (domainSelectionType === 'none') {
+        // No custom domain
+        finalSelectedDomain = 'N/A';
+        finalDomainPricing = null;
+    }
+
+    // Package validation
     const packagePrice = getPackagePrice(packageSelected);
 
     if (packagePrice === null || packageSelected.includes("Select a package")) {
@@ -356,10 +308,11 @@ window.handleContactSubmit = async function (e) {
         return;
     }
 
-    const domainPrice = window.domainPricing ? window.domainPricing.initialCost : 0;
+    // UPDATED: Domain price (0 for own domain)
+    const domainPrice = finalDomainPricing ? finalDomainPricing.initialCost : 0;
     const totalCost = packagePrice + domainPrice;
 
-    // Validate logo file size (5MB max)
+    // Logo validation
     if (logoFile && logoFile.size > 5 * 1024 * 1024) {
         showModal("Logo Too Large", "Please upload a logo smaller than 5MB.", false);
         return;
@@ -389,16 +342,30 @@ window.handleContactSubmit = async function (e) {
         formData.append('referenceWebsite', referenceWebsite);
         formData.append('mainGoal', mainGoal);
         formData.append('mustHaveFeatures', mustHaveFeatures);
-        formData.append('selectedDomain', window.selectedDomain || "N/A");
-        formData.append('domainPricing', JSON.stringify(window.domainPricing));
+
+        // UPDATED: Domain fields
+        formData.append('selectedDomain', finalSelectedDomain);
+        formData.append('domainPricing', JSON.stringify(finalDomainPricing));
         formData.append('totalCost', totalCost);
+
+        // NEW: Domain option fields
+        formData.append('domainOption', domainSelectionType);  // 'new', 'own', or 'none'
+        formData.append('isOwnDomain', isOwnDomain.toString());  // 'true' or 'false'
+
         formData.append('timestamp', new Date().toISOString());
         formData.append('status', 'pending_payment');
 
-        // ✅ ADD CATEGORY FIELD - This is critical!
+        // Category field
         const category = extractCategoryFromPackage(packageSelected);
         formData.append('category', category);
-        console.log('📦 Package category:', category, 'from package:', packageSelected);
+
+        // NEW: Log domain selection for debugging
+        console.log('📦 Domain Selection:', {
+            type: domainSelectionType,
+            isOwnDomain: isOwnDomain,
+            domain: finalSelectedDomain,
+            pricing: finalDomainPricing
+        });
 
         if (logoFile) {
             formData.append('logo', logoFile);
@@ -413,7 +380,6 @@ window.handleContactSubmit = async function (e) {
 
         if (backendResult.success) {
             if (backendResult.requiresPayment === false) {
-                // No payment needed - inquiry/custom quote
                 showModal(
                     "📧 Check Your Email!",
                     backendResult.message || "Thank you! We've sent you a package recommendation. Check your email and click the link to continue.",
@@ -422,14 +388,9 @@ window.handleContactSubmit = async function (e) {
 
                 setTimeout(() => {
                     form.reset();
-                    window.selectedDomain = null;
-                    window.domainPricing = null;
-                    if (typeof updatePricingBreakdown === 'function') {
-                        updatePricingBreakdown();
-                    }
+                    resetDomainSelection();
                 }, 4000);
             } else if (backendResult.sessionUrl) {
-                // Payment required - redirect to Stripe
                 showModal(
                     "🎉 Request Submitted Successfully!",
                     "Redirecting you to secure payment...",
@@ -455,6 +416,150 @@ window.handleContactSubmit = async function (e) {
         submitBtn.disabled = false;
     }
 };
+
+
+// ============================================
+// SECTION 2: ADD NEW HELPER FUNCTION
+// Add this function to reset domain selection
+// ============================================
+
+function resetDomainSelection() {
+    window.selectedDomain = null;
+    window.ownDomain = null;
+    window.domainPricing = null;
+    window.domainOption = null;
+    window.isOwnDomain = false;
+
+    // Reset hidden fields
+    const domainSelectionType = document.getElementById('domainSelectionType');
+    const isOwnDomainField = document.getElementById('isOwnDomain');
+    const selectedDomainValue = document.getElementById('selectedDomainValue');
+
+    if (domainSelectionType) domainSelectionType.value = '';
+    if (isOwnDomainField) isOwnDomainField.value = 'false';
+    if (selectedDomainValue) selectedDomainValue.value = '';
+
+    // Reset UI sections
+    const newSection = document.getElementById('newDomainSection');
+    const ownSection = document.getElementById('ownDomainSection');
+    const noneSection = document.getElementById('noDomainSection');
+
+    if (newSection) newSection.style.display = 'none';
+    if (ownSection) ownSection.style.display = 'none';
+    if (noneSection) noneSection.style.display = 'none';
+
+    // Uncheck radio buttons
+    document.querySelectorAll('input[name="domainOption"]').forEach(radio => {
+        radio.checked = false;
+    });
+
+    // Remove selected class from cards
+    document.querySelectorAll('.domain-option-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+
+    // Update pricing
+    if (typeof updatePricingBreakdown === 'function') {
+        updatePricingBreakdown();
+    }
+}
+
+
+// ============================================
+// SECTION 3: UPDATE updatePricingBreakdown FUNCTION
+// Update to handle domain options correctly
+// ============================================
+
+function updatePricingBreakdown() {
+    const packageSelect = document.getElementById("package");
+    const breakdownContainer = document.getElementById("pricingBreakdown");
+
+    if (!breakdownContainer) return;
+
+    const packageName = packageSelect?.value || "";
+    const packagePrice = getPackagePrice(packageName);
+
+    // Check domain option
+    const domainOption = window.domainOption || document.getElementById('domainSelectionType')?.value || '';
+
+    let domainPrice = 0;
+    let domainLabel = '';
+
+    if (domainOption === 'new' && window.domainPricing) {
+        domainPrice = window.domainPricing.initialCost || 0;
+        domainLabel = window.selectedDomain || 'New Domain';
+    } else if (domainOption === 'own') {
+        domainPrice = 0;
+        domainLabel = window.ownDomain ? `${window.ownDomain} (Your Domain)` : 'Your Domain';
+    } else if (domainOption === 'none') {
+        domainPrice = 0;
+        domainLabel = 'Free Subdomain';
+    }
+
+    if (packagePrice === null) {
+        breakdownContainer.innerHTML = '';
+        breakdownContainer.style.display = 'none';
+        return;
+    }
+
+    const total = packagePrice + domainPrice;
+
+    let html = `
+        <div style="background: linear-gradient(135deg, #f8f9fa, #e9ecef); border: 2px solid #667eea; border-radius: 12px; padding: 1.25rem; margin-top: 1.5rem;">
+            <h4 style="color: #667eea; margin: 0 0 1rem 0; font-size: 1.1rem;">💰 Order Summary</h4>
+            
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: #4b5563;">Website Package:</span>
+                <strong style="color: #1a1a1a;">$${packagePrice.toFixed(2)}</strong>
+            </div>
+    `;
+
+    if (domainOption && domainOption !== '') {
+        html += `
+            <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                <span style="color: #4b5563;">Domain: ${domainLabel}</span>
+                <strong style="color: ${domainPrice > 0 ? '#1a1a1a' : '#10b981'};">
+                    ${domainPrice > 0 ? '$' + domainPrice.toFixed(2) : 'FREE'}
+                </strong>
+            </div>
+        `;
+    }
+
+    html += `
+            <hr style="border: none; border-top: 1px solid #d1d5db; margin: 0.75rem 0;">
+            
+            <div style="display: flex; justify-content: space-between;">
+                <span style="color: #1a1a1a; font-weight: 600;">Total Due Today:</span>
+                <strong style="color: #667eea; font-size: 1.25rem;">$${total.toFixed(2)}</strong>
+            </div>
+    `;
+
+    if (domainOption === 'new' && window.domainPricing?.renewalCost > 0) {
+        html += `
+            <p style="color: #6b7280; font-size: 0.8rem; margin: 0.75rem 0 0 0;">
+                * Domain renews at $${window.domainPricing.renewalCost.toFixed(2)}/year
+            </p>
+        `;
+    }
+
+    html += `</div>`;
+
+    breakdownContainer.innerHTML = html;
+    breakdownContainer.style.display = 'block';
+}
+
+
+// ============================================
+// SECTION 4: ENSURE THESE GLOBAL VARIABLES EXIST
+// Add at the top of your file if not present
+// ============================================
+
+// Domain selection state
+window.domainOption = null;      // 'new', 'own', or 'none'
+window.selectedDomain = null;    // Domain name for new registration
+window.ownDomain = null;         // Domain name for own domain
+window.domainPricing = null;     // { initialCost, renewalCost }
+window.isOwnDomain = false;      // Boolean flag
 
 
 // ✅ ADD LOGO PREVIEW FUNCTION WITH REMOVE OPTION

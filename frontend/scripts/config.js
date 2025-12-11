@@ -18,7 +18,7 @@ const CONFIG = {
         SITE_URL: 'http://localhost:5173'
     },
     production: {
-        API_BASE_URL: 'https://api.holysmokas.com',  // ✅ FIXED
+        API_BASE_URL: 'https://api.holysmokas.com',
         GOOGLE_SHEETS_URL: 'https://script.google.com/macros/s/AKfycbzJOYtbHJRuIgQTT7BVhmzGvRaJ1TMBd-VDoe_DUk_Rbnyr9EBiB5W9Xutir8r8LcgUTg/exec',
         SITE_URL: 'https://holysmokas.com'
     }
@@ -29,13 +29,23 @@ export const GOOGLE_SHEETS_URL = CONFIG[ENV].GOOGLE_SHEETS_URL;
 export const SITE_URL = CONFIG[ENV].SITE_URL;
 
 export const ENDPOINTS = {
+    // Payment & Projects
     createPaymentSession: `${API_BASE_URL}/create-payment-session`,
     stripeWebhook: `${API_BASE_URL}/webhook`,
     userProjects: (userId) => `${API_BASE_URL}/user-projects/${userId}`,
     claimProjects: `${API_BASE_URL}/claim-projects`,
     requestModification: `${API_BASE_URL}/request-modification`,
-    createModificationCheckout: `${API_BASE_URL}/create-modification-checkout`,  // ← ADD THIS
+    createModificationCheckout: `${API_BASE_URL}/create-modification-checkout`,
+
+    // Domain (existing - Namecheap)
     checkDomain: `${API_BASE_URL}/check-domain`,
+
+    // Domain Connection (NEW - Cloudflare)
+    connectOwnDomain: `${API_BASE_URL}/api/connect-own-domain`,
+    verifyDomainConnection: `${API_BASE_URL}/api/verify-domain-connection`,
+    domainConnectionStatus: (projectId) => `${API_BASE_URL}/api/domain-connection-status/${projectId}`,
+
+    // Other
     deploy: `${API_BASE_URL}/deploy`,
     contactFormSubmission: GOOGLE_SHEETS_URL
 };

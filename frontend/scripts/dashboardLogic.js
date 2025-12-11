@@ -574,3 +574,180 @@ window.submitSupportRequest = async function (event) {
         alert('Technical error sending message. Please call us directly at (415) 691-7085');
     }
 };
+
+/**
+ * Load and display domain status for a project
+ * Call this function when loading project details
+ * 
+ * @param {string} projectId - The project ID
+ */
+async function loadDomainStatus(projectId) {
+    const section = document.getElementById('domainStatusSection');
+    const content = document.getElementById('domainStatusContent');
+
+    if (!section || !content) return;
+
+    try {
+        const response = await fetch(`${API_URL}/api/domain-connection-status/${projectId}`);
+        const data = await response.json();
+
+        if (!data.success) {
+            section.style.display = 'none';
+            return;
+        }
+
+        // Show section
+        section.style.display = 'block';
+
+        if (!data.hasConnection) {
+            // No domain set up
+            content.innerHTML = renderNoDomainStatus();
+        } else if (data.isActive || data.status === 'connected') {
+            // Domain is connected
+            content.innerHTML = renderConnectedStatus(data);
+        } else {
+            // Domain pending
+            content.innerHTML = renderPendingStatus(data, projectId);
+        }
+
+    } catch (error) {
+        console.error('Error loading domain status:', error);
+        section.style.display = 'none';
+    }
+}
+
+/**
+ * Render: No domain configured
+ */
+function renderNoDomainStatus() {
+    return `
+        <div class="domain-status-card no-domain">
+            <div style="text-align: center; padding: 10px 0;">
+                <p style="color: #6b7280; margin: 0 0 10px 0;">No custom domain configured</p>
+                <p style="color: #9ca3af; font-size: 0.85rem; margin: 0;">
+                    Your site is accessible via the GitHub Pages URL
+                </p>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Render: Domain connected successfully
+ */
+function renderConnectedStatus(data) {
+    const siteUrl = `https://${data.domain}`;
+
+    return `
+        <div class="domain-status-card connected">
+            <div class="domain-name-display">
+                ✅ ${data.domain}
+            </div>
+            <span class="status-badge-domain connected">
+                🟢 Connected & Live
+            </span>
+            
+            <div class="domain-actions">
+                <a href="${siteUrl}" target="_blank" class="domain-btn domain-btn-success">
+                    🌍 Visit Site
+                </a>
+            </div>
+            
+            <p class="domain-info-text">
+                Your domain is connected and your website is live!
+            </p>
+        </div>
+    `;
+}
+
+/**
+ * Render: Domain pending nameserver update
+ */
+function renderPendingStatus(data, projectId) {
+    const ns1 = data.nameservers?.[0] || 'Loading...';
+    const ns2 = data.nameservers?.[1] || 'Loading...';
+    const connectUrl = `/connect-domain.html?project_id=${projectId}`;
+
+    return `
+        <div class="domain-status-card pending">
+            <div class="domain-name-display">
+                ⏳ ${data.domain}
+            </div>
+            <span class="status-badge-domain pending">
+                🟡 Waiting for Nameservers
+            </span>
+            
+            <div class="nameserver-mini">
+                <strong>Update nameservers to:</strong><br>
+                ${ns1}<br>
+                ${ns2}
+            </div>
+            
+            <div class="domain-actions">
+                <a href="${connectUrl}" class="domain-btn domain-btn-primary">
+                    📋 View Instructions
+                </a>
+                <button onclick="verifyDomainFromDashboard('${projectId}')" class="domain-btn domain-btn-secondary" id="verifyBtn-${projectId}">
+                    🔍 Verify Now
+                </button>
+            </div>
+            
+            <p class="domain-info-text">
+                Update your nameservers at your domain registrar, then click "Verify Now" to check connection.
+                DNS propagation can take 1-48 hours.
+            </p>
+        </div>
+    `;
+}
+
+/**
+ * Verify domain connection from dashboard
+ */
+async function verifyDomainFromDashboard(projectId) {
+    const btn = document.getElementById(`verifyBtn-${projectId}`);
+    if (!btn) return;
+
+    const originalText = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Checking...';
+
+    try {
+        const response = await fetch(`${API_URL}/api/verify-domain-connection`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ projectId })
+        });
+
+        const data = await response.json();
+
+        if (data.isActive || data.status === 'connected') {
+            // Reload status to show connected state
+            await loadDomainStatus(projectId);
+            alert('🎉 Domain connected successfully!');
+        } else {
+            alert(data.message || 'Nameservers not verified yet. Please wait and try again.');
+            btn.disabled = false;
+            btn.innerHTML = originalText;
+        }
+
+    } catch (error) {
+        console.error('Verify error:', error);
+        alert('Error checking domain. Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    }
+}
+
+/**
+ * Initialize domain status when project is loaded
+ * Call this from your existing project loading code
+ * 
+ * Example usage in your dashboard:
+ * 
+ * async function loadProjectDetails(projectId) {
+ *     // Your existing code...
+ *     
+ *     // Add this line to load domain status
+ *     await loadDomainStatus(projectId);
+ * }
+ */
