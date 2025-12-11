@@ -1,4 +1,5 @@
 /**
+ * frontend/scripts/cookie-consent.js
  * GDPR-Compliant Cookie Consent Banner
  * 
  * Features:
