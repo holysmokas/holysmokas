@@ -1,5 +1,4 @@
 /**
- * frontend/scripts/cookie-consent.js
  * GDPR-Compliant Cookie Consent Banner
  * 
  * Features:
@@ -13,7 +12,7 @@
  * <script src="/cookie-consent.js"></script>
  */
 
-(function() {
+(function () {
     'use strict';
 
     // Configuration
@@ -39,197 +38,216 @@
         }
     };
 
-    // Styles for the banner
+    // Styles for the banner - using !important to prevent override by site CSS
     const styles = `
         .cc-banner-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            z-index: 999998;
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            bottom: 0 !important;
+            background: rgba(0, 0, 0, 0.5) !important;
+            z-index: 999998 !important;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s ease !important;
         }
         .cc-banner-overlay.cc-visible {
-            opacity: 1;
+            opacity: 1 !important;
         }
         .cc-banner {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: #fff;
-            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15);
-            z-index: 999999;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            right: 0 !important;
+            background: #fff !important;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.15) !important;
+            z-index: 999999 !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
             transform: translateY(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.3s ease !important;
         }
         .cc-banner.cc-visible {
-            transform: translateY(0);
+            transform: translateY(0) !important;
         }
         .cc-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 24px;
+            max-width: 1200px !important;
+            margin: 0 auto !important;
+            padding: 24px !important;
+            background: #fff !important;
         }
         .cc-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
+            display: flex !important;
+            align-items: center !important;
+            gap: 12px !important;
+            margin-bottom: 16px !important;
         }
         .cc-header h3 {
-            margin: 0;
-            font-size: 20px;
-            color: #1a1a1a;
+            margin: 0 !important;
+            font-size: 20px !important;
+            color: #1a1a1a !important;
+            background: transparent !important;
         }
         .cc-header .cc-icon {
-            font-size: 24px;
+            font-size: 24px !important;
         }
         .cc-description {
-            color: #555;
-            font-size: 14px;
-            line-height: 1.6;
-            margin-bottom: 20px;
+            color: #555 !important;
+            font-size: 14px !important;
+            line-height: 1.6 !important;
+            margin-bottom: 20px !important;
+            background: transparent !important;
         }
         .cc-description a {
-            color: #4F46E5;
-            text-decoration: underline;
+            color: #4F46E5 !important;
+            text-decoration: underline !important;
         }
         .cc-categories {
-            display: none;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 20px;
-            padding: 16px;
-            background: #f8f9fa;
-            border-radius: 8px;
+            display: none !important;
+            flex-direction: column !important;
+            gap: 12px !important;
+            margin-bottom: 20px !important;
+            padding: 16px !important;
+            background: #f8f9fa !important;
+            border-radius: 8px !important;
         }
         .cc-categories.cc-expanded {
-            display: flex;
+            display: flex !important;
         }
         .cc-category {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
+            display: flex !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            background: transparent !important;
         }
         .cc-category input[type="checkbox"] {
-            width: 20px;
-            height: 20px;
-            margin-top: 2px;
-            cursor: pointer;
-            accent-color: #4F46E5;
+            width: 20px !important;
+            height: 20px !important;
+            margin-top: 2px !important;
+            cursor: pointer !important;
+            accent-color: #4F46E5 !important;
         }
         .cc-category input[type="checkbox"]:disabled {
-            cursor: not-allowed;
+            cursor: not-allowed !important;
         }
         .cc-category-info {
-            flex: 1;
+            flex: 1 !important;
         }
         .cc-category-name {
-            font-weight: 600;
-            color: #1a1a1a;
-            font-size: 14px;
+            font-weight: 600 !important;
+            color: #1a1a1a !important;
+            font-size: 14px !important;
         }
         .cc-category-desc {
-            color: #666;
-            font-size: 13px;
-            margin-top: 2px;
+            color: #666 !important;
+            font-size: 13px !important;
+            margin-top: 2px !important;
         }
         .cc-category-required {
-            font-size: 11px;
-            color: #888;
-            font-style: italic;
+            font-size: 11px !important;
+            color: #888 !important;
+            font-style: italic !important;
         }
         .cc-buttons {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
+            display: flex !important;
+            flex-wrap: wrap !important;
+            gap: 12px !important;
+            align-items: center !important;
         }
         .cc-btn {
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            border: none;
+            padding: 12px 24px !important;
+            border-radius: 8px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.2s ease !important;
+            border: none !important;
+            text-decoration: none !important;
         }
         .cc-btn-accept-all {
-            background: #4F46E5;
-            color: white;
+            background: #4F46E5 !important;
+            color: white !important;
         }
         .cc-btn-accept-all:hover {
-            background: #4338CA;
+            background: #4338CA !important;
         }
         .cc-btn-accept-selected {
-            background: #10B981;
-            color: white;
-            display: none;
+            background: #10B981 !important;
+            color: white !important;
+            display: none !important;
         }
         .cc-btn-accept-selected.cc-visible {
-            display: inline-block;
+            display: inline-block !important;
         }
         .cc-btn-accept-selected:hover {
-            background: #059669;
+            background: #059669 !important;
         }
         .cc-btn-reject {
-            background: #f3f4f6;
-            color: #374151;
+            background: #f3f4f6 !important;
+            color: #374151 !important;
         }
         .cc-btn-reject:hover {
-            background: #e5e7eb;
+            background: #e5e7eb !important;
         }
         .cc-btn-customize {
-            background: transparent;
-            color: #4F46E5;
-            padding: 12px 16px;
+            background: transparent !important;
+            color: #4F46E5 !important;
+            padding: 12px 16px !important;
         }
         .cc-btn-customize:hover {
-            background: #f0f0ff;
+            background: #f0f0ff !important;
         }
         
-        /* Settings button (shown after consent) */
+        /* Settings button (shown after consent) - STICKY BOTTOM LEFT */
         .cc-settings-btn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background: #4F46E5;
-            color: white;
-            border: none;
-            padding: 10px 16px;
-            border-radius: 50px;
-            font-size: 13px;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            z-index: 999997;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            transition: all 0.2s ease;
+            position: fixed !important;
+            bottom: 20px !important;
+            left: 20px !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 14px 20px !important;
+            border-radius: 50px !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4) !important;
+            z-index: 999997 !important;
+            display: flex !important;
+            align-items: center !important;
+            gap: 8px !important;
+            transition: all 0.3s ease !important;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif !important;
+            text-decoration: none !important;
+            visibility: visible !important;
+            opacity: 1 !important;
         }
         .cc-settings-btn:hover {
-            background: #4338CA;
-            transform: scale(1.05);
+            background: linear-gradient(135deg, #764ba2 0%, #667eea 100%) !important;
+            transform: scale(1.05) translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5) !important;
         }
         .cc-settings-btn.cc-hidden {
-            display: none;
+            display: none !important;
+            visibility: hidden !important;
+            opacity: 0 !important;
         }
 
         @media (max-width: 600px) {
             .cc-container {
-                padding: 16px;
+                padding: 16px !important;
             }
             .cc-buttons {
-                flex-direction: column;
+                flex-direction: column !important;
             }
             .cc-btn {
-                width: 100%;
-                text-align: center;
+                width: 100% !important;
+                text-align: center !important;
+            }
+            .cc-settings-btn {
+                bottom: 15px !important;
+                left: 15px !important;
+                padding: 12px 16px !important;
+                font-size: 13px !important;
             }
         }
     `;
@@ -277,10 +295,10 @@
             categories: categories
         };
         setCookie(CONFIG.cookieName, consent, CONFIG.cookieExpiry);
-        
+
         // Dispatch event for other scripts to listen to
         window.dispatchEvent(new CustomEvent('cookieConsentUpdated', { detail: consent }));
-        
+
         // Load scripts based on consent
         loadConsentedScripts(categories);
     }
@@ -291,7 +309,7 @@
         if (categories.analytics) {
             loadGoogleAnalytics();
         }
-        
+
         // Add more tracking scripts here as needed
         // if (categories.marketing) { loadMarketingScripts(); }
     }
@@ -300,7 +318,7 @@
     function loadGoogleAnalytics() {
         // Check if GA ID is defined
         const gaId = window.GOOGLE_ANALYTICS_ID || 'G-ZBZWDLCJVJ';
-        
+
         if (document.querySelector(`script[src*="googletagmanager.com/gtag/js?id=${gaId}"]`)) {
             return; // Already loaded
         }
@@ -317,16 +335,29 @@
         window.gtag = gtag;
         gtag('js', new Date());
         gtag('config', gaId);
-        
+
         console.log('✅ Google Analytics loaded with consent');
+    }
+
+    // Inject styles
+    function injectStyles() {
+        if (document.getElementById('cc-styles')) return;
+        const styleEl = document.createElement('style');
+        styleEl.id = 'cc-styles';
+        styleEl.textContent = styles;
+        document.head.appendChild(styleEl);
     }
 
     // Create and show banner
     function showBanner() {
-        // Add styles
-        const styleEl = document.createElement('style');
-        styleEl.textContent = styles;
-        document.head.appendChild(styleEl);
+        // Inject styles first
+        injectStyles();
+
+        // Hide settings button if visible
+        const existingBtn = document.getElementById('cc-settings-btn');
+        if (existingBtn) {
+            existingBtn.classList.add('cc-hidden');
+        }
 
         // Create overlay
         const overlay = document.createElement('div');
@@ -346,7 +377,7 @@
                 <p class="cc-description">
                     We use cookies to enhance your browsing experience and analyze our traffic. 
                     By clicking "Accept All", you consent to our use of cookies. 
-                    <a href="/privacy.html" target="_blank">Read our Privacy Policy</a>
+                    <a href="/cookies.html" target="_blank">Read our Cookie Policy</a>
                 </p>
                 
                 <div class="cc-categories" id="cc-categories">
@@ -408,7 +439,7 @@
             const categoriesEl = document.getElementById('cc-categories');
             const acceptSelectedBtn = document.getElementById('cc-accept-selected');
             const customizeBtn = document.getElementById('cc-customize');
-            
+
             categoriesEl.classList.toggle('cc-expanded');
             acceptSelectedBtn.classList.toggle('cc-visible');
             customizeBtn.textContent = categoriesEl.classList.contains('cc-expanded') ? 'Hide Options' : 'Customize';
@@ -428,7 +459,7 @@
     function hideBanner() {
         const banner = document.getElementById('cc-banner');
         const overlay = document.getElementById('cc-overlay');
-        
+
         if (banner) {
             banner.classList.remove('cc-visible');
             setTimeout(() => banner.remove(), 300);
@@ -440,6 +471,9 @@
     }
 
     function showSettingsButton() {
+        // Inject styles first
+        injectStyles();
+
         // Remove existing button if any
         const existing = document.getElementById('cc-settings-btn');
         if (existing) existing.remove();
@@ -448,10 +482,12 @@
         btn.className = 'cc-settings-btn';
         btn.id = 'cc-settings-btn';
         btn.innerHTML = '🍪 Cookie Settings';
+        btn.setAttribute('aria-label', 'Open cookie settings');
+
         btn.addEventListener('click', () => {
             btn.classList.add('cc-hidden');
             showBanner();
-            
+
             // Pre-check boxes based on current consent
             const consent = getConsent();
             if (consent && consent.categories) {
@@ -462,20 +498,25 @@
                     }
                 });
             }
-            
+
             // Expand categories
-            document.getElementById('cc-categories').classList.add('cc-expanded');
-            document.getElementById('cc-accept-selected').classList.add('cc-visible');
-            document.getElementById('cc-customize').textContent = 'Hide Options';
+            setTimeout(() => {
+                const categoriesEl = document.getElementById('cc-categories');
+                const acceptSelectedBtn = document.getElementById('cc-accept-selected');
+                const customizeBtn = document.getElementById('cc-customize');
+                if (categoriesEl) categoriesEl.classList.add('cc-expanded');
+                if (acceptSelectedBtn) acceptSelectedBtn.classList.add('cc-visible');
+                if (customizeBtn) customizeBtn.textContent = 'Hide Options';
+            }, 100);
         });
-        
+
         document.body.appendChild(btn);
     }
 
     // Initialize
     function init() {
         const consent = getConsent();
-        
+
         if (!consent) {
             // No consent yet - show banner
             if (document.readyState === 'loading') {
@@ -499,7 +540,7 @@
         hasConsent: hasConsent,
         getConsent: getConsent,
         showBanner: showBanner,
-        reset: function() {
+        reset: function () {
             deleteCookie(CONFIG.cookieName);
             location.reload();
         }
