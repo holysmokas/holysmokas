@@ -1,5 +1,4 @@
 import { db } from '/frontend/scripts/config.js';
-import { collection, addDoc, serverTimestamp } from './config.js';
 import { ENDPOINTS } from './config.js';
 
 // Function to show modal
