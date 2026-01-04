@@ -1,6 +1,235 @@
 import { db } from '/frontend/scripts/config.js';
 import { ENDPOINTS } from './config.js';
 
+// ============================================
+// SECURITY: Input Sanitization Functions
+// ============================================
+
+const SecurityUtils = {
+    // Sanitize text input - prevents XSS
+    sanitizeText: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        return input
+            .replace(/[<>]/g, '') // Remove < and > to prevent HTML injection
+            .replace(/javascript:/gi, '') // Remove javascript: protocol
+            .replace(/on\w+=/gi, '') // Remove event handlers like onclick=
+            .replace(/data:/gi, '') // Remove data: protocol
+            .trim()
+            .slice(0, 1000); // Max length
+    },
+
+    // Sanitize name (person or business)
+    sanitizeName: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        return input
+            .replace(/[<>\"\'`;\\]/g, '') // Remove dangerous chars
+            .replace(/javascript:/gi, '')
+            .replace(/on\w+=/gi, '')
+            .trim()
+            .slice(0, 200); // Max 200 chars
+    },
+
+    // Sanitize email
+    sanitizeEmail: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        return input
+            .toLowerCase()
+            .replace(/[<>\"\'`;\\]/g, '')
+            .trim()
+            .slice(0, 254);
+    },
+
+    // Sanitize phone
+    sanitizePhone: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        // Allow only numbers, spaces, dashes, parentheses, plus
+        return input
+            .replace(/[^0-9\s\-\(\)\+]/g, '')
+            .trim()
+            .slice(0, 30);
+    },
+
+    // Sanitize URL
+    sanitizeUrl: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        const trimmed = input.trim();
+
+        // Block dangerous protocols
+        if (trimmed.match(/^(javascript|data|vbscript):/i)) {
+            return '';
+        }
+
+        return trimmed.slice(0, 2000);
+    },
+
+    // Sanitize domain name
+    sanitizeDomain: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        let cleaned = input.toLowerCase().trim();
+        // Remove protocol
+        cleaned = cleaned.replace(/^https?:\/\//, '');
+        // Remove www
+        cleaned = cleaned.replace(/^www\./, '');
+        // Remove path
+        cleaned = cleaned.split('/')[0];
+        // Only allow valid domain characters
+        cleaned = cleaned.replace(/[^a-z0-9\.\-]/g, '');
+        return cleaned.slice(0, 253);
+    },
+
+    // Sanitize long text (description, goals, features)
+    sanitizeLongText: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        return input
+            .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') // Remove script tags
+            .replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '') // Remove iframes
+            .replace(/javascript:/gi, '')
+            .replace(/on\w+=/gi, '')
+            .replace(/data:text\/html/gi, '')
+            .trim()
+            .slice(0, 10000); // Max 10000 chars for descriptions
+    },
+
+    // Check for common attack patterns
+    detectAttack: (input) => {
+        if (!input || typeof input !== 'string') return false;
+        const attackPatterns = [
+            /<script/i,
+            /javascript:/i,
+            /on\w+\s*=/i,
+            /union\s+select/i,
+            /;\s*drop\s+table/i,
+            /;\s*delete\s+from/i,
+            /'\s*or\s+'1'\s*=\s*'1/i,
+            /--\s*$/,
+            /\/\*.*\*\//,
+            /\$\{.*\}/,
+            /\{\{.*\}\}/,
+            /<iframe/i,
+            /<embed/i,
+            /<object/i,
+            /expression\s*\(/i,
+        ];
+        return attackPatterns.some(pattern => pattern.test(input));
+    },
+
+    // Escape HTML for display (use when inserting user input into DOM)
+    escapeHtml: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        const div = document.createElement('div');
+        div.textContent = input;
+        return div.innerHTML;
+    }
+};
+
+// ============================================
+// SECURITY: Rate Limiting for Form Submission
+// ============================================
+
+const FormRateLimiter = {
+    submissions: {},
+    maxSubmissions: 3,      // Max submissions per window
+    windowTime: 60 * 1000,  // 1 minute window
+    cooldownTime: 5 * 60 * 1000, // 5 minute cooldown after limit
+
+    canSubmit: (identifier = 'contact_form') => {
+        const now = Date.now();
+        const record = FormRateLimiter.submissions[identifier];
+
+        if (!record) return true;
+
+        // Check if cooldown period has passed
+        if (record.cooldownUntil && now < record.cooldownUntil) {
+            return false;
+        }
+
+        // Reset if window expired
+        if (now - record.windowStart > FormRateLimiter.windowTime) {
+            delete FormRateLimiter.submissions[identifier];
+            return true;
+        }
+
+        return record.count < FormRateLimiter.maxSubmissions;
+    },
+
+    recordSubmission: (identifier = 'contact_form') => {
+        const now = Date.now();
+
+        if (!FormRateLimiter.submissions[identifier]) {
+            FormRateLimiter.submissions[identifier] = {
+                count: 0,
+                windowStart: now
+            };
+        }
+
+        const record = FormRateLimiter.submissions[identifier];
+
+        // Reset window if expired
+        if (now - record.windowStart > FormRateLimiter.windowTime) {
+            record.count = 0;
+            record.windowStart = now;
+        }
+
+        record.count++;
+
+        // Set cooldown if limit reached
+        if (record.count >= FormRateLimiter.maxSubmissions) {
+            record.cooldownUntil = now + FormRateLimiter.cooldownTime;
+        }
+    },
+
+    getRemainingCooldown: (identifier = 'contact_form') => {
+        const record = FormRateLimiter.submissions[identifier];
+        if (!record?.cooldownUntil) return 0;
+        const remaining = record.cooldownUntil - Date.now();
+        return remaining > 0 ? Math.ceil(remaining / 1000) : 0;
+    }
+};
+
+// ============================================
+// SECURITY: Domain Check Rate Limiter
+// ============================================
+
+const DomainCheckLimiter = {
+    checks: {},
+    maxChecks: 10,          // Max checks per window
+    windowTime: 60 * 1000,  // 1 minute window
+
+    canCheck: () => {
+        const now = Date.now();
+        const record = DomainCheckLimiter.checks['domain'];
+
+        if (!record) return true;
+
+        if (now - record.windowStart > DomainCheckLimiter.windowTime) {
+            delete DomainCheckLimiter.checks['domain'];
+            return true;
+        }
+
+        return record.count < DomainCheckLimiter.maxChecks;
+    },
+
+    recordCheck: () => {
+        const now = Date.now();
+
+        if (!DomainCheckLimiter.checks['domain']) {
+            DomainCheckLimiter.checks['domain'] = {
+                count: 0,
+                windowStart: now
+            };
+        }
+
+        const record = DomainCheckLimiter.checks['domain'];
+
+        if (now - record.windowStart > DomainCheckLimiter.windowTime) {
+            record.count = 0;
+            record.windowStart = now;
+        }
+
+        record.count++;
+    }
+};
+
 // Function to show modal
 function showModal(title, message, isSuccess = true) {
     const modal = document.getElementById('formModal');
@@ -22,29 +251,53 @@ window.closeModal = function () {
     modal.classList.remove('show');
 };
 
-// ❌ REMOVED sendToGoogleScript function
-// Contact submissions are now handled entirely by the backend (server.js)
-// via the logContactSubmission() function in sheetsLogger.js
-// This prevents duplicate entries in Google Sheets
-
 function cleanDomainName(domain) {
-    let cleaned = domain.replace(/^https?:\/\//, '');
-    cleaned = cleaned.replace(/^www\./, '');
-    cleaned = cleaned.split('/')[0];
-    cleaned = cleaned.trim();
-    return cleaned;
+    return SecurityUtils.sanitizeDomain(domain);
 }
+
+// ============================================
+// SECURED: Domain Check Function
+// ============================================
 
 window.checkDomain = async function () {
     const domainInput = document.getElementById("domainInput");
     const domainResult = document.getElementById("domainResult");
 
-    const domain = domainInput.value.trim();
+    // Rate limit check
+    if (!DomainCheckLimiter.canCheck()) {
+        domainResult.innerHTML = `
+            <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="font-size: 1.5rem;">⏳</span>
+                    <strong style="color: #991b1b;">Too many requests</strong>
+                </div>
+                <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.5rem; margin-bottom: 0;">
+                    Please wait a moment before checking another domain.
+                </p>
+            </div>
+        `;
+        return;
+    }
+
+    const rawDomain = domainInput.value.trim();
+
+    // Sanitize domain input
+    const domain = SecurityUtils.sanitizeDomain(rawDomain);
+
     if (!domain) {
-        domainResult.innerHTML = "⚠️ Please enter a domain name.";
+        domainResult.innerHTML = "⚠️ Please enter a valid domain name.";
         domainResult.style.color = "#f59e0b";
         return;
     }
+
+    // Check for attack patterns
+    if (SecurityUtils.detectAttack(rawDomain)) {
+        domainResult.innerHTML = "⚠️ Invalid characters detected. Please enter a valid domain.";
+        domainResult.style.color = "#ef4444";
+        return;
+    }
+
+    DomainCheckLimiter.recordCheck();
 
     domainResult.innerHTML = "🔍 Checking availability...";
     domainResult.style.color = "#6b7280";
@@ -59,15 +312,18 @@ window.checkDomain = async function () {
         const data = await response.json();
 
         if (data.available === true) {
-            const cleanedDomain = data.cleanedDomain || cleanDomainName(domain);
+            const cleanedDomain = SecurityUtils.sanitizeDomain(data.cleanedDomain || domain);
             const initialCost = data.pricing?.initialCost || data.price || 12.99;
             const renewalCost = data.pricing?.renewalCost || data.renewalPrice || 12.99;
+
+            // Use escapeHtml for any user-influenced content displayed in HTML
+            const safeDomain = SecurityUtils.escapeHtml(cleanedDomain);
 
             domainResult.innerHTML = `
                 <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
                         <span style="font-size: 1.5rem;">✅</span>
-                        <strong style="color: #065f46; font-size: 1.1rem;">${cleanedDomain} is available!</strong>
+                        <strong style="color: #065f46; font-size: 1.1rem;">${safeDomain} is available!</strong>
                     </div>
                     
                     <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
@@ -98,7 +354,7 @@ window.checkDomain = async function () {
             window.selectedDomain = cleanedDomain;
             window.domainPricing = { initialCost, renewalCost };
         } else {
-            const checkedDomain = data.domain || domain;
+            const checkedDomain = SecurityUtils.escapeHtml(data.domain || domain);
             domainResult.innerHTML = `
                 <div style="background: #fef2f2; border: 2px solid #ef4444; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
                     <div style="display: flex; align-items: center; gap: 0.5rem;">
@@ -133,22 +389,32 @@ window.checkDomain = async function () {
 };
 
 window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
+    // Sanitize domain before using
+    const safeDomain = SecurityUtils.sanitizeDomain(domain);
+
     const currentUrlInput = document.getElementById("currentUrl");
     if (currentUrlInput) {
-        currentUrlInput.value = `https://${domain}`;
+        currentUrlInput.value = `https://${safeDomain}`;
         currentUrlInput.style.border = "2px solid #10b981";
         setTimeout(() => { currentUrlInput.style.border = ""; }, 2000);
     }
 
-    window.selectedDomain = domain;
+    window.selectedDomain = safeDomain;
     window.domainPricing = { initialCost, renewalCost };
 
+    // Update hidden field
+    const selectedDomainValue = document.getElementById('selectedDomainValue');
+    if (selectedDomainValue) {
+        selectedDomainValue.value = safeDomain;
+    }
+
+    const displayDomain = SecurityUtils.escapeHtml(safeDomain);
     const domainResult = document.getElementById("domainResult");
     domainResult.innerHTML = `
         <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
                 <span style="font-size: 1.5rem;">✅</span>
-                <strong style="color: #065f46;">${domain} added to form</strong>
+                <strong style="color: #065f46;">${displayDomain} added to form</strong>
             </div>
             
             <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
@@ -180,7 +446,6 @@ window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
 };
 
 function getPackagePrice(packageName) {
-    // Return null for placeholder/unselected state
     if (!packageName || packageName.includes("Select a package")) {
         return null;
     }
@@ -197,7 +462,6 @@ function getPackagePrice(packageName) {
         }
     }
 
-    // Return 0 for custom quotes and "Not Sure Yet"
     return 0;
 }
 
@@ -206,7 +470,6 @@ function extractCategoryFromPackage(packageName) {
 
     const normalized = packageName.toLowerCase();
 
-    // Check in specific order to avoid conflicts
     if (normalized.includes('small shop') || normalized.includes('smallshop')) {
         return 'smallshop';
     }
@@ -220,10 +483,8 @@ function extractCategoryFromPackage(packageName) {
         return 'enterprise';
     }
 
-    return 'business'; // default
+    return 'business';
 }
-
-
 
 window.removeDomainFromForm = function () {
     const currentUrlInput = document.getElementById("currentUrl");
@@ -238,67 +499,110 @@ window.removeDomainFromForm = function () {
     const domainResult = document.getElementById("domainResult");
     if (domainResult) domainResult.innerHTML = "";
 
+    const selectedDomainValue = document.getElementById('selectedDomainValue');
+    if (selectedDomainValue) selectedDomainValue.value = '';
+
     updatePricingBreakdown();
 };
 
 // ============================================
-// CONTACT FORM LOGIC - DOMAIN SYSTEM UPDATE
-// ============================================
-// This file shows the CHANGES needed to your existing contactFormLogic.js
-// Look for comments marked "// NEW:" or "// UPDATED:"
-
-
-// ============================================
-// SECTION 1: UPDATE handleContactSubmit FUNCTION
-// Find your handleContactSubmit function and update it
+// SECURED: Contact Form Submit Handler
 // ============================================
 
 window.handleContactSubmit = async function (e) {
     e.preventDefault();
     const form = e.target;
 
-    // Existing fields
-    const name = form.querySelector("#name")?.value.trim() || "";
-    const email = form.querySelector("#email")?.value.trim() || "";
-    const businessName = form.querySelector("#businessName")?.value.trim() || "";
-    const phone = form.querySelector("#phone")?.value.trim() || "";
-    const packageSelected = form.querySelector("#package")?.value.trim() || "";
-    const timeline = form.querySelector("#timeline")?.value.trim() || "";
-    const currentUrl = form.querySelector("#currentUrl")?.value.trim() || "";
-    const referenceWebsite = form.querySelector("#referenceWebsite")?.value.trim() || "";
-    const mainGoal = form.querySelector("#mainGoal")?.value.trim() || "";
-    const mustHaveFeatures = form.querySelector("#mustHaveFeatures")?.value.trim() || "";
+    // Security: Check rate limit
+    if (!FormRateLimiter.canSubmit()) {
+        const cooldown = FormRateLimiter.getRemainingCooldown();
+        showModal(
+            "Please Wait",
+            `Too many submission attempts. Please try again in ${cooldown} seconds.`,
+            false
+        );
+        return;
+    }
+
+    // Get raw form values
+    const rawValues = {
+        name: form.querySelector("#name")?.value || "",
+        email: form.querySelector("#email")?.value || "",
+        businessName: form.querySelector("#businessName")?.value || "",
+        phone: form.querySelector("#phone")?.value || "",
+        packageSelected: form.querySelector("#package")?.value || "",
+        timeline: form.querySelector("#timeline")?.value || "",
+        currentUrl: form.querySelector("#currentUrl")?.value || "",
+        referenceWebsite: form.querySelector("#referenceWebsite")?.value || "",
+        mainGoal: form.querySelector("#mainGoal")?.value || "",
+        mustHaveFeatures: form.querySelector("#mustHaveFeatures")?.value || ""
+    };
+
+    // Security: Detect attacks in any field
+    const allInputs = Object.values(rawValues).join(' ');
+    if (SecurityUtils.detectAttack(allInputs)) {
+        showModal(
+            "Invalid Input",
+            "Your submission contains invalid characters. Please remove any special characters and try again.",
+            false
+        );
+        console.warn('🚨 Attack pattern detected in form submission');
+        return;
+    }
+
+    // Security: Sanitize all inputs
+    const sanitized = {
+        name: SecurityUtils.sanitizeName(rawValues.name),
+        email: SecurityUtils.sanitizeEmail(rawValues.email),
+        businessName: SecurityUtils.sanitizeName(rawValues.businessName),
+        phone: SecurityUtils.sanitizePhone(rawValues.phone),
+        packageSelected: SecurityUtils.sanitizeText(rawValues.packageSelected),
+        timeline: SecurityUtils.sanitizeText(rawValues.timeline),
+        currentUrl: SecurityUtils.sanitizeUrl(rawValues.currentUrl),
+        referenceWebsite: SecurityUtils.sanitizeUrl(rawValues.referenceWebsite),
+        mainGoal: SecurityUtils.sanitizeLongText(rawValues.mainGoal),
+        mustHaveFeatures: SecurityUtils.sanitizeLongText(rawValues.mustHaveFeatures)
+    };
+
+    // Validate required fields after sanitization
+    if (!sanitized.name || sanitized.name.length < 2) {
+        showModal("Invalid Name", "Please enter a valid name (at least 2 characters).", false);
+        return;
+    }
+
+    if (!sanitized.email || !sanitized.email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)) {
+        showModal("Invalid Email", "Please enter a valid email address.", false);
+        return;
+    }
+
+    if (!sanitized.businessName || sanitized.businessName.length < 2) {
+        showModal("Invalid Business Name", "Please enter a valid business name.", false);
+        return;
+    }
 
     const logoInput = form.querySelector("#logoUpload");
     const logoFile = logoInput?.files[0] || null;
 
-    // NEW: Get domain option selection
+    // Domain handling
     const domainSelectionType = document.getElementById('domainSelectionType')?.value || 'new';
     const isOwnDomain = document.getElementById('isOwnDomain')?.value === 'true';
     const selectedDomainValue = document.getElementById('selectedDomainValue')?.value || '';
 
-    // Determine the selected domain based on option
     let finalSelectedDomain = 'N/A';
     let finalDomainPricing = null;
 
     if (domainSelectionType === 'new' && window.selectedDomain) {
-        // Customer wants new domain (Namecheap registration)
-        finalSelectedDomain = window.selectedDomain;
+        finalSelectedDomain = SecurityUtils.sanitizeDomain(window.selectedDomain);
         finalDomainPricing = window.domainPricing;
     } else if (domainSelectionType === 'own' && (window.ownDomain || selectedDomainValue)) {
-        // Customer has their own domain (Cloudflare connection)
-        finalSelectedDomain = window.ownDomain || selectedDomainValue;
-        finalDomainPricing = { initialCost: 0, renewalCost: 0 }; // Free for own domain
-    } else if (domainSelectionType === 'none') {
-        // No custom domain
-        finalSelectedDomain = 'N/A';
-        finalDomainPricing = null;
+        finalSelectedDomain = SecurityUtils.sanitizeDomain(window.ownDomain || selectedDomainValue);
+        finalDomainPricing = { initialCost: 0, renewalCost: 0 };
     }
 
     // Package validation
-    const packagePrice = getPackagePrice(packageSelected);
+    const packagePrice = getPackagePrice(sanitized.packageSelected);
 
-    if (packagePrice === null || packageSelected.includes("Select a package")) {
+    if (packagePrice === null || sanitized.packageSelected.includes("Select a package")) {
         showModal(
             "Please Select a Package",
             "Please choose a website package before submitting your request.",
@@ -307,14 +611,31 @@ window.handleContactSubmit = async function (e) {
         return;
     }
 
-    // UPDATED: Domain price (0 for own domain)
     const domainPrice = finalDomainPricing ? finalDomainPricing.initialCost : 0;
     const totalCost = packagePrice + domainPrice;
 
     // Logo validation
-    if (logoFile && logoFile.size > 5 * 1024 * 1024) {
-        showModal("Logo Too Large", "Please upload a logo smaller than 5MB.", false);
-        return;
+    if (logoFile) {
+        // Check file size
+        if (logoFile.size > 5 * 1024 * 1024) {
+            showModal("Logo Too Large", "Please upload a logo smaller than 5MB.", false);
+            return;
+        }
+
+        // Check file type
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+        if (!allowedTypes.includes(logoFile.type)) {
+            showModal("Invalid File Type", "Please upload an image file (JPEG, PNG, GIF, WebP, or SVG).", false);
+            return;
+        }
+
+        // Check extension
+        const extension = logoFile.name.split('.').pop().toLowerCase();
+        const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+        if (!validExtensions.includes(extension)) {
+            showModal("Invalid File", "Invalid file extension. Please upload a valid image.", false);
+            return;
+        }
     }
 
     const submitBtn = document.getElementById("submitBtn");
@@ -324,46 +645,47 @@ window.handleContactSubmit = async function (e) {
         return;
     }
 
+    // Record submission attempt
+    FormRateLimiter.recordSubmission();
+
     const originalText = submitBtn.textContent;
     submitBtn.textContent = logoFile ? "Uploading Logo..." : "Creating Payment Session...";
     submitBtn.disabled = true;
 
     try {
         const formData = new FormData();
-        formData.append('name', name);
-        formData.append('email', email);
-        formData.append('businessName', businessName);
-        formData.append('phone', phone);
-        formData.append('package', packageSelected);
-        formData.append('packagePrice', packagePrice);
-        formData.append('timeline', timeline);
-        formData.append('currentUrl', currentUrl);
-        formData.append('referenceWebsite', referenceWebsite);
-        formData.append('mainGoal', mainGoal);
-        formData.append('mustHaveFeatures', mustHaveFeatures);
 
-        // UPDATED: Domain fields
+        // Use sanitized values
+        formData.append('name', sanitized.name);
+        formData.append('email', sanitized.email);
+        formData.append('businessName', sanitized.businessName);
+        formData.append('phone', sanitized.phone);
+        formData.append('package', sanitized.packageSelected);
+        formData.append('packagePrice', packagePrice);
+        formData.append('timeline', sanitized.timeline);
+        formData.append('currentUrl', sanitized.currentUrl);
+        formData.append('referenceWebsite', sanitized.referenceWebsite);
+        formData.append('mainGoal', sanitized.mainGoal);
+        formData.append('mustHaveFeatures', sanitized.mustHaveFeatures);
+
+        // Domain fields (already sanitized)
         formData.append('selectedDomain', finalSelectedDomain);
         formData.append('domainPricing', JSON.stringify(finalDomainPricing));
         formData.append('totalCost', totalCost);
-
-        // NEW: Domain option fields
-        formData.append('domainOption', domainSelectionType);  // 'new', 'own', or 'none'
-        formData.append('isOwnDomain', isOwnDomain.toString());  // 'true' or 'false'
+        formData.append('domainOption', domainSelectionType);
+        formData.append('isOwnDomain', isOwnDomain.toString());
 
         formData.append('timestamp', new Date().toISOString());
         formData.append('status', 'pending_payment');
 
-        // Category field
-        const category = extractCategoryFromPackage(packageSelected);
+        const category = extractCategoryFromPackage(sanitized.packageSelected);
         formData.append('category', category);
 
-        // NEW: Log domain selection for debugging
-        console.log('📦 Domain Selection:', {
-            type: domainSelectionType,
-            isOwnDomain: isOwnDomain,
-            domain: finalSelectedDomain,
-            pricing: finalDomainPricing
+        console.log('📦 Secure Form Submission:', {
+            name: sanitized.name,
+            email: sanitized.email,
+            domainOption: domainSelectionType,
+            domain: finalSelectedDomain
         });
 
         if (logoFile) {
@@ -416,10 +738,8 @@ window.handleContactSubmit = async function (e) {
     }
 };
 
-
 // ============================================
-// SECTION 2: ADD NEW HELPER FUNCTION
-// Add this function to reset domain selection
+// Domain Selection Functions
 // ============================================
 
 function resetDomainSelection() {
@@ -429,7 +749,6 @@ function resetDomainSelection() {
     window.domainOption = null;
     window.isOwnDomain = false;
 
-    // Reset hidden fields
     const domainSelectionType = document.getElementById('domainSelectionType');
     const isOwnDomainField = document.getElementById('isOwnDomain');
     const selectedDomainValue = document.getElementById('selectedDomainValue');
@@ -438,35 +757,27 @@ function resetDomainSelection() {
     if (isOwnDomainField) isOwnDomainField.value = 'false';
     if (selectedDomainValue) selectedDomainValue.value = '';
 
-    // Reset UI sections
     const newSection = document.getElementById('newDomainSection');
     const ownSection = document.getElementById('ownDomainSection');
-    const noneSection = document.getElementById('noDomainSection');
 
     if (newSection) newSection.style.display = 'none';
     if (ownSection) ownSection.style.display = 'none';
-    if (noneSection) noneSection.style.display = 'none';
 
-    // Uncheck radio buttons
     document.querySelectorAll('input[name="domainOption"]').forEach(radio => {
         radio.checked = false;
     });
 
-    // Remove selected class from cards
     document.querySelectorAll('.domain-option-card').forEach(card => {
         card.classList.remove('selected');
     });
 
-    // Update pricing
     if (typeof updatePricingBreakdown === 'function') {
         updatePricingBreakdown();
     }
 }
 
-
 // ============================================
-// SECTION 3: UPDATE updatePricingBreakdown FUNCTION
-// Update to handle domain options correctly
+// Pricing Breakdown
 // ============================================
 
 function updatePricingBreakdown() {
@@ -478,7 +789,6 @@ function updatePricingBreakdown() {
     const packageName = packageSelect?.value || "";
     const packagePrice = getPackagePrice(packageName);
 
-    // Check domain option
     const domainOption = window.domainOption || document.getElementById('domainSelectionType')?.value || '';
 
     let domainPrice = 0;
@@ -486,13 +796,10 @@ function updatePricingBreakdown() {
 
     if (domainOption === 'new' && window.domainPricing) {
         domainPrice = window.domainPricing.initialCost || 0;
-        domainLabel = window.selectedDomain || 'New Domain';
+        domainLabel = SecurityUtils.escapeHtml(window.selectedDomain || 'New Domain');
     } else if (domainOption === 'own') {
         domainPrice = 0;
-        domainLabel = window.ownDomain ? `${window.ownDomain} (Your Domain)` : 'Your Domain';
-    } else if (domainOption === 'none') {
-        domainPrice = 0;
-        domainLabel = 'Free Subdomain';
+        domainLabel = window.ownDomain ? `${SecurityUtils.escapeHtml(window.ownDomain)} (Your Domain)` : 'Your Domain';
     }
 
     if (packagePrice === null) {
@@ -547,21 +854,20 @@ function updatePricingBreakdown() {
     breakdownContainer.style.display = 'block';
 }
 
-
 // ============================================
-// SECTION 4: ENSURE THESE GLOBAL VARIABLES EXIST
-// Add at the top of your file if not present
+// Global Variables
 // ============================================
 
-// Domain selection state
-window.domainOption = null;      // 'new', 'own', or 'none'
-window.selectedDomain = null;    // Domain name for new registration
-window.ownDomain = null;         // Domain name for own domain
-window.domainPricing = null;     // { initialCost, renewalCost }
-window.isOwnDomain = false;      // Boolean flag
+window.domainOption = null;
+window.selectedDomain = null;
+window.ownDomain = null;
+window.domainPricing = null;
+window.isOwnDomain = false;
 
+// ============================================
+// Logo Preview with Security
+// ============================================
 
-// ✅ ADD LOGO PREVIEW FUNCTION WITH REMOVE OPTION
 document.addEventListener('DOMContentLoaded', () => {
     const logoInput = document.getElementById('logoUpload');
     const logoPreview = document.getElementById('logoPreview');
@@ -572,9 +878,26 @@ document.addEventListener('DOMContentLoaded', () => {
         logoInput.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
+                // Validate file type
+                const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
+                if (!allowedTypes.includes(file.type)) {
+                    showModal('Invalid File Type', 'Please upload an image file (JPEG, PNG, GIF, WebP, or SVG).', false);
+                    logoInput.value = '';
+                    return;
+                }
+
                 // Validate file size (5MB max)
                 if (file.size > 5 * 1024 * 1024) {
                     showModal('File Too Large', 'Logo file must be less than 5MB. Please choose a smaller file.', false);
+                    logoInput.value = '';
+                    return;
+                }
+
+                // Validate extension
+                const extension = file.name.split('.').pop().toLowerCase();
+                const validExtensions = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'];
+                if (!validExtensions.includes(extension)) {
+                    showModal('Invalid File', 'Invalid file extension. Please upload a valid image.', false);
                     logoInput.value = '';
                     return;
                 }
@@ -591,7 +914,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Remove logo button
     if (removeLogo) {
         removeLogo.addEventListener('click', () => {
             logoInput.value = '';
@@ -606,6 +928,10 @@ document.addEventListener('DOMContentLoaded', () => {
     if (packageSelect) {
         packageSelect.addEventListener('change', updatePricingBreakdown);
     }
-    // Initialize pricing breakdown on page load
     updatePricingBreakdown();
 });
+
+// Export for testing (optional)
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { SecurityUtils, FormRateLimiter, DomainCheckLimiter };
+}
