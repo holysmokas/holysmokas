@@ -243,8 +243,8 @@
             font-weight: 600;
             cursor: pointer;
             border: none;
+            transition: all 0.3s ease;
             text-decoration: none;
-            transition: all 0.2s;
         }
 
         .btn-primary {
@@ -254,11 +254,11 @@
 
         .btn-primary:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
 
         .btn-primary:disabled {
-            background: #9ca3af;
+            opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
@@ -268,25 +268,63 @@
             color: #374151;
         }
 
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+
         .btn-group {
             display: flex;
             gap: 12px;
-            margin-top: 20px;
             flex-wrap: wrap;
+            margin-top: 20px;
         }
 
-        /* Success State */
+        /* Help Box */
+        .help-box {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .help-box h3 {
+            color: #b45309;
+            margin-bottom: 10px;
+        }
+
+        .registrar-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .registrar-link {
+            background: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: #b45309;
+            text-decoration: none;
+            font-weight: 500;
+            border: 1px solid #fcd34d;
+        }
+
+        .registrar-link:hover {
+            background: #fef3c7;
+        }
+
+        /* Success Box */
         .success-box {
             background: linear-gradient(135deg, #d1fae5, #a7f3d0);
-            border: 2px solid #10b981;
-            border-radius: 12px;
-            padding: 30px;
+            border-radius: 16px;
+            padding: 40px;
             text-align: center;
         }
 
         .success-icon {
-            font-size: 60px;
-            margin-bottom: 15px;
+            font-size: 4rem;
+            margin-bottom: 20px;
         }
 
         .success-box h2 {
@@ -297,22 +335,29 @@
         .live-url {
             display: inline-block;
             background: white;
-            padding: 12px 24px;
-            border-radius: 8px;
-            margin-top: 15px;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.2rem;
+            color: #667eea;
+            text-decoration: none;
             font-weight: 600;
-            color: #059669;
+            margin-top: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .live-url:hover {
+            transform: scale(1.02);
         }
 
         /* Spinner */
         .spinner {
-            width: 20px;
-            height: 20px;
-            border: 3px solid #e5e7eb;
-            border-top-color: #667eea;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
             display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
         }
 
         @keyframes spin {
@@ -321,50 +366,99 @@
             }
         }
 
-        /* Help Box */
-        .help-box {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 12px;
-            padding: 20px;
-            margin-top: 20px;
+        /* Custom Toast/Popup Styles */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
         }
 
-        .help-box h3 {
-            color: #92400e;
-            margin-bottom: 10px;
-        }
-
-        .help-box p {
-            color: #78350f;
-            margin: 0;
-        }
-
-        .help-box a {
-            color: #b45309;
-            font-weight: 600;
-        }
-
-        /* Registrar Links */
-        .registrar-links {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .registrar-link {
-            padding: 8px 14px;
+        .toast {
             background: white;
-            border-radius: 6px;
-            color: #374151;
-            text-decoration: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            padding: 20px 24px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: slideIn 0.3s ease-out;
+            max-width: 400px;
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            color: #6b7280;
             font-size: 0.9rem;
         }
 
-        .registrar-link:hover {
-            background: #f9fafb;
-            color: #667eea;
+        .toast-close {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            font-size: 1.25rem;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .toast-close:hover {
+            color: #6b7280;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
         }
 
         /* Responsive */
@@ -374,17 +468,12 @@
             }
 
             .progress-steps {
-                flex-direction: column;
+                flex-wrap: wrap;
                 gap: 15px;
             }
 
             .step {
-                flex-direction: row;
-                gap: 12px;
-            }
-
-            .step-circle {
-                margin-bottom: 0;
+                flex: 0 0 45%;
             }
 
             .btn-group {
@@ -394,17 +483,26 @@
             .btn {
                 width: 100%;
             }
+
+            .toast {
+                max-width: calc(100vw - 40px);
+            }
         }
     </style>
 </head>
 
 <body>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
     <div class="container">
+        <!-- Header -->
         <div class="header">
             <h1>🌐 Connect Your Domain</h1>
             <p>Follow these steps to connect your domain</p>
         </div>
 
+        <!-- Main Card -->
         <div class="card">
             <div class="card-header">
                 <h2>📋 Domain Connection Status</h2>
@@ -413,28 +511,26 @@
                 <!-- Domain Display -->
                 <div class="domain-display">
                     <div class="domain-name" id="domainName">Loading...</div>
-                    <div style="margin-top: 10px;">
-                        <span id="statusBadge" class="status-badge status-pending">⏳ Checking...</span>
-                    </div>
+                    <span class="status-badge status-pending" id="statusBadge">⏳ Checking...</span>
                 </div>
 
                 <!-- Progress Steps -->
                 <div class="progress-steps">
                     <div class="step done" id="step1">
                         <div class="step-circle">✓</div>
-                        <div class="step-label">Website<br>Created</div>
+                        <span class="step-label">Website<br>Created</span>
                     </div>
                     <div class="step active" id="step2">
                         <div class="step-circle">2</div>
-                        <div class="step-label">Update<br>Nameservers</div>
+                        <span class="step-label">Update<br>Nameservers</span>
                     </div>
                     <div class="step" id="step3">
                         <div class="step-circle">3</div>
-                        <div class="step-label">Verify</div>
+                        <span class="step-label">Verify</span>
                     </div>
                     <div class="step" id="step4">
                         <div class="step-circle">4</div>
-                        <div class="step-label">Live!</div>
+                        <span class="step-label">Live!</span>
                     </div>
                 </div>
 
@@ -529,6 +625,62 @@
     </div>
 
     <script>
+        // ============================================
+        // TOAST NOTIFICATION SYSTEM
+        // ============================================
+        function showToast(title, message, type = 'info', duration = 5000) {
+            const container = document.getElementById('toastContainer');
+
+            const icons = {
+                success: '✅',
+                warning: '⚠️',
+                error: '❌',
+                info: 'ℹ️'
+            };
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <span class="toast-icon">${icons[type]}</span>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="closeToast(this)">&times;</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Auto-remove after duration
+            if (duration > 0) {
+                setTimeout(() => {
+                    removeToast(toast);
+                }, duration);
+            }
+
+            return toast;
+        }
+
+        function closeToast(button) {
+            const toast = button.closest('.toast');
+            removeToast(toast);
+        }
+
+        function removeToast(toast) {
+            if (toast && toast.parentNode) {
+                toast.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => {
+                    if (toast.parentNode) {
+                        toast.parentNode.removeChild(toast);
+                    }
+                }, 300);
+            }
+        }
+
+        // ============================================
+        // MAIN LOGIC
+        // ============================================
+
         // Get project ID from URL
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project_id') || urlParams.get('projectId');
@@ -646,12 +798,18 @@
                     showSuccess(data.domain);
                     updateStatus('connected', true);
                     updateSteps(true);
+                    showToast('Success!', 'Your domain is now connected.', 'success');
                 } else {
-                    alert(data.message || 'Nameservers not verified yet. Please wait and try again.');
+                    showToast(
+                        'Not Ready Yet',
+                        data.message || 'Nameservers not verified yet. Please wait and try again in a few minutes.',
+                        'warning',
+                        7000
+                    );
                 }
 
             } catch (error) {
-                alert('Error verifying. Please try again.');
+                showToast('Error', 'Could not verify connection. Please try again.', 'error');
             } finally {
                 btn.disabled = false;
                 btn.innerHTML = '🔍 Verify Connection';
@@ -673,7 +831,7 @@
         // Copy all nameservers
         function copyAllNameservers() {
             navigator.clipboard.writeText(nameservers.join('\n')).then(() => {
-                alert('Nameservers copied!');
+                showToast('Copied!', 'All nameservers copied to clipboard.', 'success', 3000);
             });
         }
     </script>

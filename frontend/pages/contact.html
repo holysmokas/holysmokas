@@ -323,14 +323,6 @@
                             </div>
                         </label>
 
-                        <!-- Option 3: No Custom Domain -->
-                        <label class="domain-option-card" id="cardNone" onclick="selectDomainCard('none')">
-                            <input type="radio" name="domainOption" value="none" id="domainOptionNone">
-                            <div class="card-content">
-                                <div class="card-title">🆓 I don't need a custom domain</div>
-                                <div class="card-desc">Use free URL: holysmokas.com/your-business-name</div>
-                            </div>
-                        </label>
                     </div>
 
                     <!-- NEW DOMAIN: Search Section -->
@@ -380,19 +372,6 @@
                                     💡 Need help? We'll walk you through it - call (415) 691-7085
                                 </p>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- NO DOMAIN: Info Section -->
-                    <div id="noDomainSection" style="display: none;">
-                        <div class="info-box info-purple">
-                            <div class="info-title">🆓 Free Subdomain Included</div>
-                            <p>Your website will be hosted at:</p>
-                            <code
-                                class="free-url-display">holysmokas.com/<span id="freeUrlPreview">your-business-name</span></code>
-                            <p style="margin-top: 0.75rem; font-size: 0.85rem;">
-                                You can always add a custom domain later for ~$12/year
-                            </p>
                         </div>
                     </div>
                 </div>
@@ -729,7 +708,6 @@
             // Hide all sections
             document.getElementById('newDomainSection').style.display = 'none';
             document.getElementById('ownDomainSection').style.display = 'none';
-            document.getElementById('noDomainSection').style.display = 'none';
 
             // Update hidden fields
             document.getElementById('domainSelectionType').value = option;
@@ -752,10 +730,6 @@
                     document.getElementById('ownDomainSection').style.display = 'block';
                     document.getElementById('isOwnDomain').value = 'true';
                     window.isOwnDomain = true;
-                    break;
-                case 'none':
-                    document.getElementById('noDomainSection').style.display = 'block';
-                    updateFreeUrlPreview();
                     break;
             }
 
@@ -805,19 +779,6 @@
             return cleaned;
         }
 
-        // Update free URL preview
-        function updateFreeUrlPreview() {
-            const businessNameInput = document.getElementById('businessName');
-            const preview = document.getElementById('freeUrlPreview');
-
-            if (businessNameInput && businessNameInput.value && preview) {
-                const slug = businessNameInput.value
-                    .toLowerCase()
-                    .replace(/[^a-z0-9]+/g, '-')
-                    .replace(/^-|-$/g, '');
-                preview.textContent = slug || 'your-business-name';
-            }
-        }
 
         // Listen for business name changes
         document.addEventListener('DOMContentLoaded', function () {

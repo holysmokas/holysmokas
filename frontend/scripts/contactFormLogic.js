@@ -574,7 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (file) {
                 // Validate file size (5MB max)
                 if (file.size > 5 * 1024 * 1024) {
-                    alert('Logo file must be less than 5MB');
+                    showModal('File Too Large', 'Logo file must be less than 5MB. Please choose a smaller file.', false);
                     logoInput.value = '';
                     return;
                 }
