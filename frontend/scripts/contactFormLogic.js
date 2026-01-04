@@ -312,47 +312,58 @@ window.checkDomain = async function () {
         const data = await response.json();
 
         if (data.available === true) {
-            const cleanedDomain = SecurityUtils.sanitizeDomain(data.cleanedDomain || domain);
-            const initialCost = data.pricing?.initialCost || data.price || 12.99;
-            const renewalCost = data.pricing?.renewalCost || data.renewalPrice || 12.99;
+            const cleanedDomain = data.cleanedDomain || cleanDomainName(domain);
 
-            // Use escapeHtml for any user-influenced content displayed in HTML
-            const safeDomain = SecurityUtils.escapeHtml(cleanedDomain);
+            // Get pricing breakdown from API
+            const registrationFee = data.pricing?.registrationFee || 12.99;
+            const setupFee = data.pricing?.setupFee || 0;
+            const initialCost = data.pricing?.initialCost || (registrationFee + setupFee);
+            const renewalFee = data.pricing?.renewalFee || 14.99;
+            const renewalSetupFee = data.pricing?.renewalSetupFee || 0;
+            const renewalCost = data.pricing?.renewalCost || (renewalFee + renewalSetupFee);
 
             domainResult.innerHTML = `
-                <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
-                        <span style="font-size: 1.5rem;">✅</span>
-                        <strong style="color: #065f46; font-size: 1.1rem;">${safeDomain} is available!</strong>
-                    </div>
-                    
-                    <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                            <span style="color: #6b7280;">Initial Registration:</span>
-                            <strong style="color: #059669; font-size: 1.1rem;">$${initialCost.toFixed(2)}</strong>
-                        </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span style="color: #6b7280;">Annual Renewal:</span>
-                            <strong style="color: #059669; font-size: 1.1rem;">$${renewalCost.toFixed(2)}/year</strong>
-                        </div>
-                    </div>
-                    
-                    <button 
-                        type="button" 
-                        class="btn btn-primary" 
-                        onclick="addDomainToForm('${cleanedDomain}', ${initialCost}, ${renewalCost})" 
-                        style="width: 100%; margin-top: 0.5rem;">
-                        Add to Form
-                    </button>
-                    
-                    <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem; margin-bottom: 0;">
-                        💡 Domain will be registered after you complete your website order
-                    </p>
+        <div style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 8px; padding: 1rem; margin-top: 1rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.75rem;">
+                <span style="font-size: 1.5rem;">✅</span>
+                <strong style="color: #065f46; font-size: 1.1rem;">${cleanedDomain} is available!</strong>
+            </div>
+            
+            <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span style="color: #6b7280; font-size: 0.9rem;">Domain Registration:</span>
+                    <span style="color: #374151;">$${registrationFee.toFixed(2)}</span>
                 </div>
-            `;
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+                    <span style="color: #6b7280; font-size: 0.9rem;">Setup & Management:</span>
+                    <span style="color: #374151;">$${setupFee.toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+                    <span style="color: #065f46; font-weight: 600;">Total (First Year):</span>
+                    <strong style="color: #059669; font-size: 1.1rem;">$${initialCost.toFixed(2)}</strong>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="color: #6b7280; font-size: 0.85rem;">Annual Renewal:</span>
+                    <span style="color: #6b7280; font-size: 0.85rem;">$${renewalCost.toFixed(2)}/year</span>
+                </div>
+            </div>
+            
+            <button 
+                type="button" 
+                class="btn btn-primary" 
+                onclick="addDomainToForm('${cleanedDomain}', ${initialCost}, ${renewalCost}, ${registrationFee}, ${setupFee})" 
+                style="width: 100%; margin-top: 0.5rem;">
+                Add to Form
+            </button>
+            
+            <p style="color: #6b7280; font-size: 0.875rem; margin-top: 0.75rem; margin-bottom: 0;">
+                💡 Domain will be registered after you complete your website order
+            </p>
+        </div>
+    `;
             domainResult.style.color = "#10b981";
             window.selectedDomain = cleanedDomain;
-            window.domainPricing = { initialCost, renewalCost };
+            window.domainPricing = { initialCost, renewalCost, registrationFee, setupFee };
         } else {
             const checkedDomain = SecurityUtils.escapeHtml(data.domain || domain);
             domainResult.innerHTML = `
@@ -388,7 +399,7 @@ window.checkDomain = async function () {
     }
 };
 
-window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
+window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0, registrationFee = 0, setupFee = 0) {
     // Sanitize domain before using
     const safeDomain = SecurityUtils.sanitizeDomain(domain);
 
@@ -418,13 +429,21 @@ window.addDomainToForm = function (domain, initialCost = 0, renewalCost = 0) {
             </div>
             
             <div style="background: white; padding: 0.75rem; border-radius: 6px; margin-bottom: 0.75rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.25rem;">
+                    <span style="color: #6b7280; font-size: 0.9rem;">Domain Registration:</span>
+                    <span style="color: #374151;">$${(registrationFee || initialCost).toFixed(2)}</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem; padding-bottom: 0.5rem; border-bottom: 1px solid #e5e7eb;">
+                    <span style="color: #6b7280; font-size: 0.9rem;">Setup & Management:</span>
+                    <span style="color: #374151;">$${(setupFee || 0).toFixed(2)}</span>
+                </div>
                 <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
-                    <span style="color: #6b7280;">Initial Registration:</span>
+                    <span style="color: #065f46; font-weight: 600;">Total (First Year):</span>
                     <strong style="color: #059669; font-size: 1.1rem;">$${initialCost.toFixed(2)}</strong>
                 </div>
                 <div style="display: flex; justify-content: space-between;">
-                    <span style="color: #6b7280;">Annual Renewal:</span>
-                    <strong style="color: #059669; font-size: 1.1rem;">$${renewalCost.toFixed(2)}/year</strong>
+                    <span style="color: #6b7280; font-size: 0.85rem;">Annual Renewal:</span>
+                    <span style="color: #6b7280; font-size: 0.85rem;">$${renewalCost.toFixed(2)}/year</span>
                 </div>
             </div>
             
