@@ -191,7 +191,7 @@ async function loadProjects(userId) {
                 <div class="empty-state">
                     <h3>No projects yet</h3>
                     <p>Your projects will appear here once they're created.</p>
-                    <a href="./contact.html" class="btn btn-primary">Start a New Project</a>
+                    <a href="./build.html" class="btn btn-primary">Start a New Project</a>
                 </div>
             `;
         }

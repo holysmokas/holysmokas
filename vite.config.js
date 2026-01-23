@@ -12,7 +12,8 @@ export default defineConfig({
                 main: resolve(__dirname, 'index.html'),
                 privacy: resolve(__dirname, 'privacy.html'),
                 terms: resolve(__dirname, 'terms.html'),
-                cookies: resolve(__dirname, 'cookies.html'),  // ← Added this line
+                cookies: resolve(__dirname, 'cookies.html'),
+                build: resolve(__dirname, 'frontend/pages/build.html'),
                 contact: resolve(__dirname, 'frontend/pages/contact.html'),
                 login: resolve(__dirname, 'frontend/pages/login.html'),
                 dashboard: resolve(__dirname, 'frontend/pages/dashboard.html'),
