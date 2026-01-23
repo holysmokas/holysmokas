@@ -213,9 +213,9 @@ window.wizardData = {
 };
 
 const packagePrices = {
-    starter: 799,
-    business: 1399,
-    shop: 1799
+    starter: 0.50,
+    business: 0.50,
+    shop: 0.50
 };
 
 const packageNames = {
