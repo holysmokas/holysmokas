@@ -2,18 +2,268 @@
 <html lang="en">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - alimi.ai</title>
     <link rel="icon" type="image/svg+xml" href="/assets/alimiai1-qFnyEQ6n.png" />
-    <!-- Load Firebase and Auth Logic -->
-
-    <!-- Load CSS -->
-
-    <!-- ✅ ADD THIS -->
     <script>window.GOOGLE_ANALYTICS_ID = 'G-ZBZWDLCJVJ';</script>
     <script src="/cookie-consent.js"></script>
+
+    <style>
+        /* Override auth container for dark theme */
+        .auth-container {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .auth-box {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .auth-box h2 {
+            text-align: center;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-size: 1.75rem;
+        }
+
+        .auth-box .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            background: rgba(16, 185, 129, 0.05);
+            border: 2px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #ffffff;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
+        }
+
+        .form-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+            accent-color: #10b981;
+        }
+
+        .remember-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .remember-row label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .forgot-link {
+            color: #10b981;
+            text-decoration: none;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .forgot-link:hover {
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .btn-login {
+            width: 100%;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+        }
+
+        .form-footer a {
+            color: #10b981;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .divider {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+            text-align: center;
+        }
+
+        .divider p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+
+        .btn-secondary-custom {
+            width: 100%;
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 0.85rem;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary-custom:hover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            color: #ffffff;
+        }
+
+        .security-note {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            margin-top: 1.5rem;
+        }
+
+        .info-box {
+            margin-top: 1.5rem;
+            padding: 1rem;
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: rgba(147, 197, 253, 0.9);
+        }
+
+        /* Modal Overrides */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.1) 0%, rgba(10, 26, 10, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.2);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            z-index: 1;
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .modal-content h3 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1.5rem;
+        }
+    </style>
   <script type="module" crossorigin src="/assets/login-9RTDDFxf.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/config-elnU3pxP.js">
   <link rel="stylesheet" crossorigin href="/assets/login-CIiezVlN.css">
@@ -21,33 +271,53 @@
 </head>
 
 <body>
+    <!-- Animated Background -->
+    <div class="page-bg"></div>
+    <div class="circuit-bg"></div>
+    <div class="light-beams">
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+    </div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Navigation -->
     <nav>
         <div class="nav-container">
             <div class="logo">
-                <a href="/" style="text-decoration: none; color: inherit;">
-                    alimi.ai - Build. Connect. Bloom.
-                    <img src="/assets/alimiai1-qFnyEQ6n.png" alt="alimiai Logo"
-                        style="height:60px; vertical-align: middle; margin-left: 5px;">
+                <a href="/">
+                    <img src="/assets/alimiai1-qFnyEQ6n.png" alt="alimi.ai" class="logo-img">
+                    alimi.ai
                 </a>
             </div>
-            <div class="nav-cta">
-                <a href="/" class="btn btn-outline">Back to Home</a>
-            </div>
-            <div class="nav-cta">
+            <div class="nav-cta" style="display: flex; gap: 1rem;">
+                <a href="/" class="btn btn-secondary">Back to Home</a>
                 <a href="/build.html" class="btn btn-primary">Contact Us</a>
             </div>
         </div>
-
-
-
     </nav>
 
     <div class="auth-container">
-        <div class="auth-box" style="max-width: 500px;">
+        <!-- Login Form -->
+        <div class="auth-box" id="loginBox">
             <h2>Client Portal Login</h2>
-            <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
-                Access your project dashboard and files
-            </p>
+            <p class="subtitle">Access your project dashboard and files</p>
 
             <form id="loginForm" onsubmit="handleLogin(event)">
                 <div class="form-group">
@@ -61,18 +331,17 @@
                         autocomplete="current-password">
                 </div>
 
-                <div class="form-group" style="display: flex; justify-content: space-between; align-items: center;">
-                    <label style="display: flex; align-items: center; gap: 0.5rem; margin: 0;">
+                <div class="remember-row">
+                    <label>
                         <input type="checkbox" name="remember">
-                        <span style="font-weight: normal;">Remember me</span>
+                        <span>Remember me</span>
                     </label>
-                    <a href="#" onclick="handlePasswordReset(); return false;"
-                        style="color: var(--primary); text-decoration: none; font-size: 0.875rem;">
+                    <a href="#" onclick="handlePasswordReset(); return false;" class="forgot-link">
                         Forgot password?
                     </a>
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;" id="loginBtn">
+                <button type="submit" class="btn-login" id="loginBtn">
                     Sign In
                 </button>
 
@@ -83,28 +352,22 @@
                 </div>
             </form>
 
-            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb; text-align: center;">
-                <p style="color: var(--gray); font-size: 0.875rem; margin-bottom: 1rem;">
-                    First time here? Create your account:
-                </p>
-                <button onclick="showRegisterForm()" class="btn btn-secondary" style="width: 100%;">
+            <div class="divider">
+                <p>First time here? Create your account:</p>
+                <button onclick="showRegisterForm()" class="btn-secondary-custom">
                     Create Account
                 </button>
             </div>
 
-            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
-                <p style="text-align: center; color: var(--gray); font-size: 0.875rem;">
-                    🔒 Secure login powered by Firebase Authentication
-                </p>
-            </div>
+            <p class="security-note">
+                🔒 Secure login powered by Firebase Authentication
+            </p>
         </div>
 
         <!-- Register Form (Hidden by default) -->
-        <div id="registerBox" class="auth-box" style="max-width: 500px; display: none;">
+        <div id="registerBox" class="auth-box" style="display: none;">
             <h2>Create Your Account</h2>
-            <p style="text-align: center; color: var(--gray); margin-bottom: 2rem;">
-                Get access to your project dashboard
-            </p>
+            <p class="subtitle">Get access to your project dashboard</p>
 
             <form id="registerForm" onsubmit="handleRegister(event)">
                 <div class="form-group">
@@ -123,7 +386,7 @@
                         autocomplete="new-password">
                 </div>
 
-                <button type="submit" class="btn btn-primary" style="width: 100%;" id="registerBtn">
+                <button type="submit" class="btn-login" id="registerBtn">
                     Create Account
                 </button>
 
@@ -133,34 +396,33 @@
                 </div>
             </form>
 
-            <div
-                style="margin-top: 1.5rem; padding: 1rem; background: #eff6ff; border-radius: 8px; font-size: 0.875rem; color: #1e40af;">
+            <div class="info-box">
                 ℹ️ You'll need to verify your email address before you can log in.
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
                 <h4>alimi.ai</h4>
-                <p>Professional websites for small businesses without monthly fees. Free hosting included. That's Cheap!
-                </p>
+                <p>Professional websites for small businesses without monthly fees. Free hosting included.</p>
             </div>
             <div class="footer-section">
                 <h4>Contact</h4>
                 <ul>
                     <li>Phone: (415) 691 - 7085</li>
-                    <li>Email: <a href="mailto:contact@holysmokas.com">Holysmokas Labs</a></li>
+                    <li>Email: contact@holysmokas.com</li>
                     <li>Hours: Mon-Fri 9am-6pm</li>
                 </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
                 <ul>
-                    <li><a href="#about">About Us</a></li>
-                    <li><a href="#portfolio">Portfolio</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="/build.html">Contact</a></li>
                     <li><a href="/privacy.html">Privacy Policy</a></li>
                     <li><a href="/terms.html">Terms of Service</a></li>
+                    <li><a href="/cookies.html">Cookie Policy</a></li>
                 </ul>
             </div>
         </div>
@@ -173,7 +435,7 @@
     <div id="authModal" class="modal">
         <div class="modal-overlay" onclick="closeAuthModal()"></div>
         <div class="modal-content">
-            <div class="modal-icon" id="authIcon">✔</div>
+            <div class="modal-icon" id="authIcon">✓</div>
             <h3 id="authTitle">Success!</h3>
             <p id="authMessage">Logging you in...</p>
             <div id="authModalButtons">
@@ -184,12 +446,12 @@
 
     <script>
         function showRegisterForm() {
-            document.querySelector('.auth-box:first-of-type').style.display = 'none';
+            document.getElementById('loginBox').style.display = 'none';
             document.getElementById('registerBox').style.display = 'block';
         }
 
         function showLoginForm() {
-            document.querySelector('.auth-box:first-of-type').style.display = 'block';
+            document.getElementById('loginBox').style.display = 'block';
             document.getElementById('registerBox').style.display = 'none';
         }
     </script>
