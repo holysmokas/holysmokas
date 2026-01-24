@@ -10,8 +10,6 @@
     <script src="/cookie-consent.js"></script>
 
 
-  <script type="module" crossorigin src="/assets/build-X_yKmpB0.js"></script>
-  <link rel="modulepreload" crossorigin href="/assets/config-elnU3pxP.js">
   <link rel="stylesheet" crossorigin href="/assets/build-CReEEYRf.css">
   <link rel="stylesheet" crossorigin href="/assets/style-Bm6i-fqz.css">
 </head>
@@ -181,18 +179,25 @@
                     <label class="form-label">Industry *</label>
                     <select class="form-input" id="industry" onchange="validateStep3()">
                         <option value="">Select your industry</option>
-                        <option value="restaurant">Restaurant / Food & Beverage</option>
-                        <option value="retail">Retail / E-commerce</option>
-                        <option value="professional">Professional Services (Law, Accounting, etc.)</option>
-                        <option value="health">Health & Wellness</option>
-                        <option value="beauty">Beauty & Salon</option>
-                        <option value="construction">Construction / Home Services</option>
-                        <option value="realestate">Real Estate</option>
-                        <option value="technology">Technology / Software</option>
-                        <option value="creative">Creative / Design Agency</option>
-                        <option value="education">Education / Training</option>
-                        <option value="nonprofit">Non-Profit / Organization</option>
-                        <option value="other">Other</option>
+                        <optgroup label="Individual / Personal">
+                            <option value="personal-brand">Personal Brand / Portfolio</option>
+                            <option value="job-seeker">Job Seeker / Career Portfolio (Online Resume)</option>
+                            <option value="content-creator">Content Creator / Influencer</option>
+                        </optgroup>
+                        <optgroup label="Business / Professional">
+                            <option value="restaurant">Restaurant / Food & Beverage</option>
+                            <option value="retail">Retail / E-commerce</option>
+                            <option value="professional">Professional Services (Law, Accounting, etc.)</option>
+                            <option value="health">Health & Wellness</option>
+                            <option value="beauty">Beauty & Salon</option>
+                            <option value="construction">Construction / Home Services</option>
+                            <option value="realestate">Real Estate</option>
+                            <option value="technology">Technology / Software</option>
+                            <option value="creative">Creative / Design Agency</option>
+                            <option value="education">Education / Training</option>
+                            <option value="nonprofit">Non-Profit / Organization</option>
+                            <option value="other">Other</option>
+                        </optgroup>
                     </select>
                 </div>
 
@@ -487,7 +492,9 @@
                     </div>
                     <div class="review-item">
                         <span class="review-label">Email</span>
-                        <span class="review-value" id="reviewEmail">john@example.com</span>
+                        <span class="review-value" id="reviewEmail"><a href="/cdn-cgi/l/email-protection"
+                                class="__cf_email__"
+                                data-cfemail="b7ddd8dfd9f7d2cfd6dac7dbd299d4d8da">[email&#160;protected]</a></span>
                     </div>
                 </div>
 
@@ -524,9 +531,3 @@
                     <a href="/" class="btn-wizard">Return to Homepage</a>
                 </div>
             </div>
-        </div>
-    </div>
-
-</body>
-
-</html>
