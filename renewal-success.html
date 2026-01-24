@@ -7,34 +7,30 @@
     <title>Domain Renewed - alimi.ai</title>
     <link rel="icon" type="image/svg+xml" href="/assets/alimiai1-qFnyEQ6n.png" />
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        .renewal-container {
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 20px;
+            padding: 2rem;
+            position: relative;
+            z-index: 10;
         }
 
-        .container {
-            background: white;
-            padding: 50px 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        .renewal-card {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 3rem;
+            border-radius: 24px;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.15);
             max-width: 550px;
             width: 100%;
             text-align: center;
-            animation: slideUp 0.5s ease-out;
+            animation: cardAppear 0.5s ease-out;
         }
 
-        @keyframes slideUp {
+        @keyframes cardAppear {
             from {
                 opacity: 0;
                 transform: translateY(30px);
@@ -49,182 +45,254 @@
         .success-icon {
             width: 100px;
             height: 100px;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0 auto 30px;
-            font-size: 50px;
-            color: white;
-            animation: bounce 0.6s ease-out;
+            margin: 0 auto 2rem;
+            font-size: 3rem;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.4);
+            animation: successPulse 2s ease-in-out infinite;
         }
 
-        @keyframes bounce {
+        @keyframes successPulse {
 
             0%,
             100% {
-                transform: scale(1);
+                box-shadow: 0 0 60px rgba(16, 185, 129, 0.4);
             }
 
             50% {
-                transform: scale(1.1);
+                box-shadow: 0 0 80px rgba(16, 185, 129, 0.6);
             }
         }
 
         h1 {
-            color: #059669;
-            margin-bottom: 15px;
-            font-size: 32px;
+            color: #10b981;
+            margin-bottom: 0.5rem;
+            font-size: 2rem;
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
         }
 
         .subtitle {
-            color: #6c757d;
-            margin-bottom: 35px;
-            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
         }
 
         .domain-box {
-            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
-            padding: 30px;
-            border-radius: 15px;
-            margin: 30px 0;
-            border: 2px solid #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            padding: 1.5rem 2rem;
+            border-radius: 16px;
+            margin: 1.5rem 0;
+            border: 2px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .domain-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
         }
 
         .domain-name {
-            color: #059669;
-            font-size: 28px;
-            font-weight: bold;
-            margin: 10px 0;
+            color: #10b981;
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
             word-break: break-word;
+            text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .domain-status {
+            color: #10b981;
+            font-weight: 600;
+            margin-top: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
         }
 
         .info-box {
-            background: #f9fafb;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 25px 0;
-            text-align: left;
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            padding: 1.25rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
         }
 
         .info-item {
             display: flex;
             justify-content: space-between;
-            margin: 12px 0;
-            padding: 8px 0;
-            border-bottom: 1px solid #e5e7eb;
+            margin: 0.75rem 0;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(16, 185, 129, 0.1);
         }
 
         .info-item:last-child {
             border-bottom: none;
+            margin-bottom: 0;
         }
 
         .info-label {
-            color: #6b7280;
+            color: rgba(255, 255, 255, 0.6);
             font-weight: 500;
         }
 
         .info-value {
-            color: #111827;
+            color: #ffffff;
             font-weight: 600;
         }
 
+        .info-value.status {
+            color: #10b981;
+        }
+
         .next-steps {
-            background: #eff6ff;
+            background: rgba(59, 130, 246, 0.1);
             border-left: 4px solid #3b82f6;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 25px 0;
+            padding: 1.25rem;
+            border-radius: 0 12px 12px 0;
+            margin: 1.5rem 0;
             text-align: left;
         }
 
         .next-steps h3 {
-            color: #1e40af;
-            margin-bottom: 10px;
+            color: #60a5fa;
+            margin-bottom: 0.75rem;
+            font-size: 1.1rem;
         }
 
         .next-steps p {
-            color: #1e3a8a;
+            color: rgba(147, 197, 253, 0.9);
             line-height: 1.6;
+            margin: 0;
         }
 
-        .button {
+        .btn-dashboard {
             display: inline-block;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
-            padding: 15px 30px;
+            padding: 1rem 2.5rem;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 600;
-            margin-top: 30px;
-            transition: transform 0.2s;
+            margin-top: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
         }
 
-        .button:hover {
+        .btn-dashboard:hover {
             transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
         }
 
         .footer-note {
-            margin-top: 30px;
-            color: #6c757d;
-            font-size: 14px;
+            margin-top: 2rem;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        /* Confetti styles */
+        .confetti {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: fall 3s linear forwards;
+        }
+
+        @keyframes fall {
+            to {
+                transform: translateY(100vh) rotate(360deg);
+                opacity: 0;
+            }
         }
     </style>
+  <link rel="stylesheet" crossorigin href="/assets/style-Bm6i-fqz.css">
 </head>
 
 <body>
-    <div class="container">
-        <div class="success-icon">✅</div>
-        <h1>Domain Renewed Successfully!</h1>
-        <p class="subtitle">Your website will continue running without interruption</p>
+    <!-- Animated Background -->
+    <div class="page-bg"></div>
+    <div class="circuit-bg"></div>
+    <div class="light-beams">
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+    </div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
 
-        <div class="domain-box">
-            <p style="color: #6b7280; font-size: 14px; margin-bottom: 5px;">Your Domain</p>
-            <div class="domain-name" id="domainName">Loading...</div>
-            <p style="color: #059669; font-weight: 600; margin-top: 10px;">✓ Active for 1 More Year</p>
-        </div>
+    <div class="renewal-container">
+        <div class="renewal-card">
+            <div class="success-icon">✅</div>
+            <h1>Domain Renewed Successfully!</h1>
+            <p class="subtitle">Your website will continue running without interruption</p>
 
-        <div class="info-box">
-            <div class="info-item">
-                <span class="info-label">Renewed For:</span>
-                <span class="info-value">1 Year</span>
+            <div class="domain-box">
+                <p class="domain-label">Your Domain</p>
+                <div class="domain-name" id="domainName">Loading...</div>
+                <p class="domain-status">✓ Active for 1 More Year</p>
             </div>
-            <div class="info-item">
-                <span class="info-label">Next Renewal:</span>
-                <span class="info-value" id="nextRenewal">Loading...</span>
+
+            <div class="info-box">
+                <div class="info-item">
+                    <span class="info-label">Renewed For:</span>
+                    <span class="info-value">1 Year</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Next Renewal:</span>
+                    <span class="info-value" id="nextRenewal">Loading...</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Status:</span>
+                    <span class="info-value status">✓ Active</span>
+                </div>
             </div>
-            <div class="info-item">
-                <span class="info-label">Status:</span>
-                <span class="info-value" style="color: #10b981;">✓ Active</span>
+
+            <div class="next-steps">
+                <h3>📌 What's Next?</h3>
+                <p>Nothing! Your domain is active and your website will continue working normally. We'll send you a
+                    reminder 30 days before your next renewal date.</p>
             </div>
+
+            <a href="/login.html" class="btn-dashboard">
+                Go to Dashboard
+            </a>
+
+            <p class="footer-note">
+                Thank you for being an alimi.ai client! 🎉<br>
+                Questions? Call us at (415) 691-7085
+            </p>
         </div>
-
-        <div class="next-steps">
-            <h3>📌 What's Next?</h3>
-            <p>Nothing! Your domain is active and your website will continue working normally. We'll send you a reminder
-                30 days before your next renewal date.</p>
-        </div>
-
-        <a href="login.html" class="button">
-            Go to Dashboard
-        </a>
-
-        <p class="footer-note">
-            Thank you for being a alimi.ai client! 🎉<br>
-            Questions? Call us at (415) 691-7085
-        </p>
     </div>
 
     <script>
-        // Get domain from URL
         const urlParams = new URLSearchParams(window.location.search);
         const domain = urlParams.get('domain');
 
         if (domain) {
             document.getElementById('domainName').textContent = decodeURIComponent(domain);
 
-            // Calculate next renewal date (1 year from now)
             const nextRenewal = new Date();
             nextRenewal.setFullYear(nextRenewal.getFullYear() + 1);
             document.getElementById('nextRenewal').textContent = nextRenewal.toLocaleDateString('en-US', {
@@ -237,7 +305,7 @@
             document.getElementById('nextRenewal').textContent = 'Check your email';
         }
 
-        // Confetti effect (optional - makes it fun!)
+        // Confetti effect
         setTimeout(() => {
             for (let i = 0; i < 50; i++) {
                 createConfetti();
@@ -246,30 +314,13 @@
 
         function createConfetti() {
             const confetti = document.createElement('div');
-            confetti.style.position = 'fixed';
-            confetti.style.width = '10px';
-            confetti.style.height = '10px';
-            confetti.style.background = ['#10b981', '#059669', '#667eea', '#764ba2'][Math.floor(Math.random() * 4)];
+            confetti.className = 'confetti';
             confetti.style.left = Math.random() * 100 + 'vw';
             confetti.style.top = '-10px';
-            confetti.style.borderRadius = '50%';
-            confetti.style.pointerEvents = 'none';
-            confetti.style.animation = 'fall 3s linear';
+            confetti.style.background = ['#10b981', '#059669', '#34d399', '#f59e0b'][Math.floor(Math.random() * 4)];
             document.body.appendChild(confetti);
-
             setTimeout(() => confetti.remove(), 3000);
         }
-
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes fall {
-                to {
-                    transform: translateY(100vh) rotate(360deg);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 
