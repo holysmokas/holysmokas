@@ -6,17 +6,291 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Payment Successful - alimi.ai</title>
     <link rel="icon" type="image/svg+xml" href="/assets/alimiai1-qFnyEQ6n.png" />
+    <style>
+        .success-container {
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .success-card {
+            max-width: 700px;
+            text-align: center;
+        }
+
+        .success-icon {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 3.5rem;
+            color: #0a1a0a;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.4);
+            animation: successPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes successPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 60px rgba(16, 185, 129, 0.4);
+                transform: scale(1);
+            }
+
+            50% {
+                box-shadow: 0 0 80px rgba(16, 185, 129, 0.6);
+                transform: scale(1.02);
+            }
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #10b981;
+            margin-bottom: 1rem;
+            text-shadow: 0 0 30px rgba(16, 185, 129, 0.3);
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        /* Status Card */
+        .status-card {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.05) 100%);
+            backdrop-filter: blur(20px);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-card h2 {
+            color: #10b981;
+            font-size: 1.4rem;
+            margin-bottom: 1.25rem;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .step-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-icon {
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+
+        .step-item.active {
+            color: #10b981;
+        }
+
+        .step-item.active strong {
+            color: #10b981;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border-radius: 12px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box-blue {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .info-box-blue p {
+            color: rgba(147, 197, 253, 0.9);
+            margin: 0;
+        }
+
+        .info-box-blue strong {
+            color: #60a5fa;
+        }
+
+        .info-box-yellow {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .info-box-yellow h3 {
+            color: #fbbf24;
+            margin-bottom: 0.5rem;
+            font-size: 1.1rem;
+        }
+
+        .info-box-yellow p {
+            color: rgba(253, 224, 71, 0.9);
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        /* Buttons */
+        .button-group {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 2rem;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .btn-outline-light {
+            background: transparent;
+            color: rgba(255, 255, 255, 0.8);
+            border: 2px solid rgba(16, 185, 129, 0.3);
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-outline-light:hover {
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            color: #ffffff;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            margin-top: 2.5rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
+        }
+
+        .contact-section p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        .contact-section a {
+            color: #10b981;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-section a:hover {
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        /* Website Ready Card */
+        .ready-card {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.15) 0%, rgba(5, 150, 105, 0.08) 100%);
+            border: 2px solid #10b981;
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 0 40px rgba(16, 185, 129, 0.2);
+        }
+
+        .ready-card h2 {
+            color: #10b981;
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .ready-card p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+        }
+
+        .live-url {
+            display: inline-block;
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            transition: all 0.3s ease;
+        }
+
+        .live-url:hover {
+            background: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+        }
+    </style>
   <link rel="stylesheet" crossorigin href="/assets/style-Bm6i-fqz.css">
 </head>
 
 <body>
+    <!-- Animated Background -->
+    <div class="page-bg"></div>
+    <div class="circuit-bg"></div>
+    <div class="light-beams">
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+    </div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Navigation -->
     <nav>
         <div class="nav-container">
             <div class="logo">
-                <a href="/" style="text-decoration: none; color: inherit;">
-                    alimi.ai - Build. Connect. Bloom.
-                    <img src="/assets/alimiai1-qFnyEQ6n.png" alt="Woman looking surprised"
-                        style="height:60px; vertical-align: middle; margin-left: 5px;">
+                <a href="/">
+                    <img src="/assets/alimiai1-qFnyEQ6n.png" alt="alimi.ai" class="logo-img">
+                    alimi.ai
                 </a>
             </div>
             <div class="nav-cta">
@@ -25,84 +299,61 @@
         </div>
     </nav>
 
-    <div class="container" style="min-height: 70vh; display: flex; align-items: center; justify-content: center;">
-        <div style="max-width: 700px; text-align: center;">
-            <div
-                style="width: 120px; height: 120px; background: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 2rem; font-size: 4rem; color: white;">
-                ✓
-            </div>
+    <div class="success-container">
+        <div class="success-card">
+            <div class="success-icon">✓</div>
 
-            <h1 style="font-size: 2.5rem; color: var(--primary); margin-bottom: 1rem;">
-                🎉 Payment Successful!
-            </h1>
-
-            <p style="font-size: 1.2rem; color: var(--gray); margin-bottom: 2rem;">
-                Thank you for your payment! Your website is now being generated.
-            </p>
+            <h1>🎉 Payment Successful!</h1>
+            <p class="subtitle">Thank you for your payment! Your website is now being generated.</p>
 
             <!-- Generation Status -->
-            <div id="generationStatus"
-                style="background: #f0fdf4; border: 2px solid #10b981; border-radius: 12px; padding: 2rem; margin-bottom: 2rem;">
-                <h2 style="color: #065f46; font-size: 1.5rem; margin-bottom: 1rem;">
-                    🤖 What's Happening Now
-                </h2>
-                <div style="text-align: left; margin: 0 auto; max-width: 500px;">
-                    <p id="step1"
-                        style="color: #6b7280; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">⚡</span>
-                        <span>Our Team is generating your custom website</span>
-                    </p>
-
-                    <p id="step2"
-                        style="color: #6b7280; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">🚀</span>
-                        <span>Deploying to live hosting</span>
-                    </p>
-                    <p id="step3" style="color: #6b7280; display: flex; align-items: center; gap: 0.5rem;">
-                        <span style="font-size: 1.5rem;">📧</span>
-                        <span>You'll receive an email when it's ready</span>
-                    </p>
+            <div id="generationStatus" class="status-card">
+                <h2>🤖 What's Happening Now</h2>
+                <div id="step1" class="step-item">
+                    <span class="step-icon">⚡</span>
+                    <span>Our Team is generating your custom website</span>
+                </div>
+                <div id="step2" class="step-item">
+                    <span class="step-icon">🚀</span>
+                    <span>Deploying to live hosting</span>
+                </div>
+                <div id="step3" class="step-item">
+                    <span class="step-icon">📧</span>
+                    <span>You'll receive an email when it's ready</span>
                 </div>
             </div>
 
-            <div style="background: #eff6ff; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                <p style="color: #1e40af; margin-bottom: 0;">
-                    ⏱️ <strong>Estimated Time:</strong> 5-15 minutes
-                </p>
+            <div class="info-box info-box-blue">
+                <p>⏱️ <strong>Estimated Time:</strong> 5-15 minutes</p>
             </div>
 
-            <div style="background: #fef3c7; border-radius: 12px; padding: 1.5rem; margin-bottom: 2rem;">
-                <h3 style="color: #92400e; margin-bottom: 0.5rem;">📧 Check Your Email</h3>
-                <p style="color: #78350f; margin-bottom: 0; font-size: 0.95rem;">
-                    We've sent a confirmation to your email. You'll receive another email with your live website URL
-                    once generation is complete.
-                </p>
+            <div class="info-box info-box-yellow">
+                <h3>📧 Check Your Email</h3>
+                <p>We've sent a confirmation to your email. You'll receive another email with your live website URL
+                    once generation is complete.</p>
             </div>
 
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                <a href="/login.html" class="btn btn-primary"
-                    style="font-size: 1.1rem; padding: 1rem 2rem;">
+            <div class="button-group">
+                <a href="/login.html" class="btn-success">
                     📊 Go to Dashboard
                 </a>
-                <a href="/" class="btn btn-secondary" style="font-size: 1.1rem; padding: 1rem 2rem;">
+                <a href="/" class="btn-outline-light">
                     🏠 Back to Home
                 </a>
             </div>
 
-            <div style="margin-top: 3rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
-                <p style="color: var(--gray); font-size: 0.9rem;">
-                    Questions? Contact us at <a href="tel:4156917085" style="color: var(--primary);">(415) 691-7085</a>
-                </p>
+            <div class="contact-section">
+                <p>Questions? Contact us at <a href="tel:4156917085">(415) 691-7085</a></p>
             </div>
         </div>
     </div>
 
+    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
                 <h4>alimi.ai</h4>
-                <p>Professional websites for small businesses without monthly fees. Free hosting included. That's Cheap!
-                </p>
+                <p>Professional websites for small businesses without monthly fees. Free hosting included.</p>
             </div>
             <div class="footer-section">
                 <h4>Contact</h4>
@@ -111,13 +362,13 @@
                     <li>Email: contact@holysmokas.com</li>
                     <li>Hours: Mon-Fri 9am-6pm</li>
                 </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Legal</h4>
                 <ul>
-                    <li><a href="/#about">About Us</a></li>
-                    <li><a href="/#portfolio">Portfolio</a></li>
-                    <li><a href="/#pricing">Pricing</a></li>
-                    <li><a href="/build.html">Contact</a></li>
                     <li><a href="/privacy.html">Privacy Policy</a></li>
                     <li><a href="/terms.html">Terms of Service</a></li>
+                    <li><a href="/cookies.html">Cookie Policy</a></li>
                 </ul>
             </div>
         </div>
@@ -127,47 +378,34 @@
     </footer>
 
     <script>
-        // Get API URL based on environment
         const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8080'
             : 'https://api.holysmokas.com';
 
-        // Get URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const sessionId = urlParams.get('session_id');
         const projectId = urlParams.get('project_id');
         const bypassed = urlParams.get('bypassed');
 
-        console.log('📋 Payment success page loaded');
-        console.log('   Session ID:', sessionId);
-        console.log('   Project ID:', projectId);
-        console.log('   Bypassed:', bypassed);
-
-        // Trigger generation automatically when page loads
         async function triggerGeneration() {
             if (!projectId) {
-                console.error('❌ No project ID found in URL');
+                console.error('No project ID found in URL');
                 return;
             }
 
-            console.log('🚀 Triggering website generation...');
-
-            // Update UI to show generation started
             const step1 = document.getElementById('step1');
             if (step1) {
                 step1.innerHTML = `
-                    <span style="font-size: 1.5rem;">⏳</span>
+                    <span class="step-icon">⏳</span>
                     <span><strong>Generating your website...</strong></span>
                 `;
-                step1.style.color = '#059669';
+                step1.classList.add('active');
             }
 
             try {
                 const response = await fetch(`${API_URL}/trigger-generation`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
+                    headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         projectId: projectId,
                         sessionId: sessionId
@@ -175,42 +413,34 @@
                 });
 
                 const data = await response.json();
-                console.log('📡 Trigger response:', data);
 
                 if (data.success) {
                     if (data.alreadyGenerated) {
-                        // Already done - show link
                         const statusDiv = document.getElementById('generationStatus');
                         statusDiv.innerHTML = `
-                            <h2 style="color: #065f46; font-size: 1.5rem; margin-bottom: 1rem;">
-                                ✅ Your Website is Ready!
-                            </h2>
-                            <p style="margin-bottom: 1rem;">Your website has already been generated.</p>
-                            <a href="${data.liveUrl}" target="_blank" class="btn btn-primary">
-                                🌐 View Your Website
-                            </a>
+                            <div class="ready-card" style="margin: 0;">
+                                <h2>✅ Your Website is Ready!</h2>
+                                <p>Your website has already been generated.</p>
+                                <a href="${data.liveUrl}" target="_blank" class="live-url">
+                                    🌐 View Your Website
+                                </a>
+                            </div>
                         `;
                     } else {
-                        console.log('✅ Generation started successfully');
-                        // Update step 1 to show success
                         if (step1) {
                             step1.innerHTML = `
-                                <span style="font-size: 1.5rem;">✅</span>
+                                <span class="step-icon">✅</span>
                                 <span><strong>Generation started!</strong> This takes 5-15 minutes.</span>
                             `;
                         }
                     }
-                } else {
-                    console.error('❌ Trigger failed:', data.error);
                 }
             } catch (error) {
-                console.error('❌ Error triggering generation:', error);
+                console.error('Error triggering generation:', error);
             }
         }
 
-        // Auto-trigger on page load
         window.addEventListener('DOMContentLoaded', () => {
-            // Small delay to ensure page is fully loaded
             setTimeout(triggerGeneration, 1000);
         });
     </script>
