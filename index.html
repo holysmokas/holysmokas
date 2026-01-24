@@ -2,28 +2,49 @@
 <html lang="en">
 
 <head>
-
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>alimi.ai - Build. Connect. Bloom</title>
   <link rel="icon" type="image/svg+xml" href="/frontend/img/alimiai1.png" />
-  <script type="module">
-    import '/frontend/css/style.css';
-  </script>
-
-  <!-- ✅ ADD THIS -->
+  <link rel="stylesheet" href="/frontend/css/style.css">
   <script>window.GOOGLE_ANALYTICS_ID = 'G-ZBZWDLCJVJ';</script>
   <script src="/cookie-consent.js"></script>
 </head>
 
 <body>
+  <!-- Animated Background -->
+  <div class="page-bg"></div>
+  <div class="circuit-bg"></div>
+  <div class="light-beams">
+    <div class="beam"></div>
+    <div class="beam"></div>
+    <div class="beam"></div>
+    <div class="beam"></div>
+    <div class="beam"></div>
+  </div>
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+  <div class="orb orb-1"></div>
+  <div class="orb orb-2"></div>
+  <div class="orb orb-3"></div>
+
+  <!-- Navigation -->
   <nav>
     <div class="nav-container">
       <div class="logo">
-        <a href="/" style="text-decoration: none; color: inherit;">
-          alimi.ai - Build. Connect. Bloom.
-          <img src="/frontend/img/alimiai1.png" alt="Woman looking surprised"
-            style="height:60px; vertical-align: middle; margin-left: 5px;">
+        <a href="/">
+          <img src="/frontend/img/alimiai1.png" alt="alimi.ai" class="logo-img">
+          alimi.ai
         </a>
       </div>
       <ul class="nav-links">
@@ -39,23 +60,27 @@
     </div>
   </nav>
 
-  <div id="home-page">
-    <section class="hero">
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Hero Section -->
+    <section id="home" class="hero">
       <h1>Professional Websites for<br>Small Businesses</h1>
       <div class="slogan">Build. Connect. Bloom.</div>
       <div class="subheadline">Pay Once. Own Forever. No Subscriptions.</div>
       <p>Perfect for small businesses, local shops, and service providers. Get a complete professional website
         with your domain included for one simple payment - hosting included free.</p>
-      <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
+      <div class="hero-buttons">
         <a href="#pricing" class="btn btn-primary">See Pricing</a>
-        <a href="/build.html" class="btn btn-secondary">Start Your Project</a>
+        <a href="/build.html" class="btn btn-secondary">Start Your Project →</a>
       </div>
     </section>
 
+    <!-- Value Banner -->
     <div class="value-banner">
       ✨ Small Business Special: One Payment = Website + Domain + Free Hosting | Zero Monthly Fees ✨
     </div>
 
+    <!-- Pricing Section -->
     <section id="pricing" class="pricing-model">
       <div class="container">
         <div class="section-title">
@@ -82,7 +107,7 @@
           <div class="pricing-card featured">
             <div class="pricing-icon">💎</div>
             <h3>Business Website</h3>
-            <div class="price">$1399</div>
+            <div class="price">$1,399</div>
             <div class="price-note">One-time payment</div>
             <ul class="pricing-features">
               <li>Multi-page professional site</li>
@@ -97,7 +122,7 @@
             <a href="/build.html" class="btn btn-primary">Get Started</a>
           </div>
           <div class="pricing-card">
-            <div class="pricing-icon">🪙</div>
+            <div class="pricing-icon">🛒</div>
             <h3>Small Shop</h3>
             <div class="price">$1,799</div>
             <div class="price-note">One-time payment</div>
@@ -113,31 +138,30 @@
             <a href="/build.html" class="btn btn-outline">Get Started</a>
           </div>
         </div>
-        <div
-          style="text-align: center; padding: 2rem; background: white; border-radius: 12px; max-width: 900px; margin: 2rem auto 0;">
-          <h3 style="margin-bottom: 1rem; color: var(--dark);">🏢 Need E-Commerce or Enterprise Solutions?
-          </h3>
-          <p style="color: var(--gray); margin-bottom: 1rem;">For full e-commerce platforms with shopping
-            carts, inventory management, or enterprise-level websites, we'll need cloud hosting. These
-            projects are custom-quoted and include cloud usage fees based on your traffic and storage needs.
-          </p>
-          <p style="color: var(--gray); margin-bottom: 1rem;"><strong style="color: var(--primary);">Starting
-              at $5,999</strong> one-time + cloud hosting fees (typically $15-50/month depending on usage)
-          </p>
-          <a href="/build.html" class="btn btn-primary">Request Custom Quote</a>
+
+        <!-- Enterprise Box -->
+        <div class="info-box-dark">
+          <h3>🏢 Need E-Commerce or Enterprise Solutions?</h3>
+          <p>For full e-commerce platforms with shopping carts, inventory management, or enterprise-level
+            websites, we'll need cloud hosting. These projects are custom-quoted and include cloud usage
+            fees based on your traffic and storage needs.</p>
+          <p><strong>Starting at $5,999</strong> one-time + cloud hosting fees (typically $15-50/month
+            depending on usage)</p>
+          <a href="/build.html" class="btn btn-primary" style="margin-top: 1rem;">Request Custom Quote</a>
         </div>
-        <div
-          style="text-align: center; padding: 2rem; background: var(--light); border-radius: 12px; max-width: 800px; margin: 2rem auto 0;">
-          <h3 style="margin-bottom: 1rem; color: var(--dark);">🛠️ Need Updates Later?</h3>
-          <p style="color: var(--gray); margin-bottom: 1rem;">We're here when you need us! Our hourly
-            maintenance rate is <strong style="color: var(--primary);">$75/hour</strong> for any updates,
-            changes, or additions to your website.</p>
-          <p style="color: var(--gray); font-size: 0.95rem;"><strong>Domain Renewal:</strong> After your first
+
+        <!-- Updates Box -->
+        <div class="info-box-dark">
+          <h3>🛠️ Need Updates Later?</h3>
+          <p>We're here when you need us! Our hourly maintenance rate is <strong>$75/hour</strong> for any
+            updates, changes, or additions to your website.</p>
+          <p style="font-size: 0.9rem; margin-top: 0.5rem;"><strong>Domain Renewal:</strong> After your first
             year, you'll pay your domain provider directly for annual renewal (price varies/year)</p>
         </div>
       </div>
     </section>
 
+    <!-- How It Works -->
     <section class="how-it-works">
       <div class="container">
         <div class="section-title">
@@ -153,8 +177,8 @@
           <div class="step">
             <div class="step-number">2</div>
             <h3>We Build It</h3>
-            <p>Our team creates your custom website and registers your domain - one-time payment +
-              your domain fee.</p>
+            <p>Our team creates your custom website and registers your domain - one-time payment + your
+              domain fee.</p>
           </div>
           <div class="step">
             <div class="step-number">3</div>
@@ -171,53 +195,44 @@
       </div>
     </section>
 
+    <!-- Why Us -->
     <section class="why-us">
       <div class="container">
         <div class="section-title">
-          <h2 style="color: white;">Why Choose alimi.ai?</h2>
-          <p style="color: rgba(255,255,255,0.9);">Built for small businesses who want to own their website
-          </p>
+          <h2>Why Choose alimi.ai?</h2>
+          <p>Built for small businesses who want to own their website</p>
         </div>
         <div class="benefits-grid">
           <div class="benefit">
             <div class="benefit-icon">💰</div>
             <h3>No Monthly Fees</h3>
-            <p>Pay once, own forever. No subscriptions, no hosting bills, no surprises.</p>
+            <p>Pay once and own your website forever. No recurring charges, no surprise bills.</p>
           </div>
           <div class="benefit">
-            <div class="benefit-icon">🚀</div>
+            <div class="benefit-icon">🎁</div>
             <h3>Free Hosting</h3>
-            <p>Your website is hosted free forever on fast, reliable infrastructure.</p>
+            <p>We include hosting at no extra cost. Your site stays live without paying hosting fees.</p>
           </div>
           <div class="benefit">
-            <div class="benefit-icon">🎨</div>
-            <h3>Custom Design</h3>
-            <p>Every website is built for your brand - no cookie-cutter templates.</p>
+            <div class="benefit-icon">⚡</div>
+            <h3>Fast & Secure</h3>
+            <p>Modern technology ensures your site loads fast and includes SSL security for trust.</p>
           </div>
           <div class="benefit">
             <div class="benefit-icon">📱</div>
             <h3>Mobile Ready</h3>
-            <p>Looks great on phones, tablets, and desktops. Responsive by default.</p>
-          </div>
-          <div class="benefit">
-            <div class="benefit-icon">🔒</div>
-            <h3>SSL Secured</h3>
-            <p>Every site includes free SSL certificate for secure HTTPS connections.</p>
-          </div>
-          <div class="benefit">
-            <div class="benefit-icon">⚡</div>
-            <h3>Fast Support</h3>
-            <p>Need changes? We're here at $75/hr whenever you need updates.</p>
+            <p>Every website looks perfect on phones, tablets, and desktops. Responsive by default.</p>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Portfolio -->
     <section id="portfolio" class="portfolio">
       <div class="container">
         <div class="section-title">
           <h2>Our Work</h2>
-          <p>See what we've built for other small businesses</p>
+          <p>Real websites we've built for real businesses</p>
         </div>
       </div>
       <div class="portfolio-grid">
@@ -299,72 +314,70 @@
             </div>
           </div>
         </a>
-
       </div>
+    </section>
 
-  </div>
-  </section>
-
-  <section id="about" class="about">
-    <div class="container">
-      <div class="section-title">
-        <h2>About alimi.ai</h2>
-        <p>Affordable web design for small businesses, with enterprise options when you need them</p>
-      </div>
-      <div class="about-content">
-        <div class="about-text">
-          <h3>Small Business Websites, Done Right</h3>
-          <p>We started alimi.ai specifically for small businesses who need a professional online
-            presence without getting trapped in expensive monthly contracts or complex hosting
-            arrangements.</p>
-          <p>Most small businesses don't need fancy cloud infrastructure - you just need a great-looking,
-            fast website that shows up on Google. That's why our standard packages include free hosting
-            on reliable infrastructure. You pay once for the website, own it forever, and never worry
-            about hosting bills.</p>
-          <p>For businesses that do need more - like full e-commerce platforms with shopping carts and
-            inventory management, or enterprise solutions with advanced features - we've got you covered
-            too. We'll build on cloud infrastructure with transparent, usage-based pricing. No
-            surprises, no hidden fees.</p>
-          <a href="/build.html" class="btn btn-primary">Own Your Website Today</a>
+    <!-- About -->
+    <section id="about" class="about">
+      <div class="container">
+        <div class="section-title">
+          <h2>About alimi.ai</h2>
+          <p>Affordable web design for small businesses, with enterprise options when you need them</p>
         </div>
-        <div class="about-stats">
-          <div class="stat">
-            <div class="stat-number">FREE</div>
-            <div class="stat-label">Hosting Included</div>
+        <div class="about-content">
+          <div class="about-text">
+            <h3>Small Business Websites, Done Right</h3>
+            <p>We started alimi.ai specifically for small businesses who need a professional online
+              presence without getting trapped in expensive monthly contracts or complex hosting
+              arrangements.</p>
+            <p>Most small businesses don't need fancy cloud infrastructure - you just need a great-looking,
+              fast website that shows up on Google. That's why our standard packages include free hosting
+              on reliable infrastructure. You pay once for the website, own it forever, and never worry
+              about hosting bills.</p>
+            <p>For businesses that do need more - like full e-commerce platforms with shopping carts and
+              inventory management, or enterprise solutions with advanced features - we've got you covered
+              too. We'll build on cloud infrastructure with transparent, usage-based pricing. No
+              surprises, no hidden fees.</p>
+            <a href="/build.html" class="btn btn-primary" style="margin-top: 1rem;">Own Your Website
+              Today</a>
           </div>
-          <div class="stat">
-            <div class="stat-number">150+</div>
-            <div class="stat-label">Happy Clients</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">100%</div>
-            <div class="stat-label">Ownership</div>
-          </div>
-          <div class="stat">
-            <div class="stat-number">$75/hr</div>
-            <div class="stat-label">Optional Updates</div>
+          <div class="about-stats">
+            <div class="stat">
+              <div class="stat-number">FREE</div>
+              <div class="stat-label">Hosting Included</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">150+</div>
+              <div class="stat-label">Happy Clients</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">100%</div>
+              <div class="stat-label">Ownership</div>
+            </div>
+            <div class="stat">
+              <div class="stat-number">$75/hr</div>
+              <div class="stat-label">Optional Updates</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
   </div>
 
-
-
+  <!-- Footer -->
   <footer>
     <div class="footer-content">
       <div class="footer-section">
         <h4>alimi.ai</h4>
-        <p>Professional websites for small businesses without monthly fees. Free hosting included. That's Cheap!
-        </p>
-        <p style="margin-top: 1rem; color: var(--accent); font-weight: bold;">💰 No Monthly Hosting Fees!</p>
+        <p>Professional websites for small businesses without monthly fees. Free hosting included. That's
+          Cheap!</p>
+        <p class="footer-accent">💰 No Monthly Hosting Fees!</p>
       </div>
       <div class="footer-section">
         <h4>Small Business Packages</h4>
         <ul>
           <li><a href="#pricing">Starter Website - $799</a></li>
-          <li><a href="#pricing">Business Website - $1399</a></li>
+          <li><a href="#pricing">Business Website - $1,399</a></li>
           <li><a href="#pricing">Small Shop - $1,799</a></li>
           <li><a href="#pricing">Enterprise/E-Commerce - Custom</a></li>
           <li><a href="#pricing">Website Updates - $75/hr</a></li>
@@ -393,11 +406,9 @@
       </div>
     </div>
     <div class="footer-bottom">
-      <p>&copy; 2025 alimi.ai. All rights reserved. | No Monthly Fees. No Subscriptions. Just Great Websites.
-      </p>
+      <p>&copy; 2025 alimi.ai. All rights reserved. | No Monthly Fees. No Subscriptions. Just Great Websites.</p>
     </div>
   </footer>
-
 </body>
 
 </html>
