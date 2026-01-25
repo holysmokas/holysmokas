@@ -95,13 +95,6 @@ const SecurityUtils = {
             /expression\s*\(/i,
         ];
         return attackPatterns.some(pattern => pattern.test(input));
-    },
-
-    escapeHtml: (input) => {
-        if (!input || typeof input !== 'string') return '';
-        const div = document.createElement('div');
-        div.textContent = input;
-        return div.innerHTML;
     }
 };
 
@@ -187,35 +180,50 @@ const DomainCheckLimiter = {
 
 window.wizardData = {
     currentStep: 1,
-    totalSteps: 8,
+    totalSteps: 7,
+
+    // Step 1: Package
     package: null,
     packagePrice: 0,
+
+    // Step 2: Domain
     domainOption: null,
     domain: null,
     domainPrice: 0,
     domainPricing: null,
+
+    // Step 3: About You
     businessName: '',
-    industry: '',
-    businessDescription: '',
+    whatYouDo: '',
+    targetAudience: '',
     tagline: '',
+
+    // Step 4: Website Goals
+    primaryAction: null,
+    features: [],
+
+    // Step 5: Design
     designStyle: null,
     brandColor: '#10b981',
     inspirationUrl: '',
-    pages: ['home'],
-    features: [],
-    logoFile: null,
+
+    // Step 6: Content
     contentReady: 'yes',
+    logoFile: null,
     additionalNotes: '',
+
+    // Step 7: Contact
     fullName: '',
     email: '',
     phone: '',
     contactMethod: 'email'
 };
 
+// Package configuration
 const packagePrices = {
-    starter: 0.50,
-    business: 0.50,
-    shop: 0.50
+    starter: 799,
+    business: 1399,
+    shop: 1799
 };
 
 const packageNames = {
@@ -224,6 +232,7 @@ const packageNames = {
     shop: 'Small Shop'
 };
 
+// Style names for display
 const styleNames = {
     modern: 'Modern & Minimal',
     bold: 'Bold & Colorful',
@@ -231,69 +240,62 @@ const styleNames = {
     playful: 'Playful & Fun'
 };
 
-const industryNames = {
-    restaurant: 'Restaurant / Food & Beverage',
-    retail: 'Retail / E-commerce',
-    professional: 'Professional Services',
-    health: 'Health & Wellness',
-    beauty: 'Beauty & Salon',
-    construction: 'Construction / Home Services',
-    realestate: 'Real Estate',
-    technology: 'Technology / Software',
-    creative: 'Creative / Design Agency',
-    education: 'Education / Training',
-    nonprofit: 'Non-Profit / Organization',
-    other: 'Other'
+// Primary action names for display
+const actionNames = {
+    contact: 'Contact Me / Get Inquiries',
+    book: 'Book Appointments',
+    buy: 'Sell Products',
+    hire: 'Get Hired / Showcase Work',
+    subscribe: 'Build Email List',
+    learn: 'Educate & Inform'
 };
 
-// ============================================
-// STEP NAVIGATION
-// ============================================
+// Step names for progress indicator
+const stepNames = [
+    'Choose Package',
+    'Your Domain',
+    'About You',
+    'Website Goals',
+    'Design Style',
+    'Your Content',
+    'Review & Pay'
+];
 
-function updateProgress() {
-    const progress = (wizardData.currentStep / wizardData.totalSteps) * 100;
-    document.getElementById('progressFill').style.width = progress + '%';
-    document.getElementById('stepIndicator').textContent = `Step ${wizardData.currentStep} of ${wizardData.totalSteps}`;
-
-    const stepNames = [
-        'Choose Package', 'Domain Setup', 'Business Details', 'Design Style',
-        'Pages & Features', 'Your Assets', 'Contact Info', 'Review & Pay'
-    ];
-    document.getElementById('stepName').textContent = stepNames[wizardData.currentStep - 1] || '';
-}
+// ============================================
+// NAVIGATION
+// ============================================
 
 function showStep(step) {
+    // Hide all steps
     document.querySelectorAll('.step-content').forEach(el => {
         el.classList.remove('active');
     });
 
-    const stepEl = document.getElementById('step' + step);
-    if (stepEl) {
-        stepEl.classList.add('active');
+    // Show target step
+    const targetStep = document.getElementById(`step${step}`);
+    if (targetStep) {
+        targetStep.classList.add('active');
     }
 
-    updateProgress();
+    // Update progress
+    const progress = (step / wizardData.totalSteps) * 100;
+    document.getElementById('progressFill').style.width = `${progress}%`;
+    document.getElementById('stepIndicator').textContent = `Step ${step} of ${wizardData.totalSteps}`;
+    document.getElementById('stepName').textContent = stepNames[step - 1] || '';
+
+    // Populate review if on last step
+    if (step === 7) {
+        populateReview();
+    }
+
+    // Scroll to top
+    document.querySelector('.wizard-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
 window.nextStep = function () {
     if (wizardData.currentStep < wizardData.totalSteps) {
-        const card = document.getElementById('wizardCard');
-        card.classList.add('slide-out-left');
-
-        setTimeout(() => {
-            wizardData.currentStep++;
-            showStep(wizardData.currentStep);
-            card.classList.remove('slide-out-left');
-            card.classList.add('slide-in-right');
-
-            setTimeout(() => {
-                card.classList.remove('slide-in-right');
-            }, 400);
-
-            if (wizardData.currentStep === 8) {
-                populateReview();
-            }
-        }, 400);
+        wizardData.currentStep++;
+        showStep(wizardData.currentStep);
     }
 };
 
@@ -312,29 +314,14 @@ window.selectPackage = function (pkg) {
     wizardData.package = pkg;
     wizardData.packagePrice = packagePrices[pkg];
 
+    // Update UI
     document.querySelectorAll('.package-card').forEach(card => {
         card.classList.remove('selected');
     });
-    document.querySelector(`.package-card[data-package="${pkg}"]`).classList.add('selected');
-    document.getElementById('step1Next').disabled = false;
+    document.querySelector(`[data-package="${pkg}"]`)?.classList.add('selected');
 
-    // Pre-select shop options for shop package
-    if (pkg === 'shop') {
-        const shopPage = document.getElementById('shopPage');
-        if (shopPage && !shopPage.classList.contains('checked')) {
-            shopPage.classList.add('checked');
-            if (!wizardData.pages.includes('shop')) {
-                wizardData.pages.push('shop');
-            }
-        }
-        const paymentsFeature = document.getElementById('paymentsFeature');
-        if (paymentsFeature && !paymentsFeature.classList.contains('checked')) {
-            paymentsFeature.classList.add('checked');
-            if (!wizardData.features.includes('payments')) {
-                wizardData.features.push('payments');
-            }
-        }
-    }
+    // Enable continue button
+    document.getElementById('step1Next').disabled = false;
 };
 
 // ============================================
@@ -344,213 +331,188 @@ window.selectPackage = function (pkg) {
 window.selectDomainOption = function (option) {
     wizardData.domainOption = option;
 
-    document.querySelectorAll('.domain-option').forEach(el => {
-        el.classList.remove('selected');
+    // Update UI
+    document.querySelectorAll('.domain-option').forEach(opt => {
+        opt.classList.remove('selected');
     });
-    document.querySelector(`.domain-option[data-option="${option}"]`).classList.add('selected');
+    document.querySelector(`[data-option="${option}"]`)?.classList.add('selected');
 
-    document.getElementById('newDomainSearch').classList.remove('visible');
-    document.getElementById('ownDomainInput').classList.remove('visible');
+    // Show/hide appropriate input
+    document.getElementById('newDomainSearch').style.display = option === 'new' ? 'block' : 'none';
+    document.getElementById('ownDomainInput').style.display = option === 'own' ? 'block' : 'none';
+
+    // Reset domain data
+    wizardData.domain = null;
+    wizardData.domainPrice = 0;
+    document.getElementById('step2Next').disabled = true;
     document.getElementById('domainResult').classList.remove('visible');
-
-    if (option === 'new') {
-        document.getElementById('newDomainSearch').classList.add('visible');
-        document.getElementById('step2Next').disabled = true;
-    } else if (option === 'own') {
-        document.getElementById('ownDomainInput').classList.add('visible');
-        document.getElementById('step2Next').disabled = true;
-    }
 };
 
 window.checkDomainAvailability = async function () {
-    const domainInput = document.getElementById('domainSearchInput');
-    const rawDomain = domainInput.value.trim();
-
-    if (!rawDomain) return;
-
-    // Rate limit check
     if (!DomainCheckLimiter.canCheck()) {
-        showDomainResult(false, 'Too many requests', 'Please wait a moment before checking another domain.');
+        alert('Too many domain checks. Please wait a moment.');
         return;
     }
 
-    // Sanitize domain
-    const domain = SecurityUtils.sanitizeDomain(rawDomain);
+    const domainInput = document.getElementById('domainSearchInput');
+    const domain = SecurityUtils.sanitizeDomain(domainInput.value);
 
-    if (!domain) {
-        showDomainResult(false, 'Invalid domain', 'Please enter a valid domain name.');
+    if (!domain || domain.length < 3) {
+        alert('Please enter a valid domain name');
         return;
     }
 
-    // Check for attack patterns
-    if (SecurityUtils.detectAttack(rawDomain)) {
-        showDomainResult(false, 'Invalid characters', 'Please enter a valid domain name.');
-        return;
-    }
+    const btn = document.getElementById('checkDomainBtn');
+    const resultDiv = document.getElementById('domainResult');
+
+    btn.disabled = true;
+    btn.textContent = 'Checking...';
 
     DomainCheckLimiter.recordCheck();
 
-    const btn = document.getElementById('checkDomainBtn');
-    btn.innerHTML = '<span class="loading-spinner"></span>';
-    btn.disabled = true;
-
     try {
         const response = await fetch(ENDPOINTS.checkDomain, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ domain }),
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ domain })
         });
 
         const data = await response.json();
 
-        if (data.available === true) {
-            const cleanedDomain = data.cleanedDomain || domain;
-            const registrationFee = data.pricing?.registrationFee || 12.99;
-            const setupFee = data.pricing?.setupFee || 0;
-            const initialCost = data.pricing?.initialCost || (registrationFee + setupFee);
-            const renewalCost = data.pricing?.renewalCost || 14.99;
+        resultDiv.classList.add('visible');
 
-            wizardData.domain = cleanedDomain;
-            wizardData.domainPrice = initialCost;
-            wizardData.domainPricing = { initialCost, renewalCost, registrationFee, setupFee };
+        if (data.available) {
+            document.getElementById('domainResultIcon').textContent = '✓';
+            document.getElementById('domainResultIcon').className = 'domain-result-icon success';
+            document.getElementById('domainResultTitle').textContent = 'Domain available!';
+            document.getElementById('domainResultDesc').textContent = `${domain} - $${data.price}/year`;
 
-            showDomainResult(true, `${cleanedDomain} is available!`, `$${initialCost.toFixed(2)}/year`);
+            wizardData.domain = domain;
+            wizardData.domainPrice = data.price || 12.99;
+            wizardData.domainPricing = data.pricing || null;
             document.getElementById('step2Next').disabled = false;
         } else {
-            showDomainResult(false, `${domain} is already taken`, 'Try a different name or extension');
-            wizardData.domain = null;
-            wizardData.domainPrice = 0;
-            wizardData.domainPricing = null;
+            document.getElementById('domainResultIcon').textContent = '✗';
+            document.getElementById('domainResultIcon').className = 'domain-result-icon error';
+            document.getElementById('domainResultTitle').textContent = 'Domain not available';
+            document.getElementById('domainResultDesc').textContent = data.message || 'Try a different name';
             document.getElementById('step2Next').disabled = true;
         }
     } catch (error) {
-        console.error("Domain check error:", error);
-        showDomainResult(false, 'Error checking domain', 'Please try again or contact support');
+        console.error('Domain check error:', error);
+        resultDiv.classList.add('visible');
+        document.getElementById('domainResultIcon').textContent = '!';
+        document.getElementById('domainResultIcon').className = 'domain-result-icon error';
+        document.getElementById('domainResultTitle').textContent = 'Error checking domain';
+        document.getElementById('domainResultDesc').textContent = 'Please try again';
+    } finally {
+        btn.disabled = false;
+        btn.textContent = 'Check';
     }
-
-    btn.innerHTML = 'Check';
-    btn.disabled = false;
 };
 
-function showDomainResult(isAvailable, title, description) {
-    const resultEl = document.getElementById('domainResult');
-    const iconEl = document.getElementById('domainResultIcon');
-    const titleEl = document.getElementById('domainResultTitle');
-    const descEl = document.getElementById('domainResultDesc');
-
-    resultEl.className = `domain-result visible ${isAvailable ? 'available' : 'unavailable'}`;
-    iconEl.textContent = isAvailable ? '✓' : '✕';
-    titleEl.textContent = title;
-    descEl.textContent = description;
-}
-
 window.validateExistingDomain = function () {
-    const domain = document.getElementById('existingDomainInput').value.trim();
-    const sanitized = SecurityUtils.sanitizeDomain(domain);
-    const isValid = sanitized.includes('.') && sanitized.length > 3;
+    const input = document.getElementById('existingDomainInput');
+    const domain = SecurityUtils.sanitizeDomain(input.value);
 
-    if (isValid) {
-        wizardData.domain = sanitized;
+    if (domain && domain.includes('.') && domain.length >= 4) {
+        wizardData.domain = domain;
         wizardData.domainPrice = 0;
-        wizardData.domainPricing = { initialCost: 0, renewalCost: 0 };
         document.getElementById('step2Next').disabled = false;
     } else {
-        wizardData.domain = null;
         document.getElementById('step2Next').disabled = true;
     }
 };
 
 // ============================================
-// STEP 3: BUSINESS DETAILS
+// STEP 3: ABOUT YOU
 // ============================================
 
 window.validateStep3 = function () {
     const businessName = document.getElementById('businessName').value.trim();
-    const industry = document.getElementById('industry').value;
-    const description = document.getElementById('businessDescription').value.trim();
+    const whatYouDo = document.getElementById('whatYouDo').value.trim();
+    const targetAudience = document.getElementById('targetAudience').value.trim();
 
     wizardData.businessName = SecurityUtils.sanitizeName(businessName);
-    wizardData.industry = industry;
-    wizardData.businessDescription = SecurityUtils.sanitizeLongText(description);
-    wizardData.tagline = SecurityUtils.sanitizeText(document.getElementById('tagline').value.trim());
+    wizardData.whatYouDo = SecurityUtils.sanitizeLongText(whatYouDo);
+    wizardData.targetAudience = SecurityUtils.sanitizeLongText(targetAudience);
+    wizardData.tagline = SecurityUtils.sanitizeText(document.getElementById('tagline').value);
 
-    const isValid = businessName && industry && description;
+    const isValid = businessName.length >= 2 && whatYouDo.length >= 10 && targetAudience.length >= 5;
     document.getElementById('step3Next').disabled = !isValid;
 };
 
 // ============================================
-// STEP 4: DESIGN PREFERENCES
+// STEP 4: WEBSITE GOALS
+// ============================================
+
+window.selectPrimaryAction = function (action) {
+    wizardData.primaryAction = action;
+
+    // Update UI
+    document.querySelectorAll('.action-card').forEach(card => {
+        card.classList.remove('selected');
+    });
+    document.querySelector(`[data-action="${action}"]`)?.classList.add('selected');
+
+    // Enable continue button
+    document.getElementById('step4Next').disabled = false;
+};
+
+window.toggleCheckbox = function (element) {
+    element.classList.toggle('checked');
+
+    // Gather all checked features
+    const checked = document.querySelectorAll('#featuresGrid .checkbox-item.checked');
+    wizardData.features = Array.from(checked).map(el => el.dataset.value);
+};
+
+// ============================================
+// STEP 5: DESIGN STYLE
 // ============================================
 
 window.selectStyle = function (style) {
     wizardData.designStyle = style;
 
+    // Update UI
     document.querySelectorAll('.style-card').forEach(card => {
         card.classList.remove('selected');
     });
-    document.querySelector(`.style-card[data-style="${style}"]`).classList.add('selected');
-    document.getElementById('step4Next').disabled = false;
+    document.querySelector(`[data-style="${style}"]`)?.classList.add('selected');
 
-    wizardData.brandColor = document.getElementById('brandColor').value;
-    wizardData.inspirationUrl = SecurityUtils.sanitizeUrl(document.getElementById('inspirationUrl').value);
+    // Enable continue button
+    document.getElementById('step5Next').disabled = false;
 };
 
 // ============================================
-// STEP 5: PAGES & FEATURES
-// ============================================
-
-window.toggleCheckbox = function (el) {
-    el.classList.toggle('checked');
-
-    const value = el.dataset.value;
-    const isPage = el.closest('#pagesGrid') !== null;
-    const array = isPage ? wizardData.pages : wizardData.features;
-
-    if (el.classList.contains('checked')) {
-        if (!array.includes(value)) {
-            array.push(value);
-        }
-    } else {
-        const index = array.indexOf(value);
-        if (index > -1) {
-            array.splice(index, 1);
-        }
-    }
-};
-
-// ============================================
-// STEP 6: ASSETS
+// STEP 6: YOUR CONTENT
 // ============================================
 
 window.handleLogoUpload = function (event) {
     const file = event.target.files[0];
-    if (file) {
-        // Validate file type
-        const allowedTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('Please upload an image file (JPEG, PNG, GIF, WebP, or SVG).');
-            event.target.value = '';
-            return;
-        }
+    if (!file) return;
 
-        // Validate file size (5MB max)
-        if (file.size > 5 * 1024 * 1024) {
-            alert('Logo file must be less than 5MB.');
-            event.target.value = '';
-            return;
-        }
-
-        wizardData.logoFile = file;
-
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            document.getElementById('logoPreviewImg').src = e.target.result;
-            document.getElementById('logoFileName').textContent = file.name;
-            document.getElementById('logoPreview').classList.add('visible');
-            document.getElementById('logoUploadArea').classList.add('has-file');
-        };
-        reader.readAsDataURL(file);
+    // Validate file
+    if (file.size > 5 * 1024 * 1024) {
+        alert('File is too large. Maximum size is 5MB.');
+        return;
     }
+
+    if (!file.type.startsWith('image/')) {
+        alert('Please upload an image file.');
+        return;
+    }
+
+    wizardData.logoFile = file;
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        document.getElementById('logoPreviewImg').src = e.target.result;
+        document.getElementById('logoPreview').classList.add('visible');
+        document.getElementById('logoUploadArea').classList.add('has-file');
+    };
+    reader.readAsDataURL(file);
 };
 
 window.removeLogo = function () {
@@ -561,7 +523,7 @@ window.removeLogo = function () {
 };
 
 // ============================================
-// STEP 7: CONTACT INFO
+// STEP 7: CONTACT & REVIEW
 // ============================================
 
 window.validateStep7 = function () {
@@ -577,14 +539,16 @@ window.validateStep7 = function () {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const isValid = fullName && emailRegex.test(email) && phone.length >= 10;
 
-    document.getElementById('step7Next').disabled = !isValid;
+    document.getElementById('payBtn').disabled = !isValid;
+
+    // Update review email display
+    if (email) {
+        document.getElementById('reviewEmail').textContent = email;
+    }
 };
 
-// ============================================
-// STEP 8: REVIEW
-// ============================================
-
 function populateReview() {
+    // Capture content step data
     wizardData.contentReady = document.getElementById('contentReady').value;
     wizardData.additionalNotes = SecurityUtils.sanitizeLongText(document.getElementById('additionalNotes').value);
 
@@ -601,17 +565,19 @@ function populateReview() {
         document.getElementById('reviewDomainCost').textContent = `$${wizardData.domainPrice}/year`;
     }
 
-    // Business
+    // Business Name
     document.getElementById('reviewBusinessName').textContent = wizardData.businessName;
-    document.getElementById('reviewIndustry').textContent = industryNames[wizardData.industry] || wizardData.industry;
 
-    // Design
-    document.getElementById('reviewStyle').textContent = styleNames[wizardData.designStyle] || wizardData.designStyle;
-    document.getElementById('reviewPages').textContent = wizardData.pages.join(', ') || 'Home';
+    // Primary Action
+    document.getElementById('reviewPrimaryAction').textContent =
+        actionNames[wizardData.primaryAction] || wizardData.primaryAction;
 
-    // Contact
-    document.getElementById('reviewName').textContent = wizardData.fullName;
-    document.getElementById('reviewEmail').textContent = wizardData.email;
+    // Design Style
+    document.getElementById('reviewStyle').textContent =
+        styleNames[wizardData.designStyle] || wizardData.designStyle;
+
+    // Email (will be updated by validateStep7)
+    document.getElementById('reviewEmail').textContent = wizardData.email || '-';
 
     // Total
     const total = wizardData.packagePrice + wizardData.domainPrice;
@@ -639,7 +605,8 @@ window.processPayment = async function () {
     // Attack detection
     const allText = [
         wizardData.businessName,
-        wizardData.businessDescription,
+        wizardData.whatYouDo,
+        wizardData.targetAudience,
         wizardData.fullName,
         wizardData.email,
         wizardData.additionalNotes
@@ -670,20 +637,30 @@ window.processPayment = async function () {
         formData.append('isOwnDomain', (wizardData.domainOption === 'own').toString());
         formData.append('domainPricing', JSON.stringify(wizardData.domainPricing));
 
-        // Business info
+        // About You (replaces old business details)
         formData.append('businessName', wizardData.businessName);
-        formData.append('industry', wizardData.industry);
-        formData.append('businessDescription', wizardData.businessDescription);
+        formData.append('whatYouDo', wizardData.whatYouDo);
+        formData.append('targetAudience', wizardData.targetAudience);
         formData.append('tagline', wizardData.tagline);
+
+        // For backwards compatibility, combine into businessDescription
+        formData.append('businessDescription', `${wizardData.whatYouDo} Target audience: ${wizardData.targetAudience}`);
+        formData.append('industry', 'auto-detect'); // AI will infer from whatYouDo
+
+        // Website Goals
+        formData.append('primaryAction', wizardData.primaryAction);
+        formData.append('features', JSON.stringify(wizardData.features));
+
+        // Map primary action to pages for backwards compatibility
+        const inferredPages = inferPagesFromAction(wizardData.primaryAction, wizardData.features);
+        formData.append('pages', JSON.stringify(inferredPages));
 
         // Design preferences
         formData.append('designStyle', wizardData.designStyle);
         formData.append('brandColor', wizardData.brandColor);
         formData.append('inspirationUrl', wizardData.inspirationUrl);
-        formData.append('pages', JSON.stringify(wizardData.pages));
-        formData.append('features', JSON.stringify(wizardData.features));
 
-        // Assets
+        // Content
         formData.append('contentReady', wizardData.contentReady);
         formData.append('additionalNotes', wizardData.additionalNotes);
         if (wizardData.logoFile) {
@@ -707,6 +684,7 @@ window.processPayment = async function () {
             package: wizardData.package,
             domain: wizardData.domain,
             email: wizardData.email,
+            primaryAction: wizardData.primaryAction,
             total: totalCost
         });
 
@@ -719,10 +697,8 @@ window.processPayment = async function () {
 
         if (result.success) {
             if (result.requiresPayment === false) {
-                // Show success without redirect
                 showSuccess();
             } else if (result.sessionUrl) {
-                // Redirect to Stripe
                 window.location.href = result.sessionUrl;
             } else {
                 showSuccess();
@@ -737,6 +713,45 @@ window.processPayment = async function () {
         btn.disabled = false;
     }
 };
+
+// Helper: Infer pages from primary action and features
+function inferPagesFromAction(action, features) {
+    const pages = ['home'];
+
+    // Based on primary action
+    switch (action) {
+        case 'contact':
+        case 'book':
+            pages.push('contact');
+            break;
+        case 'buy':
+            pages.push('products', 'contact');
+            break;
+        case 'hire':
+            pages.push('portfolio', 'about', 'contact');
+            break;
+        case 'subscribe':
+            pages.push('about');
+            break;
+        case 'learn':
+            pages.push('services', 'about');
+            break;
+    }
+
+    // Based on features
+    if (features.includes('gallery')) pages.push('gallery');
+    if (features.includes('testimonials') && !pages.includes('testimonials')) pages.push('testimonials');
+    if (features.includes('blog')) pages.push('blog');
+    if (features.includes('team') && !pages.includes('about')) pages.push('about');
+    if (features.includes('pricing')) pages.push('pricing');
+    if (features.includes('faq')) pages.push('faq');
+
+    // Ensure contact is included
+    if (!pages.includes('contact')) pages.push('contact');
+
+    // Remove duplicates
+    return [...new Set(pages)];
+}
 
 function showSuccess() {
     document.getElementById('successEmail').textContent = wizardData.email;
@@ -774,6 +789,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 e.preventDefault();
                 checkDomainAvailability();
             }
+        });
+    }
+
+    // Initialize brand color listener
+    const colorInput = document.getElementById('brandColor');
+    if (colorInput) {
+        colorInput.addEventListener('input', (e) => {
+            wizardData.brandColor = e.target.value;
+        });
+    }
+
+    // Initialize inspiration URL listener
+    const inspirationInput = document.getElementById('inspirationUrl');
+    if (inspirationInput) {
+        inspirationInput.addEventListener('input', (e) => {
+            wizardData.inspirationUrl = SecurityUtils.sanitizeUrl(e.target.value);
         });
     }
 
