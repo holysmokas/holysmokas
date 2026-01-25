@@ -221,9 +221,9 @@ window.wizardData = {
 
 // Package configuration
 const packagePrices = {
-    starter: 0.25,
-    business: 0.25,
-    shop: 0.25
+    starter: 0.50,
+    business: 0.50,
+    shop: 0.50
 };
 
 const packageNames = {
