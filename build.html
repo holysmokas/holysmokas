@@ -8,11 +8,9 @@
     <link rel="icon" type="image/svg+xml" href="/assets/alimiai1-qFnyEQ6n.png" />
     <script>window.GOOGLE_ANALYTICS_ID = 'G-ZBZWDLCJVJ';</script>
     <script src="/cookie-consent.js"></script>
-
-
-  <script type="module" crossorigin src="/assets/build-X_yKmpB0.js"></script>
+  <script type="module" crossorigin src="/assets/build-BgDNzyzb.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/config-elnU3pxP.js">
-  <link rel="stylesheet" crossorigin href="/assets/build-CReEEYRf.css">
+  <link rel="stylesheet" crossorigin href="/assets/build-BNeLdla3.css">
   <link rel="stylesheet" crossorigin href="/assets/style-Bm6i-fqz.css">
 </head>
 
@@ -48,16 +46,6 @@
             <div class="particle"></div>
             <div class="particle"></div>
             <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
-            <div class="particle"></div>
         </div>
         <div class="orb orb-1"></div>
         <div class="orb orb-2"></div>
@@ -68,15 +56,17 @@
             <!-- Progress Bar -->
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 12.5%"></div>
+                    <div class="progress-fill" id="progressFill" style="width: 14.28%"></div>
                 </div>
                 <div class="progress-text">
-                    <span id="stepIndicator">Step 1 of 8</span>
+                    <span id="stepIndicator">Step 1 of 7</span>
                     <span id="stepName">Choose Package</span>
                 </div>
             </div>
 
-            <!-- Step 1: Package Selection -->
+            <!-- ============================================ -->
+            <!-- STEP 1: PACKAGE SELECTION -->
+            <!-- ============================================ -->
             <div class="step-content active" id="step1">
                 <h2 class="step-title">What are you building?</h2>
                 <p class="step-subtitle">Choose the package that fits your needs</p>
@@ -107,7 +97,9 @@
                 </button>
             </div>
 
-            <!-- Step 2: Domain Selection -->
+            <!-- ============================================ -->
+            <!-- STEP 2: DOMAIN SELECTION -->
+            <!-- ============================================ -->
             <div class="step-content" id="step2">
                 <h2 class="step-title">Your Domain</h2>
                 <p class="step-subtitle">How would you like to set up your website address?</p>
@@ -117,14 +109,14 @@
                         <div class="radio"></div>
                         <div class="domain-option-content">
                             <h4>🆕 I need a new domain</h4>
-                            <p>We'll register it for you ($12/year and up, varies by extension)</p>
+                            <p>We'll register it for you ($12/year and up)</p>
                         </div>
                     </div>
                     <div class="domain-option" data-option="own" onclick="selectDomainOption('own')">
                         <div class="radio"></div>
                         <div class="domain-option-content">
                             <h4>🔗 I already own a domain</h4>
-                            <p>Connect your existing domain (free - just update nameservers)</p>
+                            <p>Connect your existing domain (free)</p>
                         </div>
                     </div>
                 </div>
@@ -166,53 +158,39 @@
                 </div>
             </div>
 
-            <!-- Step 3: Business Details -->
+            <!-- ============================================ -->
+            <!-- STEP 3: TELL US ABOUT YOU -->
+            <!-- ============================================ -->
             <div class="step-content" id="step3">
-                <h2 class="step-title">Tell us about your business</h2>
-                <p class="step-subtitle">Help us understand what you do</p>
+                <h2 class="step-title">Tell us about you</h2>
+                <p class="step-subtitle">Help us understand who you are and what you do</p>
 
                 <div class="form-group">
-                    <label class="form-label">Business Name *</label>
-                    <input type="text" class="form-input" id="businessName" placeholder="Your Business Name"
+                    <label class="form-label">Your name or business name *</label>
+                    <input type="text" class="form-input" id="businessName"
+                        placeholder="e.g., Jane Smith Photography, The Corner Bakery, John Doe"
                         oninput="validateStep3()">
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Industry *</label>
-                    <select class="form-input" id="industry" onchange="validateStep3()">
-                        <option value="">Select your industry</option>
-                        <optgroup label="Individual / Personal">
-                            <option value="personal-brand">Personal Brand / Portfolio</option>
-                            <option value="job-seeker">Job Seeker / Career Portfolio (Online Resume)</option>
-                            <option value="content-creator">Content Creator / Influencer</option>
-                        </optgroup>
-                        <optgroup label="Business / Professional">
-                            <option value="restaurant">Restaurant / Food & Beverage</option>
-                            <option value="retail">Retail / E-commerce</option>
-                            <option value="professional">Professional Services (Law, Accounting, etc.)</option>
-                            <option value="health">Health & Wellness</option>
-                            <option value="beauty">Beauty & Salon</option>
-                            <option value="construction">Construction / Home Services</option>
-                            <option value="realestate">Real Estate</option>
-                            <option value="technology">Technology / Software</option>
-                            <option value="creative">Creative / Design Agency</option>
-                            <option value="education">Education / Training</option>
-                            <option value="nonprofit">Non-Profit / Organization</option>
-                            <option value="other">Other</option>
-                        </optgroup>
-                    </select>
+                    <label class="form-label">What do you do? *</label>
+                    <textarea class="form-input form-textarea" id="whatYouDo" rows="2"
+                        placeholder="e.g., I'm a wedding photographer based in San Francisco, I run a family-owned Italian restaurant, I'm a software developer looking for new opportunities..."
+                        oninput="validateStep3()"></textarea>
+                    <p class="form-hint">One or two sentences is perfect</p>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Describe your business in one sentence *</label>
-                    <input type="text" class="form-input" id="businessDescription"
-                        placeholder="e.g., We help small businesses grow through digital marketing"
-                        oninput="validateStep3()">
+                    <label class="form-label">Who do you serve / who's your audience? *</label>
+                    <textarea class="form-input form-textarea" id="targetAudience" rows="2"
+                        placeholder="e.g., Engaged couples planning their wedding, Local families and office workers, Tech startups looking for developers..."
+                        oninput="validateStep3()"></textarea>
                 </div>
 
                 <div class="form-group">
-                    <label class="form-label">Tagline / Slogan (optional)</label>
-                    <input type="text" class="form-input" id="tagline" placeholder="e.g., Your Success, Our Mission">
+                    <label class="form-label">Tagline or slogan (optional)</label>
+                    <input type="text" class="form-input" id="tagline"
+                        placeholder="e.g., Capturing your perfect moments, Fresh baked daily since 1985">
                 </div>
 
                 <div class="button-row">
@@ -221,8 +199,103 @@
                 </div>
             </div>
 
-            <!-- Step 4: Design Preferences -->
+            <!-- ============================================ -->
+            <!-- STEP 4: WHAT SHOULD YOUR WEBSITE DO? -->
+            <!-- ============================================ -->
             <div class="step-content" id="step4">
+                <h2 class="step-title">What should your website do?</h2>
+                <p class="step-subtitle">Tell us what you want visitors to accomplish</p>
+
+                <label class="form-label">What's the MAIN action you want visitors to take? *</label>
+                <div class="action-grid" id="primaryActionGrid">
+                    <div class="action-card" data-action="contact" onclick="selectPrimaryAction('contact')">
+                        <div class="action-icon">📞</div>
+                        <h4>Contact Me</h4>
+                        <p>Get inquiries, quotes, or messages</p>
+                    </div>
+                    <div class="action-card" data-action="book" onclick="selectPrimaryAction('book')">
+                        <div class="action-icon">📅</div>
+                        <h4>Book Appointment</h4>
+                        <p>Schedule calls, visits, or services</p>
+                    </div>
+                    <div class="action-card" data-action="buy" onclick="selectPrimaryAction('buy')">
+                        <div class="action-icon">🛒</div>
+                        <h4>Buy Products</h4>
+                        <p>Sell items online</p>
+                    </div>
+                    <div class="action-card" data-action="hire" onclick="selectPrimaryAction('hire')">
+                        <div class="action-icon">💼</div>
+                        <h4>Hire Me</h4>
+                        <p>Showcase work & get hired</p>
+                    </div>
+                    <div class="action-card" data-action="subscribe" onclick="selectPrimaryAction('subscribe')">
+                        <div class="action-icon">📧</div>
+                        <h4>Join My List</h4>
+                        <p>Build email subscribers</p>
+                    </div>
+                    <div class="action-card" data-action="learn" onclick="selectPrimaryAction('learn')">
+                        <div class="action-icon">📖</div>
+                        <h4>Learn About Us</h4>
+                        <p>Educate & inform visitors</p>
+                    </div>
+                </div>
+
+                <label class="form-label" style="margin-top: 2rem;">What else should your site include?</label>
+                <p class="form-hint" style="margin-top: -0.5rem; margin-bottom: 1rem;">Select all that apply</p>
+
+                <div class="checkbox-grid" id="featuresGrid">
+                    <div class="checkbox-item" data-value="gallery" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>📸 Photo Gallery / Portfolio</span>
+                    </div>
+                    <div class="checkbox-item" data-value="testimonials" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>⭐ Testimonials / Reviews</span>
+                    </div>
+                    <div class="checkbox-item" data-value="pricing" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>💰 Pricing / Menu</span>
+                    </div>
+                    <div class="checkbox-item" data-value="blog" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>📝 Blog / Articles</span>
+                    </div>
+                    <div class="checkbox-item" data-value="social" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>🔗 Social Media Links</span>
+                    </div>
+                    <div class="checkbox-item" data-value="location" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>📍 Location / Map</span>
+                    </div>
+                    <div class="checkbox-item" data-value="download" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>📄 Downloadable File (Resume, Menu, Brochure)</span>
+                    </div>
+                    <div class="checkbox-item" data-value="video" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>🎬 Video Content</span>
+                    </div>
+                    <div class="checkbox-item" data-value="faq" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>❓ FAQ Section</span>
+                    </div>
+                    <div class="checkbox-item" data-value="team" onclick="toggleCheckbox(this)">
+                        <div class="checkbox"></div>
+                        <span>👥 Team / About Section</span>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button class="btn-back" onclick="prevStep()">← Back</button>
+                    <button class="btn-wizard" id="step4Next" onclick="nextStep()" disabled>Continue →</button>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- STEP 5: DESIGN STYLE -->
+            <!-- ============================================ -->
+            <div class="step-content" id="step5">
                 <h2 class="step-title">Design Style</h2>
                 <p class="step-subtitle">What vibe should your website have?</p>
 
@@ -268,258 +341,151 @@
 
                 <div class="button-row">
                     <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" id="step4Next" onclick="nextStep()" disabled>Continue →</button>
+                    <button class="btn-wizard" id="step5Next" onclick="nextStep()" disabled>Continue →</button>
                 </div>
             </div>
 
-            <!-- Step 5: Pages & Features -->
-            <div class="step-content" id="step5">
-                <h2 class="step-title">Pages & Features</h2>
-                <p class="step-subtitle">What should your website include?</p>
+            <!-- ============================================ -->
+            <!-- STEP 6: YOUR CONTENT -->
+            <!-- ============================================ -->
+            <div class="step-content" id="step6">
+                <h2 class="step-title">Your Content</h2>
+                <p class="step-subtitle">Help us understand what you have ready</p>
 
-                <label class="form-label">Which pages do you need?</label>
-                <div class="checkbox-grid" id="pagesGrid">
-                    <div class="checkbox-item checked" data-value="home" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>🏠 Home</span>
+                <div class="form-group">
+                    <label class="form-label">Do you have content ready?</label>
+                    <select class="form-input" id="contentReady">
+                        <option value="yes">Yes - I have text, photos, and everything ready</option>
+                        <option value="partial">Partial - I have some content but need help with the rest</option>
+                        <option value="no">No - I need help creating content</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Upload your logo (optional)</label>
+                    <div class="upload-area" id="logoUploadArea" onclick="document.getElementById('logoFile').click()">
+                        <div class="upload-icon">📁</div>
+                        <p>Click to upload or drag and drop</p>
+                        <small>PNG, JPG, or SVG (Max 5MB)</small>
+                        <input type="file" id="logoFile" accept="image/*" style="display: none;"
+                            onchange="handleLogoUpload(event)">
                     </div>
-                    <div class="checkbox-item" data-value="about" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>👤 About Us</span>
-                    </div>
-                    <div class="checkbox-item" data-value="services" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>⚙️ Services</span>
-                    </div>
-                    <div class="checkbox-item" data-value="portfolio" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>📸 Portfolio/Gallery</span>
-                    </div>
-                    <div class="checkbox-item" data-value="contact" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>📞 Contact</span>
-                    </div>
-                    <div class="checkbox-item" data-value="blog" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>📝 Blog</span>
-                    </div>
-                    <div class="checkbox-item" data-value="testimonials" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>⭐ Testimonials</span>
-                    </div>
-                    <div class="checkbox-item" data-value="faq" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>❓ FAQ</span>
-                    </div>
-                    <div class="checkbox-item" data-value="shop" onclick="toggleCheckbox(this)" id="shopPage">
-                        <div class="checkbox"></div>
-                        <span>🛒 Shop/Products</span>
-                    </div>
-                    <div class="checkbox-item" data-value="booking" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>📅 Booking/Appointments</span>
+                    <div class="logo-preview" id="logoPreview">
+                        <img id="logoPreviewImg" src="" alt="Logo preview">
+                        <button type="button" class="remove-logo" onclick="removeLogo()">×</button>
                     </div>
                 </div>
 
-                <label class="form-label" style="margin-top: 1.5rem;">Key features needed</label>
-                <div class="checkbox-grid" id="featuresGrid">
-                    <div class="checkbox-item" data-value="contact-form" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>📧 Contact Form</span>
-                    </div>
-                    <div class="checkbox-item" data-value="google-maps" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>📍 Google Maps</span>
-                    </div>
-                    <div class="checkbox-item" data-value="social-links" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>🔗 Social Media Links</span>
-                    </div>
-                    <div class="checkbox-item" data-value="newsletter" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>📬 Newsletter Signup</span>
-                    </div>
-                    <div class="checkbox-item" data-value="gallery" onclick="toggleCheckbox(this)">
-                        <div class="checkbox"></div>
-                        <span>🖼️ Photo Gallery</span>
-                    </div>
-                    <div class="checkbox-item" data-value="payments" onclick="toggleCheckbox(this)"
-                        id="paymentsFeature">
-                        <div class="checkbox"></div>
-                        <span>💳 Payment Integration</span>
-                    </div>
+                <div class="form-group">
+                    <label class="form-label">Anything else we should know? (optional)</label>
+                    <textarea class="form-input form-textarea" id="additionalNotes" rows="3"
+                        placeholder="Any specific features, requirements, or details you'd like to share..."></textarea>
                 </div>
 
                 <div class="button-row">
                     <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" onclick="nextStep()">Continue →</button>
+                    <button class="btn-wizard" id="step6Next" onclick="nextStep()">Continue →</button>
                 </div>
             </div>
 
-            <!-- Step 6: Assets -->
-            <div class="step-content" id="step6">
-                <h2 class="step-title">Your Assets</h2>
-                <p class="step-subtitle">Do you have materials ready for your website?</p>
+            <!-- ============================================ -->
+            <!-- STEP 7: CONTACT & REVIEW -->
+            <!-- ============================================ -->
+            <div class="step-content" id="step7">
+                <h2 class="step-title">Almost Done!</h2>
+                <p class="step-subtitle">Review your order and complete checkout</p>
 
-                <div class="form-group">
-                    <label class="form-label">Upload Your Logo (optional)</label>
-                    <div class="file-upload" id="logoUploadArea" onclick="document.getElementById('logoFile').click()">
-                        <input type="file" id="logoFile" accept="image/*" onchange="handleLogoUpload(event)">
-                        <div class="file-upload-icon">📁</div>
-                        <div class="file-upload-text">
-                            Drag & drop or <span>browse</span><br>
-                            <small style="opacity: 0.7;">PNG, JPG, SVG up to 5MB</small>
+                <!-- Contact Info Section -->
+                <div class="review-section">
+                    <h3 class="review-section-title">Your Contact Info</h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Full Name *</label>
+                            <input type="text" class="form-input" id="fullName" placeholder="Your name"
+                                oninput="validateStep7()">
                         </div>
                     </div>
-                    <div class="file-preview" id="logoPreview">
-                        <img id="logoPreviewImg" src="" alt="Logo preview">
-                        <div class="file-preview-info" id="logoFileName">logo.png</div>
-                        <button class="file-preview-remove" onclick="removeLogo()">✕ Remove</button>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label">Email *</label>
+                            <input type="email" class="form-input" id="email" placeholder="you@example.com"
+                                oninput="validateStep7()">
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone *</label>
+                            <input type="tel" class="form-input" id="phone" placeholder="(555) 123-4567"
+                                oninput="validateStep7()">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Preferred contact method</label>
+                        <select class="form-input" id="contactMethod">
+                            <option value="email">Email</option>
+                            <option value="phone">Phone</option>
+                            <option value="text">Text Message</option>
+                        </select>
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <label class="form-label">Do you have website content ready?</label>
-                    <select class="form-input" id="contentReady">
-                        <option value="yes">Yes, I have all text and images ready</option>
-                        <option value="partial">I have some content, need help with the rest</option>
-                        <option value="no">No, I need help creating content</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Any specific requirements or notes?</label>
-                    <textarea class="form-input" id="additionalNotes" rows="3"
-                        placeholder="Tell us anything else we should know about your project..."></textarea>
-                </div>
-
-                <div class="button-row">
-                    <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" onclick="nextStep()">Continue →</button>
-                </div>
-            </div>
-
-            <!-- Step 7: Contact Information -->
-            <div class="step-content" id="step7">
-                <h2 class="step-title">Your Information</h2>
-                <p class="step-subtitle">How can we reach you?</p>
-
-                <div class="form-group">
-                    <label class="form-label">Full Name *</label>
-                    <input type="text" class="form-input" id="fullName" placeholder="John Doe"
-                        oninput="validateStep7()">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Email Address *</label>
-                    <input type="email" class="form-input" id="email" placeholder="john@example.com"
-                        oninput="validateStep7()">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Phone Number *</label>
-                    <input type="tel" class="form-input" id="phone" placeholder="(555) 123-4567"
-                        oninput="validateStep7()">
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Preferred contact method</label>
-                    <select class="form-input" id="contactMethod">
-                        <option value="email">Email</option>
-                        <option value="phone">Phone</option>
-                        <option value="text">Text Message</option>
-                    </select>
-                </div>
-
-                <div class="button-row">
-                    <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" id="step7Next" onclick="nextStep()" disabled>Review Order →</button>
-                </div>
-            </div>
-
-            <!-- Step 8: Review & Payment -->
-            <div class="step-content" id="step8">
-                <h2 class="step-title">Review Your Order</h2>
-                <p class="step-subtitle">Make sure everything looks correct</p>
-
+                <!-- Order Summary -->
                 <div class="review-section">
-                    <h4>📦 Package</h4>
+                    <h3 class="review-section-title">Order Summary</h3>
+
                     <div class="review-item">
-                        <span class="review-label">Selected Package</span>
-                        <span class="review-value" id="reviewPackage">Business - $1,399</span>
+                        <span class="review-label">Package</span>
+                        <span class="review-value" id="reviewPackage">-</span>
                     </div>
-                </div>
 
-                <div class="review-section">
-                    <h4>🌐 Domain</h4>
                     <div class="review-item">
                         <span class="review-label">Domain</span>
-                        <span class="review-value" id="reviewDomain">mybusiness.com</span>
+                        <span class="review-value" id="reviewDomain">-</span>
                     </div>
+
                     <div class="review-item" id="reviewDomainCostRow">
                         <span class="review-label">Domain Cost</span>
-                        <span class="review-value" id="reviewDomainCost">$12/year</span>
+                        <span class="review-value" id="reviewDomainCost">-</span>
                     </div>
-                </div>
 
-                <div class="review-section">
-                    <h4>🏢 Business</h4>
                     <div class="review-item">
-                        <span class="review-label">Business Name</span>
-                        <span class="review-value" id="reviewBusinessName">My Business</span>
+                        <span class="review-label">Name / Business</span>
+                        <span class="review-value" id="reviewBusinessName">-</span>
                     </div>
-                    <div class="review-item">
-                        <span class="review-label">Industry</span>
-                        <span class="review-value" id="reviewIndustry">Technology</span>
-                    </div>
-                </div>
 
-                <div class="review-section">
-                    <h4>🎨 Design</h4>
                     <div class="review-item">
-                        <span class="review-label">Style</span>
-                        <span class="review-value" id="reviewStyle">Modern & Minimal</span>
+                        <span class="review-label">Primary Goal</span>
+                        <span class="review-value" id="reviewPrimaryAction">-</span>
                     </div>
-                    <div class="review-item">
-                        <span class="review-label">Pages</span>
-                        <span class="review-value" id="reviewPages">Home, About, Contact</span>
-                    </div>
-                </div>
 
-                <div class="review-section">
-                    <h4>👤 Contact</h4>
                     <div class="review-item">
-                        <span class="review-label">Name</span>
-                        <span class="review-value" id="reviewName">John Doe</span>
+                        <span class="review-label">Design Style</span>
+                        <span class="review-value" id="reviewStyle">-</span>
                     </div>
-                    <div class="review-item">
-                        <span class="review-label">Email</span>
-                        <span class="review-value" id="reviewEmail"><a href="/cdn-cgi/l/email-protection"
-                                class="__cf_email__"
-                                data-cfemail="73191c1b1d33160b121e031f165d101c1e">[email&#160;protected]</a></span>
-                    </div>
-                </div>
 
-                <div class="total-section">
-                    <div class="total-row">
-                        <span class="total-label">Total Due Today</span>
-                        <span class="total-amount" id="reviewTotal">$1,411</span>
+                    <div class="review-item">
+                        <span class="review-label">Contact</span>
+                        <span class="review-value" id="reviewEmail">-</span>
                     </div>
-                    <p
-                        style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 0.75rem; text-align: center;">
-                        One-time payment • Free hosting forever • 3 free revisions included
-                    </p>
+
+                    <div class="review-total">
+                        <span class="review-label">Total Today</span>
+                        <span class="review-value" id="reviewTotal">$0</span>
+                    </div>
                 </div>
 
                 <div class="button-row">
                     <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" onclick="processPayment()" id="payBtn">
+                    <button class="btn-wizard btn-pay" id="payBtn" onclick="processPayment()" disabled>
                         Pay Now →
                     </button>
                 </div>
             </div>
 
-            <!-- Success Screen -->
+            <!-- ============================================ -->
+            <!-- SUCCESS SCREEN -->
+            <!-- ============================================ -->
             <div class="step-content" id="stepSuccess">
                 <div class="success-screen">
                     <div class="success-icon">✓</div>
@@ -533,7 +499,6 @@
                     <a href="/" class="btn-wizard">Return to Homepage</a>
                 </div>
             </div>
-
         </div>
     </div>
 
