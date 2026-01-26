@@ -75,6 +75,15 @@ const SecurityUtils = {
             .slice(0, 10000);
     },
 
+    sanitizeAddress: (input) => {
+        if (!input || typeof input !== 'string') return '';
+        return input
+            .replace(/[<>\"\'`;\\]/g, '')
+            .replace(/javascript:/gi, '')
+            .trim()
+            .slice(0, 500);
+    },
+
     detectAttack: (input) => {
         if (!input || typeof input !== 'string') return false;
         const attackPatterns = [
@@ -180,7 +189,7 @@ const DomainCheckLimiter = {
 
 window.wizardData = {
     currentStep: 1,
-    totalSteps: 7,
+    totalSteps: 8,  // Updated from 7 to 8
 
     // Step 1: Package
     package: null,
@@ -198,21 +207,35 @@ window.wizardData = {
     targetAudience: '',
     tagline: '',
 
-    // Step 4: Website Goals
+    // Step 4: Business Contact Info (NEW)
+    businessEmail: '',
+    showBusinessEmail: true,
+    businessPhone: '',
+    showBusinessPhone: true,
+    businessAddress: '',
+    showBusinessAddress: false,
+    businessHours: '',
+    showBusinessHours: false,
+    socialFacebook: '',
+    socialInstagram: '',
+    socialLinkedin: '',
+    socialTwitter: '',
+
+    // Step 5: Website Goals (was Step 4)
     primaryAction: null,
     features: [],
 
-    // Step 5: Design
+    // Step 6: Design (was Step 5)
     designStyle: null,
     brandColor: '#10b981',
     inspirationUrl: '',
 
-    // Step 6: Content
+    // Step 7: Content (was Step 6)
     contentReady: 'yes',
     logoFile: null,
     additionalNotes: '',
 
-    // Step 7: Contact
+    // Step 8: Contact & Review (was Step 7)
     fullName: '',
     email: '',
     phone: '',
@@ -250,15 +273,16 @@ const actionNames = {
     learn: 'Educate & Inform'
 };
 
-// Step names for progress indicator
+// Step names for progress indicator (Updated for 8 steps)
 const stepNames = [
     'Choose Package',
     'Your Domain',
     'About You',
-    'Website Goals',
-    'Design Style',
-    'Your Content',
-    'Review & Pay'
+    'Contact Info',      // NEW Step 4
+    'Website Goals',     // Was Step 4
+    'Design Style',      // Was Step 5
+    'Your Content',      // Was Step 6
+    'Review & Pay'       // Was Step 7
 ];
 
 // ============================================
@@ -283,8 +307,8 @@ function showStep(step) {
     document.getElementById('stepIndicator').textContent = `Step ${step} of ${wizardData.totalSteps}`;
     document.getElementById('stepName').textContent = stepNames[step - 1] || '';
 
-    // Populate review if on last step
-    if (step === 7) {
+    // Populate review if on last step (now step 8)
+    if (step === 8) {
         populateReview();
     }
 
@@ -443,7 +467,42 @@ window.validateStep3 = function () {
 };
 
 // ============================================
-// STEP 4: WEBSITE GOALS
+// STEP 4: BUSINESS CONTACT INFO (NEW)
+// ============================================
+
+window.validateStep4 = function () {
+    const businessEmail = document.getElementById('businessEmail').value.trim();
+    const businessPhone = document.getElementById('businessPhone')?.value.trim() || '';
+    const businessAddress = document.getElementById('businessAddress')?.value.trim() || '';
+    const businessHours = document.getElementById('businessHours')?.value.trim() || '';
+
+    // Sanitize and store values
+    wizardData.businessEmail = SecurityUtils.sanitizeEmail(businessEmail);
+    wizardData.businessPhone = SecurityUtils.sanitizePhone(businessPhone);
+    wizardData.businessAddress = SecurityUtils.sanitizeAddress(businessAddress);
+    wizardData.businessHours = SecurityUtils.sanitizeText(businessHours);
+
+    // Store display preferences
+    wizardData.showBusinessEmail = document.getElementById('showBusinessEmail')?.checked ?? true;
+    wizardData.showBusinessPhone = document.getElementById('showBusinessPhone')?.checked ?? true;
+    wizardData.showBusinessAddress = document.getElementById('showBusinessAddress')?.checked ?? false;
+    wizardData.showBusinessHours = document.getElementById('showBusinessHours')?.checked ?? false;
+
+    // Store social media links
+    wizardData.socialFacebook = SecurityUtils.sanitizeUrl(document.getElementById('socialFacebook')?.value || '');
+    wizardData.socialInstagram = SecurityUtils.sanitizeUrl(document.getElementById('socialInstagram')?.value || '');
+    wizardData.socialLinkedin = SecurityUtils.sanitizeUrl(document.getElementById('socialLinkedin')?.value || '');
+    wizardData.socialTwitter = SecurityUtils.sanitizeUrl(document.getElementById('socialTwitter')?.value || '');
+
+    // Validate - only business email is required
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const isValid = emailRegex.test(businessEmail);
+
+    document.getElementById('step4Next').disabled = !isValid;
+};
+
+// ============================================
+// STEP 5: WEBSITE GOALS (was Step 4)
 // ============================================
 
 window.selectPrimaryAction = function (action) {
@@ -456,7 +515,7 @@ window.selectPrimaryAction = function (action) {
     document.querySelector(`[data-action="${action}"]`)?.classList.add('selected');
 
     // Enable continue button
-    document.getElementById('step4Next').disabled = false;
+    document.getElementById('step5Next').disabled = false;
 };
 
 window.toggleCheckbox = function (element) {
@@ -468,7 +527,7 @@ window.toggleCheckbox = function (element) {
 };
 
 // ============================================
-// STEP 5: DESIGN STYLE
+// STEP 6: DESIGN STYLE (was Step 5)
 // ============================================
 
 window.selectStyle = function (style) {
@@ -481,11 +540,11 @@ window.selectStyle = function (style) {
     document.querySelector(`[data-style="${style}"]`)?.classList.add('selected');
 
     // Enable continue button
-    document.getElementById('step5Next').disabled = false;
+    document.getElementById('step6Next').disabled = false;
 };
 
 // ============================================
-// STEP 6: YOUR CONTENT
+// STEP 7: YOUR CONTENT (was Step 6)
 // ============================================
 
 window.handleLogoUpload = function (event) {
@@ -523,10 +582,10 @@ window.removeLogo = function () {
 };
 
 // ============================================
-// STEP 7: CONTACT & REVIEW
+// STEP 8: CONTACT & REVIEW (was Step 7)
 // ============================================
 
-window.validateStep7 = function () {
+window.validateStep8 = function () {
     const fullName = document.getElementById('fullName').value.trim();
     const email = document.getElementById('email').value.trim();
     const phone = document.getElementById('phone').value.trim();
@@ -540,11 +599,6 @@ window.validateStep7 = function () {
     const isValid = fullName && emailRegex.test(email) && phone.length >= 10;
 
     document.getElementById('payBtn').disabled = !isValid;
-
-    // Update review email display
-    if (email) {
-        document.getElementById('reviewEmail').textContent = email;
-    }
 };
 
 function populateReview() {
@@ -568,6 +622,12 @@ function populateReview() {
     // Business Name
     document.getElementById('reviewBusinessName').textContent = wizardData.businessName;
 
+    // Business Email (new)
+    const businessEmailEl = document.getElementById('reviewBusinessEmail');
+    if (businessEmailEl) {
+        businessEmailEl.textContent = wizardData.businessEmail || '-';
+    }
+
     // Primary Action
     document.getElementById('reviewPrimaryAction').textContent =
         actionNames[wizardData.primaryAction] || wizardData.primaryAction;
@@ -575,9 +635,6 @@ function populateReview() {
     // Design Style
     document.getElementById('reviewStyle').textContent =
         styleNames[wizardData.designStyle] || wizardData.designStyle;
-
-    // Email (will be updated by validateStep7)
-    document.getElementById('reviewEmail').textContent = wizardData.email || '-';
 
     // Total
     const total = wizardData.packagePrice + wizardData.domainPrice;
@@ -609,7 +666,9 @@ window.processPayment = async function () {
         wizardData.targetAudience,
         wizardData.fullName,
         wizardData.email,
-        wizardData.additionalNotes
+        wizardData.additionalNotes,
+        wizardData.businessEmail,
+        wizardData.businessAddress
     ].join(' ');
 
     if (SecurityUtils.detectAttack(allText)) {
@@ -647,6 +706,31 @@ window.processPayment = async function () {
         formData.append('businessDescription', `${wizardData.whatYouDo} Target audience: ${wizardData.targetAudience}`);
         formData.append('industry', 'auto-detect'); // AI will infer from whatYouDo
 
+        // Business Contact Info (NEW - for the website)
+        formData.append('businessEmail', wizardData.businessEmail);
+        formData.append('showBusinessEmail', wizardData.showBusinessEmail);
+        formData.append('businessPhone', wizardData.businessPhone);
+        formData.append('showBusinessPhone', wizardData.showBusinessPhone);
+        formData.append('businessAddress', wizardData.businessAddress);
+        formData.append('showBusinessAddress', wizardData.showBusinessAddress);
+        formData.append('businessHours', wizardData.businessHours);
+        formData.append('showBusinessHours', wizardData.showBusinessHours);
+
+        // Social Media Links (NEW)
+        formData.append('socialFacebook', wizardData.socialFacebook);
+        formData.append('socialInstagram', wizardData.socialInstagram);
+        formData.append('socialLinkedin', wizardData.socialLinkedin);
+        formData.append('socialTwitter', wizardData.socialTwitter);
+
+        // Bundle social links for AI
+        const socialLinks = {
+            facebook: wizardData.socialFacebook,
+            instagram: wizardData.socialInstagram,
+            linkedin: wizardData.socialLinkedin,
+            twitter: wizardData.socialTwitter
+        };
+        formData.append('socialLinks', JSON.stringify(socialLinks));
+
         // Website Goals
         formData.append('primaryAction', wizardData.primaryAction);
         formData.append('features', JSON.stringify(wizardData.features));
@@ -667,7 +751,7 @@ window.processPayment = async function () {
             formData.append('logo', wizardData.logoFile);
         }
 
-        // Contact info
+        // Contact info (customer's personal info for US to contact them)
         formData.append('name', wizardData.fullName);
         formData.append('email', wizardData.email);
         formData.append('phone', wizardData.phone);
@@ -684,6 +768,7 @@ window.processPayment = async function () {
             package: wizardData.package,
             domain: wizardData.domain,
             email: wizardData.email,
+            businessEmail: wizardData.businessEmail,
             primaryAction: wizardData.primaryAction,
             total: totalCost
         });
@@ -805,6 +890,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (inspirationInput) {
         inspirationInput.addEventListener('input', (e) => {
             wizardData.inspirationUrl = SecurityUtils.sanitizeUrl(e.target.value);
+        });
+    }
+
+    // Initialize business email listener to auto-validate
+    const businessEmailInput = document.getElementById('businessEmail');
+    if (businessEmailInput) {
+        businessEmailInput.addEventListener('input', () => {
+            validateStep4();
         });
     }
 
