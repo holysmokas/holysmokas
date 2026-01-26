@@ -5,10 +5,78 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Build Your Website - alimi.ai</title>
-    <link rel="icon" type="image/svg+xml" href="/assets/alimiai1-qFnyEQ6n.png" />
+    <link rel="icon" type="image/svg+xml" href="/assets/alimiai1-C48NVI5t.png" />
     <script>window.GOOGLE_ANALYTICS_ID = 'G-ZBZWDLCJVJ';</script>
     <script src="/cookie-consent.js"></script>
-  <script type="module" crossorigin src="/assets/build-3JHltJie.js"></script>
+    <style>
+        /* Additional styles for the new contact info step */
+        .contact-input-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .contact-checkbox input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #10b981;
+        }
+
+        .contact-checkbox label {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .social-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .social-input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .social-icon {
+            font-size: 1.25rem;
+            width: 30px;
+            text-align: center;
+        }
+
+        .social-input-row .form-input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-box p {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            margin: 0;
+        }
+
+        .info-box strong {
+            color: #60a5fa;
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/build-BcpYwyMb.js"></script>
   <link rel="modulepreload" crossorigin href="/assets/config-elnU3pxP.js">
   <link rel="stylesheet" crossorigin href="/assets/build-BNeLdla3.css">
   <link rel="stylesheet" crossorigin href="/assets/style-Bm6i-fqz.css">
@@ -18,7 +86,7 @@
     <!-- Header -->
     <header class="wizard-header">
         <a href="/" class="wizard-logo">
-            <img src="/assets/alimiai1-qFnyEQ6n.png" alt="alimi.ai">
+            <img src="/assets/alimiai1-C48NVI5t.png" alt="alimi.ai">
             alimi.ai
         </a>
         <a href="/" class="wizard-exit">← Exit Builder</a>
@@ -56,10 +124,10 @@
             <!-- Progress Bar -->
             <div class="progress-container">
                 <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill" style="width: 14.28%"></div>
+                    <div class="progress-fill" id="progressFill" style="width: 12.5%"></div>
                 </div>
                 <div class="progress-text">
-                    <span id="stepIndicator">Step 1 of 7</span>
+                    <span id="stepIndicator">Step 1 of 8</span>
                     <span id="stepName">Choose Package</span>
                 </div>
             </div>
@@ -200,9 +268,100 @@
             </div>
 
             <!-- ============================================ -->
-            <!-- STEP 4: WHAT SHOULD YOUR WEBSITE DO? -->
+            <!-- STEP 4: BUSINESS CONTACT INFO (FOR WEBSITE) -->
             <!-- ============================================ -->
             <div class="step-content" id="step4">
+                <h2 class="step-title">Contact Info for Your Website</h2>
+                <p class="step-subtitle">What contact details should visitors see on your site?</p>
+
+                <div class="info-box">
+                    <p>📧 <strong>Working Contact Form Included!</strong> Your website will have a contact form that
+                        sends messages directly to your email.</p>
+                </div>
+
+                <!-- Business Email -->
+                <div class="form-group">
+                    <label class="form-label">Business Email *</label>
+                    <input type="email" class="form-input" id="businessEmail" placeholder="contact@yourbusiness.com"
+                        oninput="validateStep4()">
+                    <p class="form-hint">Contact form submissions will be sent to this email</p>
+                    <div class="contact-checkbox" style="margin-top: 0.5rem;">
+                        <input type="checkbox" id="showBusinessEmail" checked>
+                        <label for="showBusinessEmail">Display this email on my website</label>
+                    </div>
+                </div>
+
+                <!-- Business Phone -->
+                <div class="form-group">
+                    <label class="form-label">Business Phone (optional)</label>
+                    <input type="tel" class="form-input" id="businessPhone" placeholder="(555) 123-4567">
+                    <div class="contact-checkbox" style="margin-top: 0.5rem;">
+                        <input type="checkbox" id="showBusinessPhone" checked>
+                        <label for="showBusinessPhone">Display phone number on my website</label>
+                    </div>
+                </div>
+
+                <!-- Business Address -->
+                <div class="form-group">
+                    <label class="form-label">Business Address (optional)</label>
+                    <input type="text" class="form-input" id="businessAddress"
+                        placeholder="123 Main St, City, State 12345">
+                    <p class="form-hint">Leave blank if you work remotely or prefer not to share</p>
+                    <div class="contact-checkbox" style="margin-top: 0.5rem;">
+                        <input type="checkbox" id="showBusinessAddress">
+                        <label for="showBusinessAddress">Display address on my website</label>
+                    </div>
+                </div>
+
+                <!-- Business Hours -->
+                <div class="form-group">
+                    <label class="form-label">Business Hours (optional)</label>
+                    <input type="text" class="form-input" id="businessHours"
+                        placeholder="Mon-Fri 9am-5pm, Sat 10am-2pm">
+                    <div class="contact-checkbox" style="margin-top: 0.5rem;">
+                        <input type="checkbox" id="showBusinessHours">
+                        <label for="showBusinessHours">Display hours on my website</label>
+                    </div>
+                </div>
+
+                <!-- Social Media Links -->
+                <div class="form-group">
+                    <label class="form-label">Social Media Links (optional)</label>
+                    <p class="form-hint" style="margin-bottom: 0.75rem;">We'll add icons linking to your profiles</p>
+                    <div class="social-inputs">
+                        <div class="social-input-row">
+                            <span class="social-icon">📘</span>
+                            <input type="url" class="form-input" id="socialFacebook"
+                                placeholder="https://facebook.com/yourbusiness">
+                        </div>
+                        <div class="social-input-row">
+                            <span class="social-icon">📸</span>
+                            <input type="url" class="form-input" id="socialInstagram"
+                                placeholder="https://instagram.com/yourbusiness">
+                        </div>
+                        <div class="social-input-row">
+                            <span class="social-icon">💼</span>
+                            <input type="url" class="form-input" id="socialLinkedin"
+                                placeholder="https://linkedin.com/in/yourprofile">
+                        </div>
+                        <div class="social-input-row">
+                            <span class="social-icon">🐦</span>
+                            <input type="url" class="form-input" id="socialTwitter"
+                                placeholder="https://x.com/yourbusiness">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="button-row">
+                    <button class="btn-back" onclick="prevStep()">← Back</button>
+                    <button class="btn-wizard" id="step4Next" onclick="nextStep()" disabled>Continue →</button>
+                </div>
+            </div>
+
+            <!-- ============================================ -->
+            <!-- STEP 5: WHAT SHOULD YOUR WEBSITE DO? -->
+            <!-- ============================================ -->
+            <div class="step-content" id="step5">
                 <h2 class="step-title">What should your website do?</h2>
                 <p class="step-subtitle">Tell us what you want visitors to accomplish</p>
 
@@ -288,14 +447,14 @@
 
                 <div class="button-row">
                     <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" id="step4Next" onclick="nextStep()" disabled>Continue →</button>
+                    <button class="btn-wizard" id="step5Next" onclick="nextStep()" disabled>Continue →</button>
                 </div>
             </div>
 
             <!-- ============================================ -->
-            <!-- STEP 5: DESIGN STYLE -->
+            <!-- STEP 6: DESIGN STYLE -->
             <!-- ============================================ -->
-            <div class="step-content" id="step5">
+            <div class="step-content" id="step6">
                 <h2 class="step-title">Design Style</h2>
                 <p class="step-subtitle">What vibe should your website have?</p>
 
@@ -341,14 +500,14 @@
 
                 <div class="button-row">
                     <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" id="step5Next" onclick="nextStep()" disabled>Continue →</button>
+                    <button class="btn-wizard" id="step6Next" onclick="nextStep()" disabled>Continue →</button>
                 </div>
             </div>
 
             <!-- ============================================ -->
-            <!-- STEP 6: YOUR CONTENT -->
+            <!-- STEP 7: YOUR CONTENT -->
             <!-- ============================================ -->
-            <div class="step-content" id="step6">
+            <div class="step-content" id="step7">
                 <h2 class="step-title">Your Content</h2>
                 <p class="step-subtitle">Help us understand what you have ready</p>
 
@@ -384,26 +543,28 @@
 
                 <div class="button-row">
                     <button class="btn-back" onclick="prevStep()">← Back</button>
-                    <button class="btn-wizard" id="step6Next" onclick="nextStep()">Continue →</button>
+                    <button class="btn-wizard" id="step7Next" onclick="nextStep()">Continue →</button>
                 </div>
             </div>
 
             <!-- ============================================ -->
-            <!-- STEP 7: CONTACT & REVIEW -->
+            <!-- STEP 8: CONTACT & REVIEW -->
             <!-- ============================================ -->
-            <div class="step-content" id="step7">
+            <div class="step-content" id="step8">
                 <h2 class="step-title">Almost Done!</h2>
                 <p class="step-subtitle">Review your order and complete checkout</p>
 
                 <!-- Contact Info Section -->
                 <div class="review-section">
                     <h3 class="review-section-title">Your Contact Info</h3>
+                    <p class="form-hint" style="margin-top: -0.5rem; margin-bottom: 1rem;">How WE will contact you about
+                        your project</p>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label class="form-label">Full Name *</label>
                             <input type="text" class="form-input" id="fullName" placeholder="Your name"
-                                oninput="validateStep7()">
+                                oninput="validateStep8()">
                         </div>
                     </div>
 
@@ -411,12 +572,12 @@
                         <div class="form-group">
                             <label class="form-label">Email *</label>
                             <input type="email" class="form-input" id="email" placeholder="you@example.com"
-                                oninput="validateStep7()">
+                                oninput="validateStep8()">
                         </div>
                         <div class="form-group">
                             <label class="form-label">Phone *</label>
                             <input type="tel" class="form-input" id="phone" placeholder="(555) 123-4567"
-                                oninput="validateStep7()">
+                                oninput="validateStep8()">
                         </div>
                     </div>
 
@@ -455,6 +616,11 @@
                     </div>
 
                     <div class="review-item">
+                        <span class="review-label">Business Email</span>
+                        <span class="review-value" id="reviewBusinessEmail">-</span>
+                    </div>
+
+                    <div class="review-item">
                         <span class="review-label">Primary Goal</span>
                         <span class="review-value" id="reviewPrimaryAction">-</span>
                     </div>
@@ -462,11 +628,6 @@
                     <div class="review-item">
                         <span class="review-label">Design Style</span>
                         <span class="review-value" id="reviewStyle">-</span>
-                    </div>
-
-                    <div class="review-item">
-                        <span class="review-label">Contact</span>
-                        <span class="review-value" id="reviewEmail">-</span>
                     </div>
 
                     <div class="review-total">
