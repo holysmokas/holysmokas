@@ -263,6 +263,11 @@
         </div>
     </div>
 
+    <div class="footer-bottom">
+        <p>&copy; 2026 alimi.ai. All rights reserved.</p>
+        <p class="made-by">Made by <a href="https://www.holysmokas.com" target="_blank">Holysmokas Labs</a></p>
+    </div>
+
     <script>
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project_id');
@@ -280,7 +285,7 @@
 
         const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8080'
-            : 'https://holysmokas.com';
+            : 'https://alimi.ai';
 
         async function startCheckout() {
             const btn = document.getElementById('checkoutBtn');
