@@ -344,7 +344,9 @@
         }
 
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         /* Toast Notifications */
@@ -373,15 +375,40 @@
             animation: slideIn 0.3s ease-out;
         }
 
-        .toast.success { border-left: 4px solid #10b981; }
-        .toast.warning { border-left: 4px solid #f59e0b; }
-        .toast.error { border-left: 4px solid #ef4444; }
-        .toast.info { border-left: 4px solid #3b82f6; }
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
 
-        .toast-icon { font-size: 1.5rem; }
-        .toast-content { flex: 1; }
-        .toast-title { color: #ffffff; font-weight: 600; margin-bottom: 4px; }
-        .toast-message { color: rgba(255, 255, 255, 0.7); font-size: 0.9rem; }
+        .toast.warning {
+            border-left: 4px solid #f59e0b;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        .toast-icon {
+            font-size: 1.5rem;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            color: #ffffff;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .toast-message {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
 
         .toast-close {
             background: none;
@@ -392,13 +419,27 @@
         }
 
         @keyframes slideIn {
-            from { opacity: 0; transform: translateX(100px); }
-            to { opacity: 1; transform: translateX(0); }
+            from {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
         }
 
         @keyframes slideOut {
-            from { opacity: 1; transform: translateX(0); }
-            to { opacity: 0; transform: translateX(100px); }
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
         }
 
         /* Info text */
@@ -469,7 +510,8 @@
             <!-- Main Card -->
             <div class="card">
                 <div class="card-header">
-                    <h2 style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                    <h2
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
                         <span>Domain Setup</span>
                         <span class="status-badge status-pending" id="statusBadge">⏳ Pending</span>
                     </h2>
@@ -508,7 +550,8 @@
                                     <span class="ns-value">Loading...</span>
                                 </div>
                             </div>
-                            <button class="btn btn-secondary" onclick="copyAllNameservers()" style="width: 100%; margin-top: 15px;">
+                            <button class="btn btn-secondary" onclick="copyAllNameservers()"
+                                style="width: 100%; margin-top: 15px;">
                                 📋 Copy All Nameservers
                             </button>
                         </div>
@@ -571,6 +614,10 @@
                         <strong>Tip:</strong> Your site is already live at a temporary URL while you wait.
                     </p>
                 </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 alimi.ai. All rights reserved.</p>
+                <p class="made-by">Made by <a href="https://www.holysmokas.com" target="_blank">Holysmokas Labs</a></p>
             </div>
         </div>
     </div>
