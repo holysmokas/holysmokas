@@ -187,6 +187,91 @@
                 font-size: 1.5rem;
             }
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1000;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            position: relative;
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.1) 0%, rgba(10, 26, 10, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.2);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            z-index: 1;
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-size: 2.5rem;
+            color: white;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+        }
+
+        .modal-icon.error {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+        }
+
+        .modal-content h3 {
+            color: #ffffff;
+            font-size: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .modal-content p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0;
+            line-height: 1.6;
+        }
     </style>
   <link rel="stylesheet" crossorigin href="/assets/style-Bm6i-fqz.css">
   <link rel="stylesheet" crossorigin href="/assets/portal-CIiezVlN.css">
@@ -271,12 +356,26 @@
 
             <div class="contact-info">
                 <h3>Other Ways to Reach Us</h3>
-                <p>📧 <a href="mailto:contact@holysmokas.com">contact@holysmokas.com</a></p>
+                <p>📧 <a href="/cdn-cgi/l/email-protection#0665696872676572466e696a7f756b696d67752865696b"><span
+                            class="__cf_email__"
+                            data-cfemail="e2818d8c96838196a28a8d8e9b918f8d898391cc818d8f">[email&#160;protected]</span></a>
+                </p>
             </div>
 
             <p class="security-note">
                 🔒 Your information is secure and will never be shared
             </p>
+        </div>
+    </div>
+
+    <!-- Success/Error Modal -->
+    <div id="statusModal" class="modal">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <div class="modal-icon" id="modalIcon">✓</div>
+            <h3 id="modalTitle">Success!</h3>
+            <p id="modalMessage">Your message has been sent.</p>
+            <button class="btn-submit" onclick="closeModal()" style="margin-top: 1rem;">Got it</button>
         </div>
     </div>
 
@@ -290,7 +389,9 @@
             <div class="footer-section">
                 <h4>Contact</h4>
                 <ul>
-                    <li>Email: contact@holysmokas.com</li>
+                    <li>Email: <a href="/cdn-cgi/l/email-protection" class="__cf_email__"
+                            data-cfemail="8be8e4e5ffeae8ffcbe3e4e7f2f8e6e4e0eaf8a5e8e4e6">[email&#160;protected]</a>
+                    </li>
                     <li>Hours: Mon-Fri 9am-6pm</li>
                 </ul>
             </div>
@@ -314,17 +415,42 @@
             ? 'http://localhost:8080'
             : 'https://api.alimi.ai';
 
+        function showModal(success, title, message) {
+            const modal = document.getElementById('statusModal');
+            const icon = document.getElementById('modalIcon');
+            const titleEl = document.getElementById('modalTitle');
+            const messageEl = document.getElementById('modalMessage');
+
+            if (success) {
+                icon.textContent = '✓';
+                icon.classList.remove('error');
+            } else {
+                icon.textContent = '✕';
+                icon.classList.add('error');
+            }
+
+            titleEl.textContent = title;
+            messageEl.textContent = message;
+            modal.classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('statusModal').classList.remove('show');
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
         document.getElementById('contactForm').addEventListener('submit', async (e) => {
             e.preventDefault();
 
             const submitBtn = document.getElementById('submitBtn');
-            const statusMessage = document.getElementById('statusMessage');
 
             // Disable button and show loading
             submitBtn.disabled = true;
             submitBtn.textContent = 'Sending...';
-            statusMessage.className = 'status-message';
-            statusMessage.style.display = 'none';
 
             const formData = {
                 name: document.getElementById('name').value.trim(),
@@ -346,16 +472,14 @@
                 const result = await response.json();
 
                 if (response.ok && result.success) {
-                    statusMessage.className = 'status-message success';
-                    statusMessage.innerHTML = '✅ <strong>Message sent!</strong> We\'ll get back to you within 24 hours.';
+                    showModal(true, 'Message Sent! 🎉', "Thanks for reaching out! We'll get back to you within 24 hours.");
                     document.getElementById('contactForm').reset();
                 } else {
                     throw new Error(result.error || 'Failed to send message');
                 }
             } catch (error) {
                 console.error('Contact form error:', error);
-                statusMessage.className = 'status-message error';
-                statusMessage.innerHTML = '❌ <strong>Unable to send message.</strong> Please try again or email us directly.';
+                showModal(false, 'Oops! Something went wrong', 'Please try again or email us directly at contact@holysmokas.com');
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Message';
