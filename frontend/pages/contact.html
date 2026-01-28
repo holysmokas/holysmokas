@@ -7,257 +7,295 @@
     <title>Contact Us - alimi.ai</title>
     <link rel="icon" type="image/svg+xml" href="/frontend/img/alimiai1.png" />
     <link rel="stylesheet" href="/frontend/css/style.css">
+    <link rel="stylesheet" href="/frontend/css/portal.css">
     <link rel="stylesheet" href="/frontend/css/legalpages.css">
     <!-- Google Analytics -->
     <script>window.GOOGLE_ANALYTICS_ID = 'G-ZBZWDLCJVJ';</script>
     <script src="/cookie-consent.js"></script>
 
     <style>
-        .contact-section {
-            padding: 80px 20px;
-            min-height: calc(100vh - 200px);
-            background: linear-gradient(135deg, #f5f7fa 0%, #e4e8ec 100%);
-        }
-
         .contact-container {
-            max-width: 600px;
-            margin: 0 auto;
+            min-height: calc(100vh - 80px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 6rem 2rem 4rem;
+            position: relative;
+            z-index: 10;
         }
 
-        .contact-header {
+        .contact-box {
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: 0 0 60px rgba(16, 185, 129, 0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .contact-box h2 {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 0.5rem;
+            color: #ffffff;
+            font-size: 1.75rem;
         }
 
-        .contact-header h1 {
-            font-size: 2.5rem;
-            color: #1a1a2e;
-            margin-bottom: 10px;
-        }
-
-        .contact-header p {
-            color: #6b7280;
-            font-size: 1.1rem;
-        }
-
-        .contact-card {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        .contact-box .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 2rem;
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 1.25rem;
         }
 
         .form-group label {
             display: block;
-            font-weight: 600;
-            color: #1a1a2e;
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-weight: 500;
             font-size: 0.95rem;
         }
 
         .form-group label .optional {
             font-weight: 400;
-            color: #9ca3af;
+            color: rgba(255, 255, 255, 0.4);
             font-size: 0.85rem;
         }
 
         .form-group input,
         .form-group textarea {
             width: 100%;
-            padding: 14px 16px;
-            border: 2px solid #e5e7eb;
+            padding: 0.85rem 1rem;
+            background: rgba(16, 185, 129, 0.05);
+            border: 2px solid rgba(16, 185, 129, 0.2);
             border-radius: 10px;
             font-size: 1rem;
+            color: #ffffff;
             transition: all 0.3s ease;
             font-family: inherit;
+        }
+
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(255, 255, 255, 0.4);
         }
 
         .form-group input:focus,
         .form-group textarea:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            border-color: #10b981;
+            background: rgba(16, 185, 129, 0.08);
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.15);
         }
 
         .form-group textarea {
-            min-height: 150px;
+            min-height: 120px;
             resize: vertical;
         }
 
-        .submit-btn {
+        .btn-submit {
             width: 100%;
-            padding: 16px 32px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #ffffff;
             border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
+            border-radius: 12px;
+            padding: 1rem;
+            font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
         }
 
-        .submit-btn:hover {
+        .btn-submit:hover {
             transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
         }
 
-        .submit-btn:disabled {
+        .btn-submit:disabled {
             opacity: 0.7;
             cursor: not-allowed;
             transform: none;
         }
 
         .status-message {
-            padding: 16px;
+            padding: 1rem;
             border-radius: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
             display: none;
+            text-align: center;
         }
 
         .status-message.success {
-            background: #d1fae5;
-            border: 2px solid #10b981;
-            color: #065f46;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.4);
+            color: #6ee7b7;
             display: block;
         }
 
         .status-message.error {
-            background: #fee2e2;
-            border: 2px solid #ef4444;
-            color: #991b1b;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            color: #fca5a5;
             display: block;
         }
 
         .contact-info {
-            margin-top: 40px;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(16, 185, 129, 0.2);
             text-align: center;
-            padding: 30px;
-            background: #f9fafb;
-            border-radius: 12px;
         }
 
         .contact-info h3 {
-            color: #1a1a2e;
-            margin-bottom: 15px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 1rem;
+            font-size: 1rem;
         }
 
         .contact-info p {
-            color: #6b7280;
-            margin-bottom: 8px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 0.5rem;
         }
 
         .contact-info a {
-            color: #667eea;
+            color: #10b981;
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
+            transition: all 0.3s ease;
         }
 
         .contact-info a:hover {
-            text-decoration: underline;
+            text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+        }
+
+        .security-note {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            margin-top: 1.5rem;
         }
 
         @media (max-width: 768px) {
-            .contact-card {
-                padding: 24px;
+            .contact-box {
+                padding: 1.5rem;
+                margin: 1rem;
             }
 
-            .contact-header h1 {
-                font-size: 2rem;
+            .contact-box h2 {
+                font-size: 1.5rem;
             }
         }
     </style>
 </head>
 
 <body>
+    <!-- Animated Background -->
+    <div class="page-bg"></div>
+    <div class="circuit-bg"></div>
+    <div class="light-beams">
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+        <div class="beam"></div>
+    </div>
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Navigation -->
     <nav>
         <div class="nav-container">
             <div class="logo">
-                <a href="/" style="text-decoration: none; color: inherit;">
-                    alimi.ai - Build. Connect. Bloom.
-                    <img src="/frontend/img/alimiai1.png" alt="alimi.ai logo"
-                        style="height:60px; vertical-align: middle; margin-left: 5px;">
+                <a href="/">
+                    <img src="/frontend/img/alimiai1.png" alt="alimi.ai" class="logo-img">
+                    alimi.ai
                 </a>
             </div>
-            <ul class="nav-links">
-                <li><a href="/">Home</a></li>
-                <li><a href="/#pricing">Pricing</a></li>
-                <li><a href="/#portfolio">Portfolio</a></li>
-                <li><a href="/#about">About</a></li>
-                <li><a href="/login.html">Login</a></li>
-            </ul>
-            <div class="nav-cta">
+            <div class="nav-cta" style="display: flex; gap: 1rem;">
+                <a href="/" class="btn btn-secondary">Back to Home</a>
                 <a href="/build.html" class="btn btn-primary">Get Started</a>
             </div>
         </div>
     </nav>
 
-    <section class="contact-section">
-        <div class="contact-container">
-            <div class="contact-header">
-                <h1>📬 Get in Touch</h1>
-                <p>Have questions? We'd love to hear from you.</p>
-            </div>
+    <div class="contact-container">
+        <div class="contact-box">
+            <h2>📬 Get in Touch</h2>
+            <p class="subtitle">Have questions? We'd love to hear from you.</p>
 
-            <div class="contact-card">
-                <div id="statusMessage" class="status-message"></div>
+            <div id="statusMessage" class="status-message"></div>
 
-                <form id="contactForm">
-                    <div class="form-group">
-                        <label for="name">Name *</label>
-                        <input type="text" id="name" name="name" required placeholder="Your full name">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="email">Email *</label>
-                        <input type="email" id="email" name="email" required placeholder="your@email.com">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="phone">Phone <span class="optional">(optional)</span></label>
-                        <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message">Message *</label>
-                        <textarea id="message" name="message" required placeholder="How can we help you?"></textarea>
-                    </div>
-
-                    <button type="submit" class="submit-btn" id="submitBtn">
-                        Send Message
-                    </button>
-                </form>
-
-                <div class="contact-info">
-                    <h3>Other Ways to Reach Us</h3>
-                    <p>📧 Email: <a href="mailto:contact@holysmokas.com">contact@holysmokas.com</a></p>
-                    <p>📞 Phone: <a href="tel:+14156917085">(415) 691-7085</a></p>
+            <form id="contactForm">
+                <div class="form-group">
+                    <label for="name">Name *</label>
+                    <input type="text" id="name" name="name" required placeholder="Your full name">
                 </div>
-            </div>
-        </div>
-    </section>
 
+                <div class="form-group">
+                    <label for="email">Email *</label>
+                    <input type="email" id="email" name="email" required placeholder="your@email.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="phone">Phone <span class="optional">(optional)</span></label>
+                    <input type="tel" id="phone" name="phone" placeholder="(555) 123-4567">
+                </div>
+
+                <div class="form-group">
+                    <label for="message">Message *</label>
+                    <textarea id="message" name="message" required placeholder="How can we help you?"></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    Send Message
+                </button>
+            </form>
+
+            <div class="contact-info">
+                <h3>Other Ways to Reach Us</h3>
+                <p>📧 <a href="mailto:contact@holysmokas.com">contact@holysmokas.com</a></p>
+            </div>
+
+            <p class="security-note">
+                🔒 Your information is secure and will never be shared
+            </p>
+        </div>
+    </div>
+
+    <!-- Footer -->
     <footer>
         <div class="footer-content">
             <div class="footer-section">
-                <h3>alimi.ai</h3>
-                <p>AI-powered websites for small businesses. Professional, fast, affordable.</p>
+                <h4>alimi.ai</h4>
+                <p>Professional websites for small businesses without monthly fees. Free hosting included.</p>
             </div>
             <div class="footer-section">
-                <h3>Quick Links</h3>
+                <h4>Contact</h4>
                 <ul>
-                    <li><a href="/">Home</a></li>
-                    <li><a href="/#pricing">Pricing</a></li>
-                    <li><a href="/#portfolio">Portfolio</a></li>
-                    <li><a href="/contact.html">Contact</a></li>
+                    <li>Email: contact@holysmokas.com</li>
+                    <li>Hours: Mon-Fri 9am-6pm</li>
                 </ul>
             </div>
             <div class="footer-section">
-                <h3>Legal</h3>
+                <h4>Legal</h4>
                 <ul>
                     <li><a href="/privacy.html">Privacy Policy</a></li>
                     <li><a href="/terms.html">Terms of Service</a></li>
@@ -267,8 +305,7 @@
         </div>
         <div class="footer-bottom">
             <p>&copy; 2026 alimi.ai. All rights reserved.</p>
-            <p style="margin-top: 8px; font-size: 12px; opacity: 0.8;">Made by <a href="https://www.holysmokas.com"
-                    target="_blank" style="color: inherit; text-decoration: underline;">Holysmokas Labs</a></p>
+            <p class="made-by">Made by <a href="https://www.holysmokas.com" target="_blank">Holysmokas Labs</a></p>
         </div>
     </footer>
 
@@ -318,7 +355,7 @@
             } catch (error) {
                 console.error('Contact form error:', error);
                 statusMessage.className = 'status-message error';
-                statusMessage.innerHTML = '❌ <strong>Unable to send message.</strong> Please try again or email us directly at contact@holysmokas.com';
+                statusMessage.innerHTML = '❌ <strong>Unable to send message.</strong> Please try again or email us directly.';
             } finally {
                 submitBtn.disabled = false;
                 submitBtn.textContent = 'Send Message';
