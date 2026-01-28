@@ -1,0 +1,324 @@
+/* ============================================
+   LEGAL PAGES - NEW SIMPLIFIED STYLES
+   ============================================ */
+
+
+/* Footer 'Made By' styles */
+.made-by {
+    margin-top: 8px;
+    font-size: 12px;
+}
+
+.made-by,
+.made-by a {
+    background: linear-gradient(90deg, #f59e0b, #fbbf24, #f59e0b);
+    background-size: 200% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: shimmer 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: 0% center;
+    }
+
+    50% {
+        background-position: 100% center;
+    }
+
+    100% {
+        background-position: 0% center;
+    }
+}
+
+/* Footer 'Made By' styles END */
+
+/* Cookies.html */
+.legal-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    z-index: 10;
+}
+
+.legal-card {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 0 60px rgba(16, 185, 129, 0.1);
+}
+
+.legal-card h1 {
+    color: #10b981;
+    margin-bottom: 0.5rem;
+    font-size: 2.25rem;
+}
+
+.legal-card .last-updated {
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.legal-card h2 {
+    color: #34d399;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.legal-card h3 {
+    color: rgba(255, 255, 255, 0.9);
+    margin-top: 1.5rem;
+    margin-bottom: 0.75rem;
+    font-size: 1.1rem;
+}
+
+.legal-card p,
+.legal-card li {
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 1rem;
+}
+
+.legal-card ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.legal-card li {
+    margin-bottom: 0.5rem;
+}
+
+.legal-card a {
+    color: #10b981;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.legal-card a:hover {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.legal-card strong {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.cookie-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.cookie-table th,
+.cookie-table td {
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    padding: 12px 16px;
+    text-align: left;
+}
+
+.cookie-table th {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    font-weight: 600;
+}
+
+.cookie-table td {
+    background: rgba(16, 185, 129, 0.05);
+    color: rgba(255, 255, 255, 0.8);
+}
+
+.cookie-table tr:hover td {
+    background: rgba(16, 185, 129, 0.1);
+}
+
+.manage-cookies-btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+    padding: 12px 24px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    font-size: 14px;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+}
+
+.manage-cookies-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(16, 185, 129, 0.4);
+}
+
+code {
+    background: rgba(16, 185, 129, 0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #34d399;
+    font-family: monospace;
+}
+
+
+/* Cookies.html END */
+
+/* privacy.html */
+.legal-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    z-index: 10;
+}
+
+.legal-card {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 0 60px rgba(16, 185, 129, 0.1);
+}
+
+.legal-card h1 {
+    color: #10b981;
+    margin-bottom: 0.5rem;
+    font-size: 2.25rem;
+}
+
+.legal-card .last-updated {
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.legal-card h2 {
+    color: #34d399;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.legal-card p,
+.legal-card li {
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 1rem;
+}
+
+.legal-card ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.legal-card li {
+    margin-bottom: 0.5rem;
+}
+
+.legal-card a {
+    color: #10b981;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.legal-card a:hover {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.legal-card strong {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+code {
+    background: rgba(16, 185, 129, 0.15);
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #34d399;
+    font-family: monospace;
+}
+
+/* privacy.html END */
+
+/* terms.html */
+.legal-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 8rem 2rem 4rem;
+    position: relative;
+    z-index: 10;
+}
+
+.legal-card {
+    background: linear-gradient(145deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.04) 100%);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    border-radius: 20px;
+    padding: 3rem;
+    box-shadow: 0 0 60px rgba(16, 185, 129, 0.1);
+}
+
+.legal-card h1 {
+    color: #10b981;
+    margin-bottom: 0.5rem;
+    font-size: 2.25rem;
+}
+
+.legal-card .last-updated {
+    color: rgba(255, 255, 255, 0.5);
+    margin-bottom: 2rem;
+    font-size: 0.9rem;
+}
+
+.legal-card h2 {
+    color: #34d399;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    font-size: 1.4rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+}
+
+.legal-card p,
+.legal-card li {
+    line-height: 1.8;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 1rem;
+}
+
+.legal-card ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.legal-card li {
+    margin-bottom: 0.5rem;
+}
+
+.legal-card a {
+    color: #10b981;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.legal-card a:hover {
+    text-shadow: 0 0 10px rgba(16, 185, 129, 0.5);
+}
+
+.legal-card strong {
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* terms.html END */
