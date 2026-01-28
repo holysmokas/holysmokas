@@ -11,7 +11,7 @@ import { ENDPOINTS } from '/frontend/scripts/config.js';
 const API_URL = ENDPOINTS?.apiUrl ||
     (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
         ? 'http://localhost:8080'
-        : 'https://api.holysmokas.com');
+        : 'https://api.alimi.ai');
 
 let currentUserId = null;
 let currentProjectId = null;
