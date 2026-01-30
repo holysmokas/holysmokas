@@ -653,6 +653,9 @@ window.processPayment = async function () {
         return;
     }
 
+    // ✅ FIX: Capture all form data before submission (in case validate functions weren't triggered)
+    validateStep4(); // Capture business contact info & checkboxes
+
     // Validate all data
     if (!wizardData.package || !wizardData.fullName || !wizardData.email) {
         alert('Please complete all required fields.');
