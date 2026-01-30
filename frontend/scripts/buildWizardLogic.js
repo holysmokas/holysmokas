@@ -406,13 +406,16 @@ window.checkDomainAvailability = async function () {
         resultDiv.classList.add('visible');
 
         if (data.available) {
+            // Get price from pricing object (API returns pricing.initialCost, not price)
+            const domainPrice = data.pricing?.initialCost || 12.99;
+
             document.getElementById('domainResultIcon').textContent = '✓';
             document.getElementById('domainResultIcon').className = 'domain-result-icon success';
             document.getElementById('domainResultTitle').textContent = 'Domain available!';
-            document.getElementById('domainResultDesc').textContent = `${domain} - $${data.price}/year`;
+            document.getElementById('domainResultDesc').textContent = `${domain} - $${domainPrice.toFixed(2)}/year`;
 
             wizardData.domain = domain;
-            wizardData.domainPrice = data.price || 12.99;
+            wizardData.domainPrice = domainPrice;
             wizardData.domainPricing = data.pricing || null;
             document.getElementById('step2Next').disabled = false;
         } else {
