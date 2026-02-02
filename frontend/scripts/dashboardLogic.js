@@ -807,7 +807,7 @@ async function verifyDomainFromDashboard(projectId) {
  * Initialize domain status when project is loaded
  * Call this from your existing project loading code
  * 
- * Example usage in your dashboard:
+ * Example usage in your dashboard: $$
  * 
  * async function loadProjectDetails(projectId) {
  *     // Your existing code...
