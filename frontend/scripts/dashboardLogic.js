@@ -278,21 +278,86 @@ window.submitAiModification = async function (event) {
             // Add AI response
             const aiMsg = document.createElement('div');
             aiMsg.className = 'ai-message';
-            aiMsg.innerHTML = `<strong>AI Assistant:</strong> Great! I've processed your request and updated your website. The changes are being deployed now and should be live in 2-3 minutes. ${data.modificationsRemaining} free modification${data.modificationsRemaining !== 1 ? 's' : ''} remaining.`;
+            aiMsg.innerHTML = `<strong>AI Assistant:</strong> Great! I've submitted your request. The AI is now processing your changes - this typically takes 1-3 minutes. I'll update this page automatically when it's complete. ${data.modificationsRemaining} free modification${data.modificationsRemaining !== 1 ? 's' : ''} remaining.`;
             chatMessages.appendChild(aiMsg);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
             // Update count
             document.getElementById('modificationsCount').textContent = data.modificationsRemaining;
 
-            // Reload projects to update UI
-            setTimeout(() => {
-                loadProjects(currentUser.uid);
-                if (data.modificationsRemaining === 0) {
-                    closeAiModificationModal();
-                    showResponseModal('Modifications Limit Reached', 'You\'ve used all 3 free modifications. Additional changes will require a small fee. Contact us at (415) 691-7085 to discuss pricing.');
+            // Poll for modification completion (every 10 seconds for up to 3 minutes)
+            let pollCount = 0;
+            const maxPolls = 18; // 18 * 10 seconds = 3 minutes
+            const projectIdToCheck = currentProject.id;
+
+            const pollInterval = setInterval(async () => {
+                pollCount++;
+                console.log(`🔄 Polling for modification status... (${pollCount}/${maxPolls})`);
+
+                try {
+                    // Fetch latest project data directly
+                    const response = await fetch(ENDPOINTS.userProjects(currentUser.uid));
+                    const data = await response.json();
+
+                    if (data.success && data.projects) {
+                        const updatedProject = data.projects.find(p => p.id === projectIdToCheck);
+                        if (updatedProject && updatedProject.modifications) {
+                            const latestMod = updatedProject.modifications[updatedProject.modifications.length - 1];
+                            if (latestMod && latestMod.status === 'completed') {
+                                clearInterval(pollInterval);
+                                console.log('✅ Modification completed!');
+
+                                // Update currentProject with new data
+                                currentProject = updatedProject;
+
+                                // Reload the projects list to update the UI
+                                await loadProjects(currentUser.uid);
+
+                                // Show completion message
+                                const completeMsg = document.createElement('div');
+                                completeMsg.className = 'ai-message';
+                                completeMsg.innerHTML = `<strong>AI Assistant:</strong> ✅ Your modification is complete! Your website has been updated. <a href="${updatedProject.liveUrl}" target="_blank" style="color: #6366f1; font-weight: bold;">View your updated site</a>`;
+                                chatMessages.appendChild(completeMsg);
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                            } else if (latestMod && latestMod.status === 'failed') {
+                                clearInterval(pollInterval);
+                                console.log('❌ Modification failed');
+
+                                // Reload the projects list to update the UI
+                                await loadProjects(currentUser.uid);
+
+                                const failMsg = document.createElement('div');
+                                failMsg.className = 'ai-message';
+                                failMsg.innerHTML = `<strong>AI Assistant:</strong> ❌ Sorry, there was an error processing your modification. Please try again or contact support at (415) 691-7085.`;
+                                chatMessages.appendChild(failMsg);
+                                chatMessages.scrollTop = chatMessages.scrollHeight;
+                            }
+                        }
+                    }
+                } catch (err) {
+                    console.error('Poll error:', err);
                 }
-            }, 2000);
+
+                // Stop polling after max attempts
+                if (pollCount >= maxPolls) {
+                    clearInterval(pollInterval);
+                    console.log('⏱️ Polling timeout');
+
+                    // Final reload to show current status
+                    await loadProjects(currentUser.uid);
+
+                    const timeoutMsg = document.createElement('div');
+                    timeoutMsg.className = 'ai-message';
+                    timeoutMsg.innerHTML = `<strong>AI Assistant:</strong> Your modification is still processing. Please refresh the page in a few minutes to see the updated status, or check your email for confirmation.`;
+                    chatMessages.appendChild(timeoutMsg);
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                }
+            }, 10000); // Poll every 10 seconds
+
+            if (data.modificationsRemaining === 0) {
+                closeAiModificationModal();
+                showResponseModal('Modifications Limit Reached', 'You\'ve used all 3 free modifications. Additional changes will require a small fee. Contact us at (415) 691-7085 to discuss pricing.');
+            }
 
         } else {
             const aiMsg = document.createElement('div');
