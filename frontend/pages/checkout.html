@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Domain Registration - alimi.ai</title>
+    <title>Checkout - alimi.ai</title>
     <link rel="icon" type="image/svg+xml" href="/frontend/img/alimiai1.png" />
     <link rel="stylesheet" href="/frontend/css/style.css">
     <link rel="stylesheet" href="/frontend/css/legalpages.css">
@@ -44,112 +44,120 @@
             }
         }
 
-        .checkmark {
-            width: 90px;
-            height: 90px;
-            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 2rem;
-            font-size: 2.5rem;
-            color: #0a1a0a;
-            box-shadow: 0 0 40px rgba(16, 185, 129, 0.4);
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                box-shadow: 0 0 40px rgba(16, 185, 129, 0.4);
-            }
-
-            50% {
-                box-shadow: 0 0 60px rgba(16, 185, 129, 0.6);
-            }
-        }
-
-        h1 {
-            color: #10b981;
-            margin-bottom: 0.5rem;
-            font-size: 1.75rem;
+        /* Header */
+        .checkout-header {
             text-align: center;
-        }
-
-        .subtitle {
-            color: rgba(255, 255, 255, 0.6);
             margin-bottom: 2rem;
-            font-size: 1rem;
-            text-align: center;
         }
 
-        .domain-box {
-            background: rgba(16, 185, 129, 0.1);
-            padding: 1.5rem 2rem;
-            border-radius: 12px;
-            margin: 1.5rem 0;
-            border: 2px solid rgba(16, 185, 129, 0.3);
-            text-align: center;
+        .checkout-header .logo-img {
+            height: 48px;
+            margin-bottom: 0.5rem;
         }
 
-        .domain-box h2 {
+        .checkout-header h1 {
             color: #10b981;
-            font-size: 1.5rem;
-            margin: 0;
-            word-break: break-word;
+            font-size: 1.75rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .checkout-header .tagline {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+        }
+
+        /* Order Summary Section */
+        .order-summary {
+            background: rgba(16, 185, 129, 0.06);
+            border: 1px solid rgba(16, 185, 129, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .order-summary h2 {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 0;
+        }
+
+        .order-item .item-name {
+            color: #ffffff;
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+
+        .order-item .item-desc {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin-top: 0.15rem;
+        }
+
+        .order-item .item-price {
+            color: #10b981;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+
+        .order-features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.75rem 0;
+        }
+
+        .order-features span {
+            font-size: 0.75rem;
+            color: #10b981;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 20px;
+            padding: 0.25rem 0.75rem;
+        }
+
+        .order-divider {
+            height: 1px;
+            background: rgba(16, 185, 129, 0.15);
+            margin: 0.5rem 0;
+        }
+
+        .order-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 0.75rem;
+        }
+
+        .order-total .total-label {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+
+        .order-total .total-amount {
+            color: #10b981;
+            font-weight: 800;
+            font-size: 1.75rem;
             text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
         }
 
-        .price {
-            font-size: 3.5rem;
-            font-weight: 800;
-            color: #10b981;
-            margin: 1.5rem 0 0.5rem;
-            text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
-            text-align: center;
-        }
-
-        .price-note {
+        .order-total .total-note {
             color: rgba(255, 255, 255, 0.4);
-            font-size: 0.9rem;
-            text-align: center;
-            margin-bottom: 1.5rem;
+            font-size: 0.8rem;
+            font-weight: 400;
         }
 
-        .features {
-            text-align: left;
-            margin: 1.5rem 0;
-            padding: 1.25rem;
-            background: rgba(16, 185, 129, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(16, 185, 129, 0.15);
-            list-style: none;
-        }
-
-        .features li {
-            color: rgba(255, 255, 255, 0.8);
-            margin: 0.75rem 0;
-            padding-left: 2rem;
-            position: relative;
-        }
-
-        .features li::before {
-            content: "✔";
-            position: absolute;
-            left: 0;
-            color: #10b981;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        /* Payment Form Styles */
-        .payment-section {
-            margin-top: 1.5rem;
-        }
-
-        .payment-section h3 {
+        /* Payment Form */
+        .payment-section h2 {
             color: rgba(255, 255, 255, 0.4);
             font-size: 0.75rem;
             text-transform: uppercase;
@@ -200,6 +208,7 @@
             flex: 1;
         }
 
+        /* Stripe Element Containers */
         .stripe-element {
             padding: 0.85rem 1rem;
             border: 1.5px solid rgba(16, 185, 129, 0.2);
@@ -218,16 +227,19 @@
             box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
         }
 
+        /* Error Message */
         .error-message {
             background: rgba(239, 68, 68, 0.15);
             color: #f87171;
-            padding: 1rem;
+            padding: 0.85rem 1rem;
             border-radius: 10px;
-            margin: 1rem 0;
+            margin-top: 1rem;
             display: none;
             border: 1px solid rgba(239, 68, 68, 0.3);
+            font-size: 0.9rem;
         }
 
+        /* Pay Button */
         #checkoutBtn {
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
@@ -255,31 +267,34 @@
             transform: none;
         }
 
+        /* Security & Footer */
         .security-badge {
             text-align: center;
             margin-top: 1.25rem;
             color: rgba(255, 255, 255, 0.4);
             font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
         }
 
-        .footer-note {
-            margin-top: 2rem;
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.9rem;
+        .checkout-footer-note {
             text-align: center;
-        }
-
-        .powered-by {
-            margin-top: 1rem;
+            margin-top: 1.5rem;
             color: rgba(255, 255, 255, 0.4);
             font-size: 0.85rem;
-            text-align: center;
+        }
+
+        .checkout-footer-note a {
+            color: #10b981;
+            text-decoration: none;
         }
     </style>
 </head>
 
 <body>
-    <!-- Animated Background -->
+    <!-- Animated Background (same as your other pages) -->
     <div class="page-bg"></div>
     <div class="circuit-bg"></div>
     <div class="light-beams">
@@ -307,27 +322,40 @@
 
     <div class="checkout-container">
         <div class="checkout-card">
-            <div class="checkmark">✔</div>
-            <h1>Website Payment Successful!</h1>
-            <p class="subtitle">Now let's secure your custom domain</p>
 
-            <div class="domain-box">
-                <h2 id="domainName">Loading...</h2>
+            <!-- Header -->
+            <div class="checkout-header">
+                <img src="/frontend/img/alimiai1.png" alt="alimi.ai" class="logo-img" />
+                <h1>alimi.ai</h1>
+                <p class="tagline">Build. Connect. Bloom.</p>
             </div>
 
-            <div class="price" id="domainPrice">$0.00</div>
-            <p class="price-note">First year registration</p>
+            <!-- Order Summary (populated dynamically from URL params) -->
+            <div class="order-summary">
+                <h2>Order Summary</h2>
+                <div class="order-item">
+                    <div>
+                        <div class="item-name" id="packageName">Business Website</div>
+                        <div class="item-desc" id="packageDesc">Multi-page + Free Hosting Forever</div>
+                    </div>
+                    <div class="item-price" id="packagePrice">$1,399</div>
+                </div>
+                <div class="order-features" id="packageFeatures">
+                    <span>Free Hosting</span>
+                    <span>SSL Included</span>
+                    <span>Mobile Ready</span>
+                    <span>No Monthly Fees</span>
+                </div>
+                <div class="order-divider"></div>
+                <div class="order-total">
+                    <span class="total-label">Total</span>
+                    <span class="total-amount" id="totalAmount">$1,399 <span class="total-note">one-time</span></span>
+                </div>
+            </div>
 
-            <ul class="features">
-                <li>First year registration included</li>
-                <li>Automatic SSL certificate</li>
-                <li>DNS management included</li>
-                <li>Email forwarding available</li>
-            </ul>
-
-            <!-- Payment Form (replaces the old Stripe redirect) -->
+            <!-- Payment Form -->
             <div class="payment-section">
-                <h3>Payment Details</h3>
+                <h2>Payment Details</h2>
 
                 <form id="payment-form">
                     <div class="form-row">
@@ -358,16 +386,20 @@
 
                     <div id="card-errors" class="error-message"></div>
 
-                    <button type="submit" id="checkoutBtn">Complete Domain Registration</button>
+                    <button type="submit" id="checkoutBtn">
+                        Pay $1,399
+                    </button>
                 </form>
 
                 <div class="security-badge">
-                    🔒 Secure payment powered by Stripe
+                    <span>🔒</span>
+                    <span>Secured by Stripe • SSL Encrypted</span>
                 </div>
             </div>
 
-            <p class="footer-note">
-                Your domain will be automatically configured with your new website
+            <p class="checkout-footer-note">
+                Questions? Call <a href="tel:+14156917085">(415) 691-7085</a> or email <a
+                    href="mailto:contact@alimi.ai">contact@alimi.ai</a>
             </p>
         </div>
     </div>
@@ -385,27 +417,58 @@
             ? 'http://localhost:8080'
             : 'https://alimi.ai';
 
-        // Replace with your Stripe PUBLISHABLE key
+        // Replace with your Stripe PUBLISHABLE key (pk_live_... or pk_test_...)
         const stripe = Stripe('pk_live_51ST13UBBOVyvZcr4JWC1lQSfqsNZ5wCj27YGeeg825kdVbc6ANUAw2vbrVnSWZBOZ5qBXlEmO9G1UEKpC6cggDkF00HBrV07cT');
 
         // =============================================
-        // READ URL PARAMS
+        // PACKAGE DATA (match your pricing page)
+        // =============================================
+        const packages = {
+            starter: {
+                name: 'Starter Website',
+                desc: 'Beautiful single-page design',
+                price: 799,
+                features: ['Free Hosting', 'SSL Included', 'Mobile Ready', 'Contact Form']
+            },
+            business: {
+                name: 'Business Website',
+                desc: 'Multi-page professional site',
+                price: 1399,
+                features: ['Free Hosting', 'SSL Included', 'Mobile Ready', 'Multi-Page']
+            },
+            shop: {
+                name: 'Small Shop',
+                desc: 'Product showcase + up to 200 products',
+                price: 1799,
+                features: ['Free Hosting', 'Admin Dashboard', 'Shopping Cart', 'Up to 200 Products']
+            }
+        };
+
+        // =============================================
+        // READ URL PARAMS & POPULATE ORDER SUMMARY
         // =============================================
         const urlParams = new URLSearchParams(window.location.search);
         const projectId = urlParams.get('project_id');
-        const domain = urlParams.get('domain');
-        const price = urlParams.get('price') || '12.99';
-        const finalPrice = parseFloat(price);
+        const selectedPackage = urlParams.get('package') || 'business';
+        const customPrice = urlParams.get('price');
 
-        if (!projectId || !domain) {
-            document.getElementById('card-errors').textContent = 'Missing required information. Please contact support.';
-            document.getElementById('card-errors').style.display = 'block';
-            document.getElementById('checkoutBtn').disabled = true;
-        } else {
-            document.getElementById('domainName').textContent = decodeURIComponent(domain);
-            document.getElementById('domainPrice').textContent = '$' + finalPrice.toFixed(2);
-            document.getElementById('checkoutBtn').textContent = 'Pay $' + finalPrice.toFixed(2) + ' — Register Domain';
-        }
+        const pkg = packages[selectedPackage] || packages.business;
+        const finalPrice = customPrice ? parseFloat(customPrice) : pkg.price;
+
+        document.getElementById('packageName').textContent = pkg.name;
+        document.getElementById('packageDesc').textContent = pkg.desc;
+        document.getElementById('packagePrice').textContent = '$' + finalPrice.toLocaleString();
+        document.getElementById('totalAmount').innerHTML = '$' + finalPrice.toLocaleString() + ' <span class="total-note">one-time</span>';
+        document.getElementById('checkoutBtn').textContent = 'Pay $' + finalPrice.toLocaleString();
+
+        // Populate feature tags
+        const featuresEl = document.getElementById('packageFeatures');
+        featuresEl.innerHTML = '';
+        pkg.features.forEach(f => {
+            const span = document.createElement('span');
+            span.textContent = f;
+            featuresEl.appendChild(span);
+        });
 
         // =============================================
         // STRIPE ELEMENTS
@@ -433,6 +496,7 @@
         cardExpiry.mount('#card-expiry');
         cardCvc.mount('#card-cvc');
 
+        // Show card errors
         cardNumber.on('change', (event) => {
             const errorEl = document.getElementById('card-errors');
             if (event.error) {
@@ -466,17 +530,16 @@
 
             try {
                 // 1. Create PaymentIntent on your backend
-                // This replaces your old /create-domain-session endpoint
-                const res = await fetch(API_URL + '/create-domain-payment-intent', {
+                const res = await fetch(API_URL + '/create-payment-intent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        projectId: projectId,
-                        domain: domain,
-                        price: finalPrice,
+                        amount: Math.round(finalPrice * 100), // Convert to cents
                         email: email,
                         name: name,
-                        product: 'alimi-domain',
+                        projectId: projectId,
+                        package: selectedPackage,
+                        product: 'alimi-website',
                     }),
                 });
 
@@ -500,19 +563,19 @@
                 if (error) {
                     showError(error.message);
                     payBtn.disabled = false;
-                    payBtn.textContent = 'Pay $' + finalPrice.toFixed(2) + ' — Register Domain';
+                    payBtn.textContent = 'Pay $' + finalPrice.toLocaleString();
                 } else if (paymentIntent.status === 'succeeded') {
-                    // 3. Redirect to renewal success page (domain registered)
-                    const successUrl = new URL('/renewal-success.html', window.location.origin);
-                    successUrl.searchParams.set('domain', domain);
+                    // 3. Redirect to your existing success page
+                    const successUrl = new URL('/payment-success.html', window.location.origin);
                     successUrl.searchParams.set('session_id', paymentIntent.id);
+                    if (projectId) successUrl.searchParams.set('project_id', projectId);
                     window.location.href = successUrl.toString();
                 }
             } catch (err) {
                 console.error('Payment error:', err);
-                showError(err.message || 'Something went wrong. Please contact support at (415) 691-7085');
+                showError(err.message || 'Something went wrong. Please try again or call (415) 691-7085.');
                 payBtn.disabled = false;
-                payBtn.textContent = 'Pay $' + finalPrice.toFixed(2) + ' — Register Domain';
+                payBtn.textContent = 'Pay $' + finalPrice.toLocaleString();
             }
         });
 

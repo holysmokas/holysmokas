@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Domain Registration - alimi.ai</title>
     <link rel="icon" type="image/svg+xml" href="/assets/alimiai1-CPpxdF2t.png" />
+    <script src="https://js.stripe.com/v3/"></script>
     <style>
         .checkout-container {
             min-height: 100vh;
@@ -24,9 +25,8 @@
             padding: 3rem;
             border-radius: 24px;
             box-shadow: 0 0 60px rgba(16, 185, 129, 0.15);
-            max-width: 550px;
+            max-width: 520px;
             width: 100%;
-            text-align: center;
             animation: cardAppear 0.5s ease-out;
         }
 
@@ -73,12 +73,14 @@
             color: #10b981;
             margin-bottom: 0.5rem;
             font-size: 1.75rem;
+            text-align: center;
         }
 
         .subtitle {
             color: rgba(255, 255, 255, 0.6);
             margin-bottom: 2rem;
             font-size: 1rem;
+            text-align: center;
         }
 
         .domain-box {
@@ -87,6 +89,7 @@
             border-radius: 12px;
             margin: 1.5rem 0;
             border: 2px solid rgba(16, 185, 129, 0.3);
+            text-align: center;
         }
 
         .domain-box h2 {
@@ -101,8 +104,16 @@
             font-size: 3.5rem;
             font-weight: 800;
             color: #10b981;
-            margin: 1.5rem 0;
+            margin: 1.5rem 0 0.5rem;
             text-shadow: 0 0 30px rgba(16, 185, 129, 0.4);
+            text-align: center;
+        }
+
+        .price-note {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.9rem;
+            text-align: center;
+            margin-bottom: 1.5rem;
         }
 
         .features {
@@ -123,7 +134,7 @@
         }
 
         .features li::before {
-            content: "✓";
+            content: "✔";
             position: absolute;
             left: 0;
             color: #10b981;
@@ -131,12 +142,86 @@
             font-size: 1.1rem;
         }
 
+        /* Payment Form Styles */
+        .payment-section {
+            margin-top: 1.5rem;
+        }
+
+        .payment-section h3 {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1.25rem;
+        }
+
+        .form-row {
+            margin-bottom: 1rem;
+        }
+
+        .form-row label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 0.4rem;
+        }
+
+        .form-row input {
+            width: 100%;
+            padding: 0.85rem 1rem;
+            border: 1.5px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            font-size: 1rem;
+            color: #ffffff;
+            background: rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s, box-shadow 0.2s;
+            outline: none;
+            font-family: inherit;
+        }
+
+        .form-row input:focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .form-row input::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        .form-row-half {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .form-row-half .form-row {
+            flex: 1;
+        }
+
+        .stripe-element {
+            padding: 0.85rem 1rem;
+            border: 1.5px solid rgba(16, 185, 129, 0.2);
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .stripe-element.StripeElement--focus {
+            border-color: #10b981;
+            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.15);
+        }
+
+        .stripe-element.StripeElement--invalid {
+            border-color: #ef4444;
+            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+        }
+
         .error-message {
             background: rgba(239, 68, 68, 0.15);
             color: #f87171;
             padding: 1rem;
             border-radius: 10px;
-            margin: 1.5rem 0;
+            margin: 1rem 0;
             display: none;
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
@@ -154,6 +239,7 @@
             margin-top: 1.5rem;
             transition: all 0.3s ease;
             box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+            font-family: inherit;
         }
 
         #checkoutBtn:hover:not(:disabled) {
@@ -167,37 +253,25 @@
             transform: none;
         }
 
-        .spinner {
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid #ffffff;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            animation: spin 1s linear infinite;
-            margin: 1.5rem auto;
-            display: none;
-        }
-
-        @keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
+        .security-badge {
+            text-align: center;
+            margin-top: 1.25rem;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
         }
 
         .footer-note {
             margin-top: 2rem;
             color: rgba(255, 255, 255, 0.5);
             font-size: 0.9rem;
+            text-align: center;
         }
 
         .powered-by {
             margin-top: 1rem;
             color: rgba(255, 255, 255, 0.4);
             font-size: 0.85rem;
+            text-align: center;
         }
     </style>
   <link rel="stylesheet" crossorigin href="/assets/style-Bm6i-fqz.css">
@@ -233,7 +307,7 @@
 
     <div class="checkout-container">
         <div class="checkout-card">
-            <div class="checkmark">✓</div>
+            <div class="checkmark">✔</div>
             <h1>Website Payment Successful!</h1>
             <p class="subtitle">Now let's secure your custom domain</p>
 
@@ -242,6 +316,7 @@
             </div>
 
             <div class="price" id="domainPrice">$0.00</div>
+            <p class="price-note">First year registration</p>
 
             <ul class="features">
                 <li>First year registration included</li>
@@ -250,96 +325,206 @@
                 <li>Email forwarding available</li>
             </ul>
 
-            <div class="error-message" id="errorMessage"></div>
+            <!-- Payment Form (replaces the old Stripe redirect) -->
+            <div class="payment-section">
+                <h3>Payment Details</h3>
 
-            <button id="checkoutBtn">Complete Domain Registration</button>
-            <div class="spinner" id="spinner"></div>
+                <form id="payment-form">
+                    <div class="form-row">
+                        <label for="customerName">Full Name</label>
+                        <input type="text" id="customerName" placeholder="John Smith" required />
+                    </div>
+
+                    <div class="form-row">
+                        <label for="customerEmail">Email Address</label>
+                        <input type="email" id="customerEmail" placeholder="john@example.com" required />
+                    </div>
+
+                    <div class="form-row">
+                        <label>Card Number</label>
+                        <div id="card-number" class="stripe-element"></div>
+                    </div>
+
+                    <div class="form-row-half">
+                        <div class="form-row">
+                            <label>Expiry Date</label>
+                            <div id="card-expiry" class="stripe-element"></div>
+                        </div>
+                        <div class="form-row">
+                            <label>CVC</label>
+                            <div id="card-cvc" class="stripe-element"></div>
+                        </div>
+                    </div>
+
+                    <div id="card-errors" class="error-message"></div>
+
+                    <button type="submit" id="checkoutBtn">Complete Domain Registration</button>
+                </form>
+
+                <div class="security-badge">
+                    🔒 Secure payment powered by Stripe
+                </div>
+            </div>
 
             <p class="footer-note">
                 Your domain will be automatically configured with your new website
-            </p>
-            <p class="powered-by">
-                🔒 Secure payment powered by Stripe
             </p>
         </div>
     </div>
 
     <div class="footer-bottom">
         <p>&copy; 2026 alimi.ai. All rights reserved.</p>
-        <p class="made-by">Made by <a href="https://www.holysmokas.com" target="_blank">Holysmokas Labs</a></p>
+        <p class="made-by">Made by <a href="https://www.milanilabs.com" target="_blank">Milani Labs</a></p>
     </div>
 
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const projectId = urlParams.get('project_id');
-        const domain = urlParams.get('domain');
-        const price = urlParams.get('price') || '12.99';
-
-        if (!projectId || !domain) {
-            document.getElementById('errorMessage').textContent = 'Missing required information. Please contact support.';
-            document.getElementById('errorMessage').style.display = 'block';
-            document.getElementById('checkoutBtn').disabled = true;
-        } else {
-            document.getElementById('domainName').textContent = decodeURIComponent(domain);
-            document.getElementById('domainPrice').textContent = '$' + parseFloat(price).toFixed(2);
-        }
-
+        // =============================================
+        // CONFIG
+        // =============================================
         const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://localhost:8080'
             : 'https://alimi.ai';
 
-        async function startCheckout() {
-            const btn = document.getElementById('checkoutBtn');
-            const spinner = document.getElementById('spinner');
-            const errorMsg = document.getElementById('errorMessage');
+        // Replace with your Stripe PUBLISHABLE key
+        const stripe = Stripe('pk_live_51ST13UBBOVyvZcr4JWC1lQSfqsNZ5wCj27YGeeg825kdVbc6ANUAw2vbrVnSWZBOZ5qBXlEmO9G1UEKpC6cggDkF00HBrV07cT');
 
-            btn.disabled = true;
-            btn.textContent = 'Creating checkout...';
-            spinner.style.display = 'block';
-            errorMsg.style.display = 'none';
+        // =============================================
+        // READ URL PARAMS
+        // =============================================
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('project_id');
+        const domain = urlParams.get('domain');
+        const price = urlParams.get('price') || '12.99';
+        const finalPrice = parseFloat(price);
+
+        if (!projectId || !domain) {
+            document.getElementById('card-errors').textContent = 'Missing required information. Please contact support.';
+            document.getElementById('card-errors').style.display = 'block';
+            document.getElementById('checkoutBtn').disabled = true;
+        } else {
+            document.getElementById('domainName').textContent = decodeURIComponent(domain);
+            document.getElementById('domainPrice').textContent = '$' + finalPrice.toFixed(2);
+            document.getElementById('checkoutBtn').textContent = 'Pay $' + finalPrice.toFixed(2) + ' — Register Domain';
+        }
+
+        // =============================================
+        // STRIPE ELEMENTS
+        // =============================================
+        const elements = stripe.elements();
+
+        const elementStyle = {
+            base: {
+                fontSize: '16px',
+                color: '#ffffff',
+                '::placeholder': { color: 'rgba(255, 255, 255, 0.25)' },
+                fontFamily: 'inherit',
+            },
+            invalid: {
+                color: '#f87171',
+                iconColor: '#f87171',
+            },
+        };
+
+        const cardNumber = elements.create('cardNumber', { style: elementStyle, showIcon: true });
+        const cardExpiry = elements.create('cardExpiry', { style: elementStyle });
+        const cardCvc = elements.create('cardCvc', { style: elementStyle });
+
+        cardNumber.mount('#card-number');
+        cardExpiry.mount('#card-expiry');
+        cardCvc.mount('#card-cvc');
+
+        cardNumber.on('change', (event) => {
+            const errorEl = document.getElementById('card-errors');
+            if (event.error) {
+                errorEl.textContent = event.error.message;
+                errorEl.style.display = 'block';
+            } else {
+                errorEl.style.display = 'none';
+            }
+        });
+
+        // =============================================
+        // FORM SUBMISSION
+        // =============================================
+        const form = document.getElementById('payment-form');
+        const payBtn = document.getElementById('checkoutBtn');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = document.getElementById('customerName').value.trim();
+            const email = document.getElementById('customerEmail').value.trim();
+
+            if (!name || !email) {
+                showError('Please fill in your name and email.');
+                return;
+            }
+
+            payBtn.disabled = true;
+            payBtn.textContent = 'Processing...';
+            hideError();
 
             try {
-                const response = await fetch(API_URL + '/create-domain-session', {
+                // 1. Create PaymentIntent on your backend
+                // This replaces your old /create-domain-session endpoint
+                const res = await fetch(API_URL + '/create-domain-payment-intent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         projectId: projectId,
                         domain: domain,
-                        price: parseFloat(price)
-                    })
+                        price: finalPrice,
+                        email: email,
+                        name: name,
+                        product: 'alimi-domain',
+                    }),
                 });
 
-                const data = await response.json();
+                const data = await res.json();
 
-                if (data.success && data.sessionUrl) {
-                    window.location.href = data.sessionUrl;
-                } else {
-                    throw new Error(data.error || 'Failed to create checkout session');
+                if (!data.clientSecret) {
+                    throw new Error(data.error || 'Failed to create payment. Please try again.');
                 }
-            } catch (error) {
-                console.error('Checkout error:', error);
-                errorMsg.textContent = 'Error: ' + error.message + '. Please contact support at (415) 691-7085';
-                errorMsg.style.display = 'block';
-                btn.disabled = false;
-                btn.textContent = 'Complete Domain Registration';
-                spinner.style.display = 'none';
+
+                // 2. Confirm payment with Stripe
+                const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+                    payment_method: {
+                        card: cardNumber,
+                        billing_details: {
+                            name: name,
+                            email: email,
+                        },
+                    },
+                });
+
+                if (error) {
+                    showError(error.message);
+                    payBtn.disabled = false;
+                    payBtn.textContent = 'Pay $' + finalPrice.toFixed(2) + ' — Register Domain';
+                } else if (paymentIntent.status === 'succeeded') {
+                    // 3. Redirect to renewal success page (domain registered)
+                    const successUrl = new URL('/renewal-success.html', window.location.origin);
+                    successUrl.searchParams.set('domain', domain);
+                    successUrl.searchParams.set('session_id', paymentIntent.id);
+                    window.location.href = successUrl.toString();
+                }
+            } catch (err) {
+                console.error('Payment error:', err);
+                showError(err.message || 'Something went wrong. Please contact support at (415) 691-7085');
+                payBtn.disabled = false;
+                payBtn.textContent = 'Pay $' + finalPrice.toFixed(2) + ' — Register Domain';
             }
+        });
+
+        function showError(message) {
+            const errorEl = document.getElementById('card-errors');
+            errorEl.textContent = message;
+            errorEl.style.display = 'block';
         }
 
-        document.getElementById('checkoutBtn').addEventListener('click', startCheckout);
-
-        let autoTriggerTimeout;
-        if (projectId && domain) {
-            autoTriggerTimeout = setTimeout(() => {
-                if (!document.getElementById('checkoutBtn').disabled) {
-                    startCheckout();
-                }
-            }, 3000);
+        function hideError() {
+            document.getElementById('card-errors').style.display = 'none';
         }
-
-        document.getElementById('checkoutBtn').addEventListener('click', () => {
-            if (autoTriggerTimeout) clearTimeout(autoTriggerTimeout);
-        }, { once: true });
     </script>
 </body>
 
