@@ -20,6 +20,7 @@ export default defineConfig({
                 'payment-success': resolve(__dirname, 'frontend/pages/payment-success.html'),
                 'renewal-success': resolve(__dirname, 'frontend/pages/renewal-success.html'),
                 'domain-checkout': resolve(__dirname, 'frontend/pages/domain-checkout.html'),
+                'checkout': resolve(__dirname, 'frontend/pages/checkout.html'),
                 'connect-domain': resolve(__dirname, 'frontend/pages/connect-domain.html')
             },
             output: {
